@@ -1,0 +1,676 @@
+public class Main {
+
+	double isolationEffectiveness = 0.5;
+	boolean	doActiveSurveillance = false;
+	double daysBetweenTests = 14.0;
+
+	public static void main(String[] args) {		
+
+		//Time unit: day
+   
+		double burnInTime = 10*365.0;
+		double postBurnInTime = 5000*365.0; 
+		
+		Region region = new Region();
+
+		//Event name: endBurnInPeriod					
+		//Event type: timeout
+		//Event timeout value: burnInTime
+		//Event action code: doEndBurnInPeriod();
+
+		//Event name: endSimulation
+		//Event type: timeout
+		//Event timeout value: postBurnInTime
+		//Event action at occurrence: doSimulationEnd();
+
+	 	setupAgents();
+		endBurnInPeriod.restart();
+	}
+
+	void doEndBurnInPeriod(){
+		region.inBurnInPeriod = false;
+		if(doActiveSurveillance) region.startActiveSurveillance();
+		region.dailyPopulationTally.restart();
+		endSimulation.restart();
+	}
+
+	void doSimulationEnd(){
+		finishSimulation(); \\AnyLogic code to stop all events
+		writeSimulationResults();
+	}
+
+	void setupAgents(){
+		int numDiseases = 1;
+		int[] diseaseList = {Disease.CRE};
+
+		for(int i=0; i<numDiseases; i++){
+			Disease d = region.add_diseases();
+			d.simIndex = i;
+			d.type = diseaseList[i];
+		}
+
+		int numFacilities = region.facilities.size();
+
+		int[] facilitySize = {75};
+		int[] facilityType = {0};
+		double[] meanLOS = {27.1199026};
+
+		for(Facility f : region.facilities){
+			f.region = region;
+			for(Disease d : region.diseases){
+				FacilityOutbreak fo = f.add_outbreaks();
+				fo.disease = d;
+				fo.diseaseName = d.getDiseaseName();
+				fo.facility = f;
+			}
+		}
+
+		for(int i=0; i<numFacilities; i++){
+			Facility f = region.facilities.get(i);
+			f.type = facilityType[i];
+			f.avgPopTarget = facilitySize[i];
+			f.meanLOS = meanLOS[i];
+			f.betaIsolationReduction = 1-isolationEffectiveness;
+			f.newPatientAdmissionRate = facilitySize[i]/meanLOS[i];
+			if(doActiveSurveillance){
+				f.timeBetweenMidstaySurveillanceTests = daysBetweenTests;
+			}
+		}
+
+		for(int i=0; i<numFacilities; i++){
+			Facility f = region.facilities.get(i);
+			for(int j=0; j<facilitySize[i]; j++){
+				region.addInitialFacilityPatient(f);
+			}
+			f.admitNewPatient.restart();
+		}
+	}
+
+	void writeSimulationResults(){
+		for(int i=0; i<region.facilities.size(); i++){ 
+			facilityPrevalenceData.printf("%d %d %d"
+							,region.facilities.get(i).outbreaks.get(0).getNumColonized()
+							,region.facilities.get(i).currentPopulationSize
+							,region.facilities.get(i).outbreaks.get(0).transmissionsTally);
+			facilityPrevalenceData.println();
+		}
+
+		R0Data.printf("%d",root.region.numTransmissionsFromInitialCase);
+		R0Data.println();
+	
+		//"facilityPrevalenceData" and "R0Data" are text file objects on which to write the outputs
+	}
+}
+
+public class Region{
+
+	boolean inBurnInPeriod = true;
+	int numImportations = 0;
+	boolean useSingleImportation = false;
+	int numTransmissionsFromInitialCase = 0;
+
+	ArrayList<Facility> facilities = new ArrayList<Facility>();
+	ArrayList<Disease> diseases = new ArrayList<Disease>();
+	ArrayList<Person> people = new ArrayList<Person>();
+
+	//Event name: dailyPopulationTally
+	//Event type: timeout
+	//Timeout value: 1
+	//Event action code: doPopulationTally();
+	
+	void doPopulationTally(){
+		for(Facility f : facilities) f.updatePopulationTally();
+		dailyPopulationTally.restart();
+	}
+
+	void importToFacility(Facility f){
+
+		Person p = add_people();
+		p.region = this;
+		for(Disease d : diseases){
+			PersonDisease pd = p.add_diseases();
+			pd.disease = d;
+			pd.person = p;
+			if(useSingleImportation){
+				if(!inBurnInPeriod){
+					if(++numImportations == 1){
+						pd.colonize();
+						pd.initialInfection = true;
+					}
+				}
+			}
+			else{
+				if(uniform() < d.getImportationProb()) pd.colonize();
+			}
+		}
+		f.admitPatient(p);
+	}
+
+	void addInitialFacilityPatient(Facility f){
+		Person p = add_people();
+		p.region = this;
+		for(Disease d : diseases){
+			PersonDisease pd = p.add_diseases();
+			pd.disease = d;
+			pd.person = p;
+			if(!useSingleImportation && uniform() < 0.456) pd.colonize();
+		}
+		f.admitInitialPatient(p);
+	}
+
+	void startActiveSurveillance(){
+		for(Facility f : facilities) f.startActiveSurveillance();
+	}
+}
+
+
+public class Facility{
+	
+	int currentPopulationSize = 0;
+	double betaIsolationReduction;
+	double timeBetweenMidstaySurveillanceTests = -1.0;
+	boolean onActiveSurveillance = false;
+	int type;
+	Region region;			
+	double newPatientAdmissionRate;
+	double avgPopTarget;
+	double meanLOS;
+	double avgPopulation;
+	int numDaysTallied = 0;
+	double patientDays;
+	int numAdmissions = 0;
+	double admissionSurveillanceAdherence = 0.911;
+	double midstaySurveillanceAdherence = 0.954;
+
+	ArrayList<FacilityOutbreak> outbreaks = new ArrayList<FacilityOutbreak>();
+	LinkedList<Person> currentPatients = new LinkedList<Person>();
+
+	//Event name: admitNewPatient
+	//Event type: timeout
+	//Event timeout value: exponential(newPatientAdmissionRate)
+	//Event action code: doNewPatientAdmission();
+
+	void doNewPatientAdmission(){
+		region.importToFacility(this);
+		admitNewPatient.restart();
+	}
+
+	void admitPatient(Person p){
+		p.admitToFacility(this);
+
+		p.startDischargeTimer(getRandomLOS());
+
+		currentPopulationSize++;
+		 
+		for(PersonDisease pd : p.diseases){
+			if(pd.colonized){
+				if(pd.disease.isActiveSurveillanceAgent() && onActiveSurveillance){ 
+					if(uniform() < pd.disease.getProbSurveillanceDetection() * admissionSurveillanceAdherence){
+						pd.detected = true;
+						if(pd.disease.isolatePatientWhenDetected()) p.isolate();
+					}
+				}
+				pd.startClinicalDetectionTimer();
+			}
+		}
+		currentPatients.add(p);
+
+		if(onActiveSurveillance && !p.isolated && timeBetweenMidstaySurveillanceTests > 0) 
+			p.startNextPeriodicSurveillanceTimer();
+
+		p.updateAllTransmissionRateContributions();
+
+		if(!region.inBurnInPeriod) updateAdmissionTally(p);
+	}
+
+
+	void dischargePatient(Person p){
+		currentPopulationSize--;
+		currentPatients.remove(p);
+		updateTransmissionRate();
+
+		if(!region.inBurnInPeriod) updateStayTally(p);
+
+		p.destroyMyself();
+	}
+
+	void updateTransmissionRate(){
+		for(FacilityOutbreak fo : outbreaks) fo.updateTransmissionRate();
+	}
+
+	double getRandomLOS(){
+		if(type==0){ //special LTAC distribution
+			
+			double shape1 = 7.6019666;
+			double scale1 = 3.4195217;
+			double shape2 = 1.2327910;
+			double scale2 = 23.5214724;
+			double prob1 = 0.6253084;
+	
+			if(uniform() < prob1) return gamma(shape1,scale1);
+			else return gamma(shape2,scale2);
+		}
+		else{
+			return -1.0;
+		}
+	}	
+
+	void admitInitialPatient(Person p){
+		p.admitToFacility(this);
+
+		//use exponential LOS to smooth out discharge times of initial patients
+		p.startDischargeTimer(exponential(1.0/meanLOS));
+
+		currentPopulationSize++;
+
+		boolean doSurveillanceTest = false;
+		if(onActiveSurveillance) doSurveillanceTest = true;
+		 
+		for(PersonDisease pd : p.diseases){
+			if(pd.colonized){
+				pd.startClinicalDetectionTimer();
+			}
+		}
+		currentPatients.add(p);
+
+		p.updateAllTransmissionRateContributions();
+	}
+
+	void updatePopulationTally(){
+		avgPopulation = (avgPopulation * numDaysTallied + currentPopulationSize) / (numDaysTallied + 1);
+		numDaysTallied++;
+
+		for(FacilityOutbreak fo : outbreaks) fo.updatePrevalenceTally();
+	}
+
+	void updateStayTally(Person p){
+		patientDays += p.currentLOS;
+
+		for(int i=0; i<outbreaks.size(); i++)
+			outbreaks.get(i).updateStayTally(p.diseases.get(i));
+
+	}
+
+	void updateAdmissionTally(Person p){
+		numAdmissions++;
+
+		for(int i=0; i<outbreaks.size(); i++)
+			outbreaks.get(i).updateAdmissionTally(p.diseases.get(i));
+	}
+
+	void startActiveSurveillance(){
+		onActiveSurveillance = true;
+	}
+}
+
+public class Person {
+
+	Region region;			
+	Facility currentFacility;
+	boolean isolated = false;
+	double currentLOS = -1.0;					
+	double admissionTime;
+	ArrayList<PersonDisease> diseases = new ArrayList<PersonDisease>();
+
+	//Event name: discharge
+	//Event type: timeout (user control)
+	//Event action code: doPatientDischarge();
+
+	void doPatientDischarge(){
+		currentFacility.dischargePatient(this);
+	}
+
+	//Event name: surveillanceTest
+	//Event type: timeout (user control)
+	//Event action code: doSurveillanceTest();				
+
+	void doSurveillanceTest(){
+		for(PersonDisease pd : diseases){
+			if(!pd.detected && pd.disease.isActiveSurveillanceAgent()){
+				if(pd.colonized && uniform() < pd.disease.getProbSurveillanceDetection() * currentFacility.midstaySurveillanceAdherence){
+					pd.detected = true;
+					if(!isolated){
+						isolate();
+						updateAllTransmissionRateContributions();
+					}
+				}
+				else startNextPeriodicSurveillanceTimer();
+			}
+		}
+	}
+
+	void admitToFacility(Facility f){
+		currentFacility = f;
+		admissionTime = time();
+	}
+
+	void startDischargeTimer(double timeToDischarge){
+		if(currentLOS > 0) currentLOS = currentLOS - discharge.getRest() + timeToDischarge;
+		else currentLOS = timeToDischarge;
+		discharge.restart(timeToDischarge);
+	}
+
+	void destroyMyself(){					
+		region.remove_people(this);
+	}
+
+	void startNextPeriodicSurveillanceTimer(){
+		double timeToNextSurveillance = currentFacility.timeBetweenMidstaySurveillanceTests;
+		if(timeToNextSurveillance < discharge.getRest()){
+			surveillanceTest.restart(timeToNextSurveillance);
+		}
+	}
+
+	void isolate(){
+		isolated = true;
+	}
+
+	void updateAllTransmissionRateContributions(){
+		for(PersonDisease pd : diseases) pd.updateTransmissionRateContribution();
+		currentFacility.updateTransmissionRate();
+	}
+}
+				
+
+public class Disease {
+
+	public static CRE = 1;
+	int type;
+	int simIndex;	
+
+			
+	double getBaselineBetaValue(int facilityType){
+		double acuteCareBeta = -1.0;
+		double longTermAcuteCareBeta = -1.0;
+		double nursingHomeBeta = -1.0;
+		double nhReduction;
+
+		if(type == CRE){
+			longTermAcuteCareBeta = 0.0615;
+			acuteCareBeta = 0.06;
+			nhReduction = 10.0;
+			nursingHomeBeta = acuteCareBeta / nhReduction;
+		}
+
+		double betaVal = 0.0;
+
+		if(facilityType == 0) betaVal = longTermAcuteCareBeta;
+		else if(facilityType == 1) betaVal = acuteCareBeta;
+		else if(facilityType == 2) betaVal = nursingHomeBeta;
+
+		return betaVal;
+	}
+
+	double getMeanTimeToClinicalDetection(int facilityType){
+		double acuteCareMean = -1.0;
+		double longTermAcuteCareMean = -1.0;
+		double nursingHomeMean = -1.0;
+		double nhChangeFactor = 1.0;
+
+
+		if(type == CRE){
+			acuteCareMean = 122.0;
+			nhChangeFactor = 8.0;
+			longTermAcuteCareMean = 106.0;
+			nursingHomeMean = acuteCareMean * nhChangeFactor;
+		}
+
+		double t = 0.0;
+
+		if(facilityType == 0) t = longTermAcuteCareMean;
+		else if(facilityType == 1) t = acuteCareMean;
+		else if(facilityType == 2) t = nursingHomeMean;
+
+		return t;
+	}
+
+
+	String getDiseaseName(){
+		if(type==CRE) return "CRE";
+		return "";
+	}
+
+	double getAvgDecolonizationTime(){
+		if(type == CRE) return 387.0;
+		return 0;
+	}
+
+	double getProbSurveillanceDetection(){
+		return 0.8
+	}
+				
+	boolean allowImportationsDuringBurnIn(){
+		if(type == CRE) return false;
+	}
+
+	boolean isolatePatientWhenDetected(){
+		if(type == CRE) return true;
+		return false;
+	}
+
+	boolean isActiveSurveillanceAgent(){
+		if(type == CRE) return true;
+		return false;
+	}
+
+	double getImportationProb{}{
+		return 0.206;
+	}
+}
+
+public class FacilityOutbreak {
+
+	Disease disease;
+	Facility facility;
+	double numSusceptibleNow = 0;
+	int numColonizedNow = 0;
+	double numSusceptibleEffective;
+	double numContagiousEffective;
+	int transmissionsTally = 0;				
+	int numAdmissionsColonized = 0;
+	double importationRate;
+	double prevalence;
+	String diseaseName;
+	int numAdmissionsTallied = 0;
+	int popTallied = 0;
+	double popTalliedColonized = 0;
+	double avgPrevalence;
+	int numSusceptibleNonIsoNow = 0;
+	int numSusceptibleIsoNow = 0;
+	int numColonizedNonIsoNow = 0;
+	int numColonizedIsoNow = 0;
+	double clinicalDetectionsTallied;
+	double clinicalDetectionsPer10000PatientDays;
+	int dischargesTallied = 0;
+	int colonizedDischargesTallied = 0;
+	double avgDischargePrevalence;
+	double transmissionRate = 0.0;
+
+	//Event name: transmission
+	//Event type: rate
+	//Event Rate: transmissionRate
+	//Event action code: doTransmission();
+
+	public void doTransmission(){
+		PersonDisease pdS = null; PersonDisease pdC = null;
+		double unifS = uniform()*numSusceptibleEffective; 
+		double unifC = uniform()*numContagiousEffective;
+		double uS = 0.0;
+		double uC = 0.0;
+		for(Person p : facility.currentPatients){
+			PersonDisease pd = p.diseases.get(disease.simIndex);
+			if(pd.colonized && uC < unifC){
+				uC += pd.transmissionRateContribution;
+				if(uC > unifC) pdC = pd;
+			}
+			if(!pd.colonized && uS < unifS){
+				uS += pd.transmissionRateContribution;
+				if(uS > unifS) pdS = pd;
+			}
+			if(uC > unifC && uS > unifS) break;	
+		}
+		if(pdC == null || pdS == null) 
+			error("Transmission pair choice failure\nuS = %f; unifS = %f; nS = %f;\nuC = %f; unifC = %f; nC = %f\n",
+					uS,unifS,numSusceptibleEffective,uC,unifC,numContagiousEffective);
+
+		pdS.colonize();
+		pdS.addAcquisition();
+
+		if(pdC.initialInfection) facility.region.numTransmissionsFromInitialCase++;
+
+		transmissionsTally++;
+	}
+
+	void updateTransmissionRate(){
+		double newTransmissionRate;
+
+		/*
+		C = colonized
+		S = susceptible
+		I = isolated
+		*/
+
+		int nC = 0;
+		int nS = 0;
+		int nCI = 0;
+		int nSI = 0;
+
+		double cScore = 0.0;
+		double sScore = 0.0;
+
+		for(Person p : facility.currentPatients){
+			PersonDisease pd = p.diseases.get(disease.simIndex);
+			if(pd.colonized){
+				cScore += pd.transmissionRateContribution;
+				if(p.isolated) nCI++; else nC++;
+			}
+			else{
+				sScore += pd.transmissionRateContribution;
+				if(p.isolated) nSI++; else nS++;
+			}	
+		}
+
+		numSusceptibleNonIsoNow = nS;
+		numColonizedNonIsoNow = nC;
+		numSusceptibleIsoNow = nSI;
+		numColonizedIsoNow = nCI;
+		numSusceptibleNow = nS + nSI;
+		numColonizedNow = nC + nCI;
+
+		prevalence = 1.0 * numColonizedNow / facility.currentPopulationSize;
+
+		numContagiousEffective = cScore;
+		numSusceptibleEffective = sScore;
+
+		newTransmissionRate = disease.getBaselineBetaValue(facility.type) * numContagiousEffective * numSusceptibleEffective / facility.currentPatients.size()
+
+		set_transmissionRate(newTransmissionRate);
+
+		/*
+		The function call "set_transmissionRate(...)" in AnyLogic accomplishes both of the following:
+		  1) Assigns the value in the argument to the 'transmissionRate' parameter (transmissionRate = newTransmissionRate;)
+		  2) Checks the 'transmission' Event object (which has 'transmissionRate' as its rate-of-occurrence value) and adjusts it accordingly:
+			a) If a transmission is currently scheduled and the new 'transmissionRate' value is different, cancel the event
+			b) If the new transmission rate is positive and different than than the old one, schedule a new event using the new rate
+		*/
+	}
+
+	int getNumColonized(){
+		return numColonizedNow;
+	}
+
+	void updatePrevalenceTally(){
+
+		popTallied += facility.currentPopulationSize;
+		popTalliedColonized += numColonizedNow;
+		avgPrevalence = 1.0 * popTalliedColonized / popTallied;
+	}
+
+	void updateStayTally(PersonDisease pd){
+		if(pd.clinicallyDetectedDuringCurrentStay){
+			clinicalDetectionsTallied++;
+		}
+		clinicalDetectionsPer10000PatientDays = 10000 * clinicalDetectionsTallied / facility.patientDays;
+
+		dischargesTallied++;
+		if(pd.colonized) colonizedDischargesTallied++;
+		avgDischargePrevalence = 1.0 * colonizedDischargesTallied / dischargesTallied;
+	}
+
+	void updateAdmissionTally(PersonDisease pd){
+		if(pd.colonized){
+			numAdmissionsColonized++;
+		}
+		importationRate = 1.0 * numAdmissionsColonized / facility.numAdmissions;
+	}
+}
+
+public class PersonDisease{
+
+	Disease disease;
+	Person person;
+	boolean colonized = false;
+	boolean detected = false;
+	double transmissionRateContribution = 1.0
+	boolean clinicallyDetectedDuringCurrentStay= false;
+	boolean initialInfection = false
+
+	//Event name: deColonize
+	//Event type: timeout, user controlled
+	//Event action code: doDecolonization();
+
+	void doDecolonization(){
+		if(!colonized) error("decolonizing an agent that is not colonized");
+		colonized = false;
+		clinicallyDetect.reset();
+		person.updateAllTransmissionRateContributions();
+	}
+
+	//Event name: clinicallyDetect
+	//Event type: timeout, user controlled
+	//Event action code: doClinicalDetection();
+
+	void doClinicalDetection{
+		detected = true;
+		clinicallyDetectedDuringCurrentStay = true;
+		if(!person.isolated && disease.isolatePatientWhenDetected()){
+			person.isolate();
+			person.updateAllTransmissionRateContributions();
+		}
+	}
+
+	void colonize{
+		colonized = true;
+		startDecolonizationTimer();
+	}
+
+	void startClinicalDetectionTimer(){
+		double timeToDetection = -1.0;
+		double meanTimeToClinicalDetection = disease.getMeanTimeToClinicalDetection(person.currentFacility.type);
+
+		timeToDetection = exponential(1.0/meanTimeToClinicalDetection);
+
+		clinicallyDetect.restart(timeToDetection);
+	}
+
+	void updateTransmissionRateContribution(){
+		double score = 1.0;
+		if(person.isolated) score *= person.currentFacility.betaIsolationReduction;
+		transmissionRateContribution = score;
+	}
+
+	void startDecolonizationTimer(){
+		double decolonizationRate = 1.0/disease.getAvgDecolonizationTime();
+		deColonize.restart(exponential(decolonizationRate));
+	}
+
+	void addAcquisition(){
+		startClinicalDetectionTimer();
+		person.updateAllTransmissionRateContributions();
+	}
+}
+
+
+
+
+
