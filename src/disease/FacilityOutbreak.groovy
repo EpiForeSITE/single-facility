@@ -1,0 +1,4 @@
+package disease
+
+class FacilityOutbreak {
+}
