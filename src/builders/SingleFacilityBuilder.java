@@ -95,8 +95,9 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
     }
     
     public void scheduleSimulationEnd() {
-    	System.out.println("COOOOL");
-    	schedule.schedule(ScheduleParameters.createOneTime(totalTime,ScheduleParameters.LAST_PRIORITY), this, "doSimulationEnd");
+    	if(schedule.getTickCount()==3650) {
+    	schedule.schedule(ScheduleParameters.createOneTime(totalTime), this, "doSimulationEnd");
+    	}
 
     }
 
@@ -105,7 +106,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
         region.inBurnInPeriod = false;
         region.startDailyPopulationTallyTimer();
         doActiveSurveillance = true;
-        if(!stop&&schedule.getTickCount()==3650) {
+        if(!stop) {
         	scheduleSimulationEnd();
         }
     }
