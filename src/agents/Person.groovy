@@ -42,7 +42,8 @@ public class Person extends Agent {
         schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + dischargeTime), this, "doPatientDischarge");
     }
 
-    public void destroyMyself() {                    
+    public void destroyMyself(Region r) {
+		region=r                    
         region.remove_people(this);
     }
 
@@ -83,7 +84,7 @@ public class Person extends Agent {
 	}
     public void doSurveillanceTest() {
         for (PersonDisease pd : diseases) {
-            if (!pd.detected && pd.disease.isActiveSurveillanceAgent()) {
+            if (!pd.detected && uniform()<pd.disease.isActiveSurveillanceAgent()) {
                 if (pd.colonized && uniform() < pd.disease.getProbSurveillanceDetection() * currentFacility.midstaySurveillanceAdherence) {
                     pd.detected = true;
                     if (!isolated) {

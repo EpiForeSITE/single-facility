@@ -49,7 +49,7 @@ public class FacilityOutbreak {
 		   schedule = null
 	   }
 	   meanIntraEventTime = intra_event_time
-	   distro = new ExponentialDistribution(intra_event_time)
+	   distro = new ExponentialDistribution(meanIntraEventTime)
    }
    }
    
@@ -97,7 +97,7 @@ public void transmission() {
                    uS, unifS, numSusceptibleEffective, uC, unifC, numContagiousEffective);
        }
        
-       if (pdC.initialInfection) facility.region.numTransmissionsFromInitialCase++;
+       else if (pdC.initialInfection) facility.region.numTransmissionsFromInitialCase++;
        transmissionsTally++;
    }
    public void updateTransmissionRate() {
@@ -114,6 +114,7 @@ public void transmission() {
        double cScore = 0.0;
        double sScore = 0.0;
        for (Person p : facility.currentPatients) {
+		   if(p.diseases.size()!=0) {
            PersonDisease pd = p.diseases.get(disease.simIndex);
            if (pd.colonized) {
                cScore += pd.transmissionRateContribution;
@@ -123,7 +124,8 @@ public void transmission() {
                sScore += pd.transmissionRateContribution;
                if (p.isolated) nSI++;
                else nS++;
-           }   
+           	} 
+		   }  
        }
        numSusceptibleNonIsoNow = nS;
        numColonizedNonIsoNow = nC;
@@ -137,23 +139,19 @@ public void transmission() {
        newTransmissionRate = disease.getBaselineBetaValue(facility.type) * numContagiousEffective * numSusceptibleEffective / facility.currentPatients.size();
        setTransmissionRate(newTransmissionRate);
    }
-   public void setTransmissionRate(double newTransmissionRate) {
-       this.transmissionRate = newTransmissionRate;
-       if (transmissionEvent != null) {
-           if (transmissionRate != newTransmissionRate) {
-               schedule.setFinishing(true);
-               transmissionEvent = null;
-           }
-       }
-       if (transmissionRate > 0) {
-           ScheduleParameters params = ScheduleParameters.createRepeating(
-               schedule.getTickCount(),
-               1.0,                  
-               1.0                   
-           );
-           transmissionEvent = schedule.schedule(params, this, "doTransmission");
-       }
-   }
+  public void setTransmissionRate(double newTransmissionRate) {
+    if (transmissionRate != newTransmissionRate) {
+        if (nextAction != null) {
+            schedule.removeAction(nextAction);
+        }
+        transmissionRate = newTransmissionRate;
+        if (transmissionRate > 0) {
+            ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + 10); // or any time-based logic
+            nextAction = schedule.schedule(params, this, "doTransmission");
+        }
+    }
+}
+
    private void error(String message, double... values) {
        System.err.printf(message, values);
    }

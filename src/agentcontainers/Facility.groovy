@@ -41,6 +41,7 @@ public class Facility extends AgentContainer{
 		   distro = new ExponentialDistribution(intra_event_time)
 	   }
 	   this.schedule = schedule;
+	   region = new Region(meanIntraEventTime, this);
 	   
    }
    
@@ -58,7 +59,7 @@ public class Facility extends AgentContainer{
 		region.importToFacility(this);
 		currentPopulationSize++;
 		if(!stop) {
-			admitNewPatient();
+			admitPatient(new Person(meanIntraEventTime,schedule));
 		}
 	}
    void admitPatient(Person p){
@@ -87,7 +88,7 @@ public class Facility extends AgentContainer{
 		p.updateAllTransmissionRateContributions();
 
 		if(!region.inBurnInPeriod) updateAdmissionTally(p);
-		admitNewPatient();
+		admitNewPatient(schedule);
 	}
    void dischargePatient(Person p){
 		currentPopulationSize--;
@@ -96,7 +97,7 @@ public class Facility extends AgentContainer{
 
 		if(!region.inBurnInPeriod) updateStayTally(p);
 
-		p.destroyMyself();
+		p.destroyMyself(region);
 	}
 
 	void updateTransmissionRate(){

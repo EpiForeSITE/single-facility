@@ -27,7 +27,7 @@ public class Region extends AgentContainer{
     public Region(ISchedule schedule2, double intra_event_time, Facility f) {
 		super(intra_event_time)
 		schedule = schedule2;
-		if(!facilities.contains(f)) {
+		if(!facilities.contains(f)&&facilities.size()<1) {
 			facilities.add(f);
 		}
 	}
@@ -35,13 +35,13 @@ public class Region extends AgentContainer{
 
 	public Region(double intra_event_time, Facility f) {
 	   super(intra_event_time)
-	   if(!facilities.contains(f)) {
+	   if(!facilities.contains(f)&&facilities.size()<1) {
 			facilities.add(f);
 		}
 	   
    }
    public void dailyPopulationTally() {
-		   	this.stop = false
+		   	stop = false
 			double currTime = schedule.getTickCount()
 			double elapse = distro.sample()
 			ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse)
@@ -58,7 +58,7 @@ public class Region extends AgentContainer{
 		if(!stop) {
 			dailyPopulationTally();
 		}
-		
+		//stop=true;
 	}
 	public void remove_people(Person person) {
 		if (people.remove(person)) {
@@ -91,7 +91,7 @@ public class Region extends AgentContainer{
 			}
 		}
 		f.admitPatient(p);
-		if(!facilities.contains(f)) {
+		if(!facilities.contains(f)&&facilities.size()<1) {
 			facilities.add(f);
 		}
 		System.out.println("Adding facility");
@@ -109,7 +109,7 @@ public class Region extends AgentContainer{
 			if(!useSingleImportation && uniform() < 0.456) pd.colonize();
 		}
 		f.admitInitialPatient(p);
-		if(!facilities.contains(f)) {
+		if(!facilities.contains(f)&&facilities.size()<1) {
 			facilities.add(f);
 		}
 		System.out.println("Adding facility 2");
@@ -133,22 +133,23 @@ public class Region extends AgentContainer{
 		Person person = people.get(people.size() - 1);
 		Disease disease = diseases.get(0);
 		
-		Disease d = new Disease();
-		person.diseases.add(d);
-		return d;
+		for (int i=0;i<diseases.size()-1;i++) {
+			person.diseases.add(disease);
+		}
+		return disease;
 	}
 
 
 	public void startDailyPopulationTallyTimer() {
-    this.stop = false;
-    double currTime = schedule.getTickCount();
-    ScheduleParameters params = ScheduleParameters.createRepeating(currTime, intra_event_time);
-    schedule.schedule(params, this, "doPopulationTally");
+		stop = false;
+		double currTime = schedule.getTickCount();
+		ScheduleParameters params = ScheduleParameters.createRepeating(currTime, intra_event_time);
+		schedule.schedule(params, this, "doPopulationTally");
 }
 
 
 	public void finishSimulation() {
-			this.stop = true;
+			stop = true;
 			System.out.println("Simulation has been finished and cleaned up.");
 			schedule.setFinishing(true);
 		

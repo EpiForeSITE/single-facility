@@ -463,3 +463,196 @@ Possible solutions: getAt(java.lang.Integer), grep(), grep(), grep(java.lang.Obj
 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109) ~[?:?]
 	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101) ~[?:?]
 	at java.awt.EventDispatchThread.run(EventDispatchThread.java:90) ~[?:?]
+FATAL [Thread-1] 2024-09-27T11:41:43,495 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (0.0)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at agents.Person$$FastClassByCGLIB$$16b8c355.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.lang.NullPointerException: Cannot get property 'inBurnInPeriod' on null object
+	at org.codehaus.groovy.runtime.NullObject.getProperty(NullObject.java:89) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Facility.dischargePatient(Facility.groovy:97) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agents.Person.doPatientDischarge(Person.groovy:67) ~[?:?]
+	at agents.Person$$FastClassByCGLIB$$16b8c355.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2024-09-27T11:43:12,402 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (0.0)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at agents.Person$$FastClassByCGLIB$$16b8c355.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.lang.NullPointerException: Cannot get property 'inBurnInPeriod' on null object
+	at org.codehaus.groovy.runtime.NullObject.getProperty(NullObject.java:89) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Facility.dischargePatient(Facility.groovy:97) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agents.Person.doPatientDischarge(Person.groovy:67) ~[?:?]
+	at agents.Person$$FastClassByCGLIB$$16b8c355.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2024-10-01T20:19:51,670 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (10.0)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.lang.NullPointerException: Cannot get property 'initialInfection' on null object
+	at org.codehaus.groovy.runtime.NullObject.getProperty(NullObject.java:89) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at disease.FacilityOutbreak.doTransmission(FacilityOutbreak.groovy:100) ~[?:?]
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2024-10-01T20:21:10,538 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (507.3033185469118)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at agentcontainers.Facility$$FastClassByCGLIB$$71f001fa.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64) ~[?:?]
+	at jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70) ~[?:?]
+	at jdk.internal.util.Preconditions.checkIndex(Preconditions.java:266) ~[?:?]
+	at java.util.Objects.checkIndex(Objects.java:361) ~[?:?]
+	at java.util.ArrayList.get(ArrayList.java:427) ~[?:?]
+	at disease.FacilityOutbreak.updateTransmissionRate(FacilityOutbreak.groovy:117) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Facility.updateTransmissionRate(Facility.groovy:104) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agents.Person.updateAllTransmissionRateContributions(Person.groovy:64) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Facility.admitPatient(Facility.groovy:88) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Region.importToFacility(Region.groovy:93) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Facility.doNewPatientAdmission(Facility.groovy:59) ~[?:?]
+	at agentcontainers.Facility$$FastClassByCGLIB$$71f001fa.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2024-10-01T20:24:02,920 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (391.0678050686526)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at agentcontainers.Facility$$FastClassByCGLIB$$71f001fa.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.lang.NullPointerException: Cannot invoke method getTickCount() on null object
+	at org.codehaus.groovy.runtime.NullObject.invokeMethod(NullObject.java:110) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at org.codehaus.groovy.vmplugin.v8.IndyGuardsFiltersAndSignatures.invokeGroovyObjectInvoker(IndyGuardsFiltersAndSignatures.java:148) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Facility.admitNewPatient(Facility.groovy:51) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Facility.admitPatient(Facility.groovy:91) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Region.importToFacility(Region.groovy:93) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Facility.doNewPatientAdmission(Facility.groovy:59) ~[?:?]
+	at agentcontainers.Facility$$FastClassByCGLIB$$71f001fa.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2024-10-01T20:25:23,368 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (481.95598597904694)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at agentcontainers.Facility$$FastClassByCGLIB$$71f001fa.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.lang.NullPointerException: Cannot invoke method admitToFacility() on null object
+	at org.codehaus.groovy.runtime.NullObject.invokeMethod(NullObject.java:110) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at org.codehaus.groovy.vmplugin.v8.IndyGuardsFiltersAndSignatures.invokeGroovyObjectInvoker(IndyGuardsFiltersAndSignatures.java:148) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Facility.admitPatient(Facility.groovy:66) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Facility.doNewPatientAdmission(Facility.groovy:62) ~[?:?]
+	at agentcontainers.Facility$$FastClassByCGLIB$$71f001fa.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2024-10-01T20:27:26,172 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (517.173539725127)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at agents.Person$$FastClassByCGLIB$$16b8c355.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.lang.NullPointerException: Cannot invoke method remove_people() on null object
+	at org.codehaus.groovy.runtime.NullObject.invokeMethod(NullObject.java:110) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at org.codehaus.groovy.vmplugin.v8.IndyGuardsFiltersAndSignatures.invokeGroovyObjectInvoker(IndyGuardsFiltersAndSignatures.java:148) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agents.Person.destroyMyself(Person.groovy:46) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agentcontainers.Facility.dischargePatient(Facility.groovy:100) ~[?:?]
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:318) ~[groovy-3.0.21-indy.jar:3.0.21]
+	at agents.Person.doPatientDischarge(Person.groovy:67) ~[?:?]
+	at agents.Person$$FastClassByCGLIB$$16b8c355.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more

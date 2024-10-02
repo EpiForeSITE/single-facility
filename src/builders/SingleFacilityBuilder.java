@@ -4,7 +4,6 @@ import disease.Disease;
 import disease.FacilityOutbreak;
 import repast.simphony.context.Context;
 import repast.simphony.dataLoader.ContextBuilder;
-import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
 import agentcontainers.Facility;
@@ -22,42 +21,27 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
     private Region region;
     private double burnInTime = 10 * 365.0;
     private double postBurnInTime = 5 * 365.0;
-    private double totalTime;
+    double totalTime=burnInTime+postBurnInTime;
     private Facility facility;
-
+    boolean stop = false;
+    
     @Override
     public Context<Object> build(Context<Object> context) {
         System.out.println("Starting simulation build.");
-
-        schedule = RunEnvironment.getInstance().getCurrentSchedule();
-        facility = new Facility(burnInTime, schedule);
-        region = new Region(schedule, burnInTime, facility);
+        schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
+        facility =  new Facility(totalTime, schedule);
+        region = new Region(schedule, totalTime,facility);
         setupAgents();
 
-        try {
-            facilityPrevalenceData = new PrintWriter("facilityPrevalenceData.txt");
-            R0Data = new PrintWriter("R0Data.txt");
-        } catch (Exception e) {
-            System.err.println("Error initializing PrintWriters: " + e.getMessage());
-        }
-
-        totalTime = burnInTime + postBurnInTime;
         scheduleEvents();
 
-        //schedule.schedule(ScheduleParameters.createOneTime(0, ScheduleParameters.FIRST_PRIORITY), this, "initializeSimulation");
-
-        RunEnvironment.getInstance().endAt(totalTime);
+        
 
         return context;
     }
 
-    private void setupAgents() {
+    public void setupAgents() {
         System.out.println("Setting up AGENTS");
-
-        int initialPeopleCount = 10;
-        for (int i = 0; i < initialPeopleCount; i++) {
-            region.add_people();
-        }
 
         int numDiseases = 1;
         int[] diseaseList = {(int) Disease.CRE};
@@ -68,56 +52,52 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
             region.diseases.add(disease);
         }
 
-        int numFacilities = region.facilities.size();
         int[] facilitySize = {75};
         int[] facilityType = {0};
         double[] meanLOS = {27.1199026};
 
-        for (Facility f : region.facilities) {
-            f.region = region;
-            for (Disease d : region.diseases) {
-                FacilityOutbreak fo = f.addOutbreaks();
-                fo.disease = d;
-                fo.diseaseName = d.getDiseaseName();
-                fo.facility = f;
-            }
-        }
-
-        for (int i = 0; i < numFacilities; i++) {
+        for (int i = 0; i < region.facilities.size(); i++) {
             Facility f = region.facilities.get(i);
             f.type = facilityType[i];
             f.avgPopTarget = facilitySize[i];
             f.meanLOS = meanLOS[i];
             f.betaIsolationReduction = 1 - isolationEffectiveness;
             f.newPatientAdmissionRate = facilitySize[i] / meanLOS[i];
+
             if (doActiveSurveillance) {
                 f.timeBetweenMidstaySurveillanceTests = daysBetweenTests;
             }
-        }
 
-        for (int i = 0; i < numFacilities; i++) {
-            Facility f = region.facilities.get(i);
+            for (Disease d : region.diseases) {
+                FacilityOutbreak fo = f.addOutbreaks();
+                fo.disease = d;
+                fo.diseaseName = d.getDiseaseName();
+                fo.facility = f;
+            }
+
             for (int j = 0; j < facilitySize[i]; j++) {
                 region.addInitialFacilityPatient(f);
             }
             f.admitNewPatient(schedule);
         }
     }
-    public void initializeSimulation() {
-        System.out.println("Initializing simulation events.");
-
-        scheduleEvents();
-    }
-
     public void scheduleEvents() {
         System.out.println("Scheduling events.");
-
         schedule.schedule(ScheduleParameters.createOneTime(burnInTime), this, "doEndBurnInPeriod");
-
-        schedule.schedule(ScheduleParameters.createOneTime(totalTime), this, "doSimulationEnd");
-
+        
         System.out.println("Scheduled burn-in end at tick: " + burnInTime);
         System.out.println("Scheduled simulation end at tick: " + totalTime);
+    }
+
+    public void printCurrentTick() {
+        double currentTick = schedule.getTickCount();
+        System.out.println("Current tick: " + currentTick);
+    }
+    
+    public void scheduleSimulationEnd() {
+    	System.out.println("COOOOL");
+    	schedule.schedule(ScheduleParameters.createOneTime(totalTime,ScheduleParameters.LAST_PRIORITY), this, "doSimulationEnd");
+
     }
 
     public void doEndBurnInPeriod() {
@@ -125,13 +105,18 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
         region.inBurnInPeriod = false;
         region.startDailyPopulationTallyTimer();
         doActiveSurveillance = true;
+        if(!stop&&schedule.getTickCount()==3650) {
+        	scheduleSimulationEnd();
+        }
     }
 
     public void doSimulationEnd() {
+    	stop=true;
         System.out.println("Ending simulation at tick: " + schedule.getTickCount());
-        writeSimulationResults();
+        //writeSimulationResults();
         region.finishSimulation();
-        RunEnvironment.getInstance().endRun();
+        repast.simphony.engine.environment.RunEnvironment.getInstance().endAt(totalTime);
+        
     }
 
     private void writeSimulationResults() {
