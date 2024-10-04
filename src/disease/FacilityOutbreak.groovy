@@ -37,6 +37,8 @@ public class FacilityOutbreak {
    private Object transmissionEvent;
    private ISchedule schedule;
    boolean stop = false
+   
+   
    ISchedulableAction nextAction;
    ExponentialDistribution distro;
    double meanIntraEventTime;

@@ -36,13 +36,17 @@ public class Region extends AgentContainer{
 		}
 	   
    }
+   
+   // make int
    public void dailyPopulationTally() {
+       System.out.println("daily population: " + people.size())
 		   	/*stop = false
 			double currTime = schedule.getTickCount()
 			double elapse = distro.sample()
 			ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse)
 			nextAction = schedule.schedule(params, this, "doPopulationTally")
 			*/
+      //return people.size()
    }
 
 

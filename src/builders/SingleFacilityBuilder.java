@@ -4,8 +4,10 @@ import disease.Disease;
 import disease.FacilityOutbreak;
 import repast.simphony.context.Context;
 import repast.simphony.dataLoader.ContextBuilder;
+import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
+import repast.simphony.engine.schedule.ScheduledMethod;
 import agentcontainers.Facility;
 import agentcontainers.Region;
 
@@ -34,10 +36,18 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
         setupAgents();
 
         scheduleEvents();
+        schedule.schedule(this);
 
-        
-
+        // Oct 4, 2024 WRR: return facility?
         return context;
+    }
+    
+    
+    // Oct 4, 2024 WRR:  Here's one possible implementation of regular repeating events,
+    // example, like the Region.dailyPopulationTally even that Damon has described in the text file.
+    @ScheduledMethod(start = 1.0, interval = 1)
+    public void dailyEvents() {
+	region.doPopulationTally();
     }
 
     public void setupAgents() {
@@ -55,6 +65,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
         int[] facilitySize = {75};
         int[] facilityType = {0};
         double[] meanLOS = {27.1199026};
+
 
         for (int i = 0; i < region.facilities.size(); i++) {
             Facility f = region.facilities.get(i);
@@ -95,6 +106,8 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
     }
     
     public void scheduleSimulationEnd() {
+	// Oct 4, 2024 WRR:this should be rolled into scheduleEvents().  The schedule is an 
+	//event queuing system.  It holds and sorts as many events as you give it.
     	if(schedule.getTickCount()==3650) {
     	schedule.schedule(ScheduleParameters.createOneTime(totalTime), this, "doSimulationEnd");
     	}
