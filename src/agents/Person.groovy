@@ -21,10 +21,11 @@ public class Person extends Agent {
 	ArrayList<Facility> facilities = new ArrayList<>();
 	ArrayList<Disease> diseasesNew = new ArrayList<>();
 	ArrayList<Person> people = new ArrayList<>();
-
+	
+	
     public Person() {
         super();
-	
+
 	
 	schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
 	

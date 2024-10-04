@@ -101,6 +101,7 @@ public class Region extends AgentContainer{
 
 
     void addInitialFacilityPatient(Facility f){
+		// Oct 4, 2024 WRR: This needs to be refactored to do non-Anylogic instantiation.
 		Person p = add_people();
 		p.region = this;
 		for(Disease d : diseases){
@@ -123,6 +124,8 @@ public class Region extends AgentContainer{
 	double uniform() {
 		return Math.random();
 	}
+	
+	
 	public Person add_people() {
 		Person newPerson = new Person();
 		

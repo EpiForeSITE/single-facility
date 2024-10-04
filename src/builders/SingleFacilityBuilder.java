@@ -2,6 +2,7 @@ package builders;
 
 import disease.Disease;
 import disease.FacilityOutbreak;
+import processes.Admission;
 import repast.simphony.context.Context;
 import repast.simphony.dataLoader.ContextBuilder;
 import repast.simphony.engine.environment.RunEnvironment;
@@ -36,6 +37,10 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
         setupAgents();
 
         scheduleEvents();
+        
+        // Oct 4, 2024 WRR:Start admissions process
+        Admission admit = new Admission(21.1199/75.0);
+        admit.start();
         
         // Oct 4, 2024 WRR: schedule annotated methods on this builder class.
         schedule.schedule(this);
