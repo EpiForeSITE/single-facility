@@ -23,9 +23,9 @@ public class Person extends Agent {
 	ArrayList<Person> people = new ArrayList<>();
 
     public Person(double intra_event_time, ISchedule sched) {
-        super(intra_event_time);
-		schedule = sched;
-		currentFacility = new Facility(admissionTime, schedule);
+        super();
+	schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
+	currentFacility = new Facility();
 		
     }
 	public static void setSchedule(ISchedule sched) {

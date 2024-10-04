@@ -14,38 +14,35 @@ import java.util.ArrayList;
 public class Region extends AgentContainer{
 	boolean stop = false
 
-    public boolean inBurnInPeriod = true;
+	public boolean inBurnInPeriod = true;
 	int numImportations = 0;
 	boolean useSingleImportation = false;
 	public int numTransmissionsFromInitialCase = 0;
 	double intra_event_time;
+	ISchedule schedule;
 
 	public ArrayList<Facility> facilities = new ArrayList<Facility>();
 	public ArrayList<Disease> diseases = new ArrayList<Disease>();
 	public ArrayList<Person> people = new ArrayList<Person>();
 
-    public Region(ISchedule schedule2, double intra_event_time, Facility f) {
-		super(intra_event_time)
-		schedule = schedule2;
-		if(!facilities.contains(f)&&facilities.size()<1) {
-			facilities.add(f);
-		}
-	}
 
 
-	public Region(double intra_event_time, Facility f) {
-	   super(intra_event_time)
+
+	public Region(Facility f) {
+	   super()
+	   schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
 	   if(!facilities.contains(f)&&facilities.size()<1) {
 			facilities.add(f);
 		}
 	   
    }
    public void dailyPopulationTally() {
-		   	stop = false
+		   	/*stop = false
 			double currTime = schedule.getTickCount()
 			double elapse = distro.sample()
 			ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse)
 			nextAction = schedule.schedule(params, this, "doPopulationTally")
+			*/
    }
 
 

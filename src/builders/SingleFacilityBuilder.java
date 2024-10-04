@@ -29,8 +29,8 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
     public Context<Object> build(Context<Object> context) {
         System.out.println("Starting simulation build.");
         schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
-        facility =  new Facility(totalTime, schedule);
-        region = new Region(schedule, totalTime,facility);
+        facility =  new Facility();
+        region = new Region(facility);
         setupAgents();
 
         scheduleEvents();

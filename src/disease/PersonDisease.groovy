@@ -28,7 +28,7 @@ public class PersonDisease {
     public PersonDisease(Disease disease, Person person, ISchedule schedule) {
         this.disease = disease;
         this.person = person;
-        this.schedule = schedule;
+        this.schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
 		initializeEventDistributions();
 		double decolonizationRate = 1.0 / disease.getAvgDecolonizationTime();
 		if (person.getCurrentFacility() == null) {

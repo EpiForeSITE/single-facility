@@ -34,25 +34,21 @@ public class Facility extends AgentContainer{
    LinkedList<Person> currentPatients = new LinkedList<>();
    boolean stop = false
    double meanIntraEventTime;
-   public Facility(double intra_event_time, ISchedule schedule) {
-	   super(intra_event_time)
-	   meanIntraEventTime = intra_event_time
-	   if(meanIntraEventTime>0) {
-		   distro = new ExponentialDistribution(intra_event_time)
-	   }
-	   this.schedule = schedule;
-	   region = new Region(meanIntraEventTime, this);
+   public Facility() {
+	   super()
+	   schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
+	   region = new Region(this);
 	   
    }
    
    public void admitNewPatient(ISchedule sched) {
 	   	schedule = sched
 	   	stop = false
-        double currTime = schedule.getTickCount()
-        double elapse = distro.sample()
-        ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse)
-        nextAction = schedule.schedule(params, this, "doNewPatientAdmission")
-		currentPopulationSize++;
+        // double currTime = schedule.getTickCount()
+        // double elapse = distro.sample()
+        // ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse)
+        // nextAction = schedule.schedule(params, this, "doNewPatientAdmission")
+	//	currentPopulationSize++;
 }
    void doNewPatientAdmission(){
 	   	System.out.println("Do new patient admission");
