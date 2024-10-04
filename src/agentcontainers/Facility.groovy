@@ -44,6 +44,8 @@ public class Facility extends AgentContainer{
    public void admitNewPatient(ISchedule sched) {
 	   	schedule = sched
 	   	stop = false
+		   
+		
         // double currTime = schedule.getTickCount()
         // double elapse = distro.sample()
         // ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse)

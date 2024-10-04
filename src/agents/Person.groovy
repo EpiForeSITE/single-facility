@@ -22,9 +22,13 @@ public class Person extends Agent {
 	ArrayList<Disease> diseasesNew = new ArrayList<>();
 	ArrayList<Person> people = new ArrayList<>();
 
-    public Person(double intra_event_time, ISchedule sched) {
+    public Person() {
         super();
+	
+	
 	schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
+	
+	// Oct 4, 2024 WRR: 
 	currentFacility = new Facility();
 		
     }

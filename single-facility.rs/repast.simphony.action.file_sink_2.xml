@@ -1,0 +1,12 @@
+<repast.simphony.data2.engine.FileSinkDescriptor simphonyVersion="2.11.0">
+  <name>populationTally</name>
+  <dataSet>PopulationTally</dataSet>
+  <delimiter>,</delimiter>
+  <format>TABULAR</format>
+  <sourceIds class="linked-hash-set">
+    <string>dailyPopulationTally</string>
+    <string>tick</string>
+  </sourceIds>
+  <fileName>populationTally.txt</fileName>
+  <addTimeStamp>true</addTimeStamp>
+</repast.simphony.data2.engine.FileSinkDescriptor>

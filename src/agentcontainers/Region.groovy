@@ -38,7 +38,7 @@ public class Region extends AgentContainer{
    }
    
    // make int
-   public void dailyPopulationTally() {
+   public dailyPopulationTally() {
        System.out.println("daily population: " + people.size())
 		   	/*stop = false
 			double currTime = schedule.getTickCount()
@@ -46,7 +46,7 @@ public class Region extends AgentContainer{
 			ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse)
 			nextAction = schedule.schedule(params, this, "doPopulationTally")
 			*/
-      //return people.size()
+      return people.size()
    }
 
 
@@ -124,7 +124,8 @@ public class Region extends AgentContainer{
 		return Math.random();
 	}
 	public Person add_people() {
-		Person newPerson = new Person(intra_event_time, schedule);
+		Person newPerson = new Person();
+		
 		newPerson.region = this;
 		people.add(newPerson);  
 		return newPerson;

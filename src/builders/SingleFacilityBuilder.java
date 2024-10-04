@@ -36,6 +36,8 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
         setupAgents();
 
         scheduleEvents();
+        
+        // Oct 4, 2024 WRR: schedule annotated methods on this builder class.
         schedule.schedule(this);
 
         // Oct 4, 2024 WRR: return facility?
@@ -45,9 +47,11 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
     
     // Oct 4, 2024 WRR:  Here's one possible implementation of regular repeating events,
     // example, like the Region.dailyPopulationTally even that Damon has described in the text file.
+    
+  
     @ScheduledMethod(start = 1.0, interval = 1)
     public void dailyEvents() {
-	region.doPopulationTally();
+	// region.doPopulationTally();
     }
 
     public void setupAgents() {
