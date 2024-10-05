@@ -6,9 +6,9 @@ public class Disease {
 
 	public static CRE = 1;
 	public int type;
-	public int simIndex;	
+	public int simIndex;
 
-			
+
 	double getBaselineBetaValue(int facilityType){
 		double acuteCareBeta = -1.0;
 		double longTermAcuteCareBeta = -1.0;
@@ -68,7 +68,7 @@ public class Disease {
 	double getProbSurveillanceDetection(){
 		return 0.8
 	}
-				
+
 	boolean allowImportationsDuringBurnIn(){
 		if(type == CRE) return false;
 	}
@@ -92,6 +92,5 @@ public class Disease {
 
 	public void setType(int diseaseType) {
 		type = diseaseType
-		
 	}
 }

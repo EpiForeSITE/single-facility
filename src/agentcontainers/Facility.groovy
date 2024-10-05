@@ -12,188 +12,186 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 public class Facility extends AgentContainer{
 
-    public int currentPopulationSize = 0;
-    public double betaIsolationReduction;
-    public double timeBetweenMidstaySurveillanceTests = -1.0;
-    boolean onActiveSurveillance = false;
-    public int type;
-    public Region region;
-    public double newPatientAdmissionRate;
-    public double avgPopTarget;
-    public double meanLOS;
-    double avgPopulation;
-    int numDaysTallied = 0;
-    double patientDays;
-    int numAdmissions = 0;
-    double admissionSurveillanceAdherence = 0.911;
-    double midstaySurveillanceAdherence = 0.954;
-    ExponentialDistribution distro;
-    ISchedule schedule;
-    ISchedulableAction nextAction;
-    public ArrayList<FacilityOutbreak> outbreaks = new ArrayList<>();
-    LinkedList<Person> currentPatients = new LinkedList<>();
-    boolean stop = false
-    double meanIntraEventTime;
-    public Facility() {
-	super()
-	schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
-	region = new Region(this);
-    }
-
-    public void admitNewPatient(ISchedule sched) {
-	schedule = sched
-	stop = false
-
-
-	// double currTime = schedule.getTickCount()
-	// double elapse = distro.sample()
-	// ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse)
-	// nextAction = schedule.schedule(params, this, "doNewPatientAdmission")
-	//	currentPopulationSize++;
-    }
-    void doNewPatientAdmission(){
-	System.out.println("Do new patient admission");
-	region.importToFacility(this);
-	currentPopulationSize++;
-	if(!stop) {
-	    admitPatient(new Person(meanIntraEventTime,schedule));
+	public int currentPopulationSize = 0;
+	public double betaIsolationReduction;
+	public double timeBetweenMidstaySurveillanceTests = -1.0;
+	boolean onActiveSurveillance = false;
+	public int type;
+	public Region region;
+	public double newPatientAdmissionRate;
+	public double avgPopTarget;
+	public double meanLOS;
+	double avgPopulation;
+	int numDaysTallied = 0;
+	double patientDays;
+	int numAdmissions = 0;
+	double admissionSurveillanceAdherence = 0.911;
+	double midstaySurveillanceAdherence = 0.954;
+	ExponentialDistribution distro;
+	ISchedule schedule;
+	ISchedulableAction nextAction;
+	public ArrayList<FacilityOutbreak> outbreaks = new ArrayList<>();
+	LinkedList<Person> currentPatients = new LinkedList<>();
+	boolean stop = false
+	double meanIntraEventTime;
+	public Facility() {
+		super()
+		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
+		region = new Region(this);
 	}
-    }
-    void admitPatient(Person p){
-	p.admitToFacility(this);
 
-	p.startDischargeTimer(getRandomLOS());
+	public void admitNewPatient(ISchedule sched) {
+		schedule = sched;
+		Person newPatient = new Person(this);
+		admitPatient(newPatient);
 
-	currentPopulationSize++;
-
-	for(PersonDisease pd : p.diseases){
-	    if(pd.colonized){
-		if(pd.disease.isActiveSurveillanceAgent() && onActiveSurveillance){
-		    if(uniform() < pd.disease.getProbSurveillanceDetection() * admissionSurveillanceAdherence){
-			pd.detected = true;
-			if(pd.disease.isolatePatientWhenDetected()) p.isolate();
-		    }
+		System.out.println("New patient admitted. Current population: " + currentPopulationSize);
+	}
+	void doNewPatientAdmission(){
+		System.out.println("Do new patient admission");
+		region.importToFacility(this);
+		currentPopulationSize++;
+		if(!stop) {
+			admitPatient(new Person(this));
 		}
-		pd.startClinicalDetectionTimer();
-	    }
 	}
-	currentPatients.add(p);
+	void admitPatient(Person p){
+		p.admitToFacility(this);
 
-	if(onActiveSurveillance && !p.isolated && timeBetweenMidstaySurveillanceTests > 0)
-	    p.startNextPeriodicSurveillanceTimer();
+		p.startDischargeTimer(getRandomLOS());
 
-	p.updateAllTransmissionRateContributions();
+		currentPopulationSize++;
 
-	if(!region.inBurnInPeriod) updateAdmissionTally(p);
-	admitNewPatient(schedule);
-    }
-    void dischargePatient(Person p){
-	currentPopulationSize--;
-	currentPatients.remove(p);
-	updateTransmissionRate();
-	// Oct 4, 2024 WRR: This isn't deleting the patient from anywhere but this currentPatients collection.
-	if(!region.inBurnInPeriod) updateStayTally(p);
+		for(PersonDisease pd : p.diseases){
+			if(pd.colonized){
+				if(pd.disease.isActiveSurveillanceAgent() && onActiveSurveillance){
+					if(uniform() < pd.disease.getProbSurveillanceDetection() * admissionSurveillanceAdherence){
+						pd.detected = true;
+						if(pd.disease.isolatePatientWhenDetected()) p.isolate();
+					}
+				}
+				pd.startClinicalDetectionTimer();
+			}
+		}
+		currentPatients.add(p);
 
-	p.destroyMyself(region);
-    }
+		if(onActiveSurveillance && !p.isolated && timeBetweenMidstaySurveillanceTests > 0)
+			p.startNextPeriodicSurveillanceTimer();
 
-    void updateTransmissionRate(){
-	for(FacilityOutbreak fo : outbreaks) fo.updateTransmissionRate();
-    }
+		p.updateAllTransmissionRateContributions();
 
-    double getRandomLOS(){
-	if(type==0){
-
-	    double shape1 = 7.6019666;
-	    double scale1 = 3.4195217;
-	    double shape2 = 1.2327910;
-	    double scale2 = 23.5214724;
-	    double prob1 = 0.6253084;
-
-	    if(uniform() < prob1) return gamma(shape1,scale1);
-	    else return gamma(shape2,scale2);
+		if(!region.inBurnInPeriod) updateAdmissionTally(p);
 	}
-	else{
-	    return -1.0;
+	void dischargePatient(Person p){
+		currentPopulationSize--;
+		currentPatients.remove(p);
+		updateTransmissionRate();
+		// Oct 4, 2024 WRR: This isn't deleting the patient from anywhere but this currentPatients collection.
+		if(!region.inBurnInPeriod) updateStayTally(p);
+
+		p.destroyMyself(region);
 	}
-    }
 
-    void admitInitialPatient(Person p){
-	p.admitToFacility(this);
-	p.startDischargeTimer(exponential(1.0/meanLOS));
-
-	currentPopulationSize++;
-
-	boolean doSurveillanceTest = false;
-	if(onActiveSurveillance) doSurveillanceTest = true;
-
-	for(PersonDisease pd : p.diseases){
-	    if(pd.colonized){
-		pd.startClinicalDetectionTimer();
-	    }
+	void updateTransmissionRate(){
+		for(FacilityOutbreak fo : outbreaks) fo.updateTransmissionRate();
 	}
-	currentPatients.add(p);
 
-	p.updateAllTransmissionRateContributions();
-	currentPopulationSize++;
-    }
+	double getRandomLOS(){
+		if(type==0){
 
-    void updatePopulationTally(){
-	avgPopulation = (avgPopulation * numDaysTallied + currentPopulationSize) / (numDaysTallied + 1);
-	numDaysTallied++;
+			double shape1 = 7.6019666;
+			double scale1 = 3.4195217;
+			double shape2 = 1.2327910;
+			double scale2 = 23.5214724;
+			double prob1 = 0.6253084;
 
-	for(FacilityOutbreak fo : outbreaks) fo.updatePrevalenceTally();
-    }
+			if(uniform() < prob1) return gamma(shape1,scale1);
+			else return gamma(shape2,scale2);
+		}
+		else{
+			return -1.0;
+		}
+	}
 
-    void updateStayTally(Person p){
-	patientDays += p.currentLOS;
+	void admitInitialPatient(Person p){
+		p.admitToFacility(this);
+		p.startDischargeTimer(exponential(1.0/meanLOS));
 
-	for(int i=0; i<outbreaks.size(); i++)
-	    outbreaks.get(i).updateStayTally(p.diseases.get(i));
-    }
+		currentPopulationSize++;
 
-    void updateAdmissionTally(Person p){
-	numAdmissions++;
+		boolean doSurveillanceTest = false;
+		if(onActiveSurveillance) doSurveillanceTest = true;
 
-	for(int i=0; i<outbreaks.size(); i++)
-	    outbreaks.get(i).updateAdmissionTally(p.diseases.get(i));
-    }
+		for(PersonDisease pd : p.diseases){
+			if(pd.colonized){
+				pd.startClinicalDetectionTimer();
+			}
+		}
+		currentPatients.add(p);
 
-    void startActiveSurveillance(){
-	onActiveSurveillance = true;
-    }
-    double uniform() {
-	return Math.random();
-    }
-    double gamma(double shape, double scale) {
-	GammaDistribution gammaDistribution = new GammaDistribution(shape, scale);
-	return gammaDistribution.sample();
-    }
-    double exponential(double rate) {
-	ExponentialDistribution exponentialDistribution = new ExponentialDistribution(rate);
-	return exponentialDistribution.sample();
-    }
-    public FacilityOutbreak addOutbreaks() {
-	FacilityOutbreak newOutbreak = new FacilityOutbreak(meanIntraEventTime);
-	newOutbreak.setFacility(this);
+		p.updateAllTransmissionRateContributions();
+		currentPopulationSize++;
+	}
 
-	outbreaks.add(newOutbreak);
+	void updatePopulationTally(){
+		avgPopulation = (avgPopulation * numDaysTallied + currentPopulationSize) / (numDaysTallied + 1);
+		numDaysTallied++;
 
-	return newOutbreak;
-    }
-    public int getType() {
-	return type;
-    }
+		for(FacilityOutbreak fo : outbreaks) fo.updatePrevalenceTally();
+	}
 
-    public void addOutbreak(FacilityOutbreak outbreak) {
-	outbreaks.add(outbreak)
-    }
+	void updateStayTally(Person p){
+		patientDays += p.currentLOS;
 
-    public int getCapacity() {
-	return capacity;
-    }
+		for(int i=0; i<outbreaks.size(); i++)
+			outbreaks.get(i).updateStayTally(p.diseases.get(i));
+	}
 
-    public void setIsolationEffectiveness(double isolationEffectiveness) {
-	this.isolationEffectiveness = isolationEffectiveness;
-    }
+	void updateAdmissionTally(Person p){
+		numAdmissions++;
+
+		for(int i=0; i<outbreaks.size(); i++)
+			outbreaks.get(i).updateAdmissionTally(p.diseases.get(i));
+	}
+
+	void startActiveSurveillance(){
+		onActiveSurveillance = true;
+	}
+	double uniform() {
+		return Math.random();
+	}
+	double gamma(double shape, double scale) {
+		GammaDistribution gammaDistribution = new GammaDistribution(shape, scale);
+		return gammaDistribution.sample();
+	}
+	double exponential(double rate) {
+		ExponentialDistribution exponentialDistribution = new ExponentialDistribution(rate);
+		return exponentialDistribution.sample();
+	}
+	public FacilityOutbreak addOutbreaks() {
+		FacilityOutbreak newOutbreak = new FacilityOutbreak(meanIntraEventTime);
+		newOutbreak.setFacility(this);
+
+		outbreaks.add(newOutbreak);
+
+		return newOutbreak;
+	}
+	public int getType() {
+		return type;
+	}
+
+	public void addOutbreak(FacilityOutbreak outbreak) {
+		outbreaks.add(outbreak)
+	}
+
+	public int getCapacity() {
+		return capacity;
+	}
+
+	public void setIsolationEffectiveness(double isolationEffectiveness) {
+		this.isolationEffectiveness = isolationEffectiveness;
+	}
+	public int getPopulationSize() {
+		return currentPopulationSize;
+	}
 }

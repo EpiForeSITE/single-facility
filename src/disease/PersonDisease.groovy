@@ -11,21 +11,21 @@ import repast.simphony.engine.schedule.ScheduledMethod;
 public class PersonDisease {
 
 
-    private Disease disease;
-    private Person person;
-    public boolean colonized = false;
-    private boolean detected = false;
-    private double transmissionRateContribution = 1.0;
-    private boolean clinicallyDetectedDuringCurrentStay = false;
-    private boolean initialInfection = false;
+	private Disease disease;
+	private Person person;
+	public boolean colonized = false;
+	private boolean detected = false;
+	private double transmissionRateContribution = 1.0;
+	private boolean clinicallyDetectedDuringCurrentStay = false;
+	private boolean initialInfection = false;
 
 
-    private ISchedule schedule;
-    private ExponentialDistribution decolonizationDistribution;
-    private ExponentialDistribution clinicalDetectionDistribution;
+	private ISchedule schedule;
+	private ExponentialDistribution decolonizationDistribution;
+	private ExponentialDistribution clinicalDetectionDistribution;
 
 
-    public PersonDisease(Disease disease, Person person, ISchedule schedule) {
+	 public PersonDisease(Disease disease, Person person, ISchedule schedule) {
         this.disease = disease;
         this.person = person;
         this.schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
@@ -41,15 +41,15 @@ public class PersonDisease {
         decolonizationDistribution = new ExponentialDistribution(decolonizationRate);
         clinicalDetectionDistribution = new ExponentialDistribution(1.0 / meanTimeToClinicalDetection);
     }
-	
-    public void doDecolonization() {
-        if (!colonized) {
-            throw new IllegalStateException("Decolonizing an agent that is not colonized");
-        }
-        colonized = false;
-        resetClinicalDetectionEvent();
-        person.updateAllTransmissionRateContributions();
-    }
+
+	public void doDecolonization() {
+		if (!colonized) {
+			throw new IllegalStateException("Decolonizing an agent that is not colonized");
+		}
+		colonized = false;
+		resetClinicalDetectionEvent();
+		person.updateAllTransmissionRateContributions();
+	}
 	public boolean isColonized() {
 		return colonized;
 	}
@@ -59,64 +59,64 @@ public class PersonDisease {
 	public void setDisease(Disease disease) {
 		this.disease = disease;
 	}
-    public void doClinicalDetection() {
-        detected = true;
-        clinicallyDetectedDuringCurrentStay = true;
-        if (!person.isIsolated() && disease.isolatePatientWhenDetected()) {
-            person.isolate();
-            person.updateAllTransmissionRateContributions();
-        }
-    }
+	public void doClinicalDetection() {
+		detected = true;
+		clinicallyDetectedDuringCurrentStay = true;
+		if (!person.isIsolated() && disease.isolatePatientWhenDetected()) {
+			person.isolate();
+			person.updateAllTransmissionRateContributions();
+		}
+	}
 
 
-    public void colonize() {
-        colonized = true;
-        startDecolonizationTimer();
+	public void colonize() {
+		colonized = true;
+		startDecolonizationTimer();
 		person.updateAllTransmissionRateContributions();
-    }
-    public void startClinicalDetectionTimer() {
-        double meanTimeToClinicalDetection = disease.getMeanTimeToClinicalDetection(person.getCurrentFacility().getType());
-        double timeToDetection = clinicalDetectionDistribution.sample();
-        
-        ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDetection);
-        schedule.schedule(params, this, "doClinicalDetection");
-    }
-    public void updateTransmissionRateContribution(){
+	}
+	public void startClinicalDetectionTimer() {
+		double meanTimeToClinicalDetection = disease.getMeanTimeToClinicalDetection(person.getCurrentFacility().getType());
+		double timeToDetection = clinicalDetectionDistribution.sample();
+
+		ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDetection);
+		schedule.schedule(params, this, "doClinicalDetection");
+	}
+	public void updateTransmissionRateContribution(){
 		double score = 1.0;
 		if(person.isolated) score *= person.currentFacility.betaIsolationReduction;
 		transmissionRateContribution = score;
 	}
 
 
-    public void startDecolonizationTimer() {
+	public void startDecolonizationTimer() {
 		if (decolonizationDistribution == null) {
 			System.err.println("Decolonization distribution is not initialized.");
 			return;
 		}
-        double decolonizationRate = 1.0 / disease.getAvgDecolonizationTime();
-        double timeToDecolonization = decolonizationDistribution.sample();
+		double decolonizationRate = 1.0 / disease.getAvgDecolonizationTime();
+		double timeToDecolonization = decolonizationDistribution.sample();
 
 
-        ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDecolonization);
-        schedule.schedule(params, this, "doDecolonization");
-    }
-    public void addAcquisition() {
-        startClinicalDetectionTimer();
-        person.updateAllTransmissionRateContributions();
-    }
+		ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDecolonization);
+		schedule.schedule(params, this, "doDecolonization");
+	}
+	public void addAcquisition() {
+		startClinicalDetectionTimer();
+		person.updateAllTransmissionRateContributions();
+	}
 
 
-    public void initializeEventDistributions() {
-       if (disease != null && person != null && person.getCurrentFacility() != null) {
-            double decolonizationRate = 1.0 / disease.getAvgDecolonizationTime();
-            double meanTimeToClinicalDetection = disease.getMeanTimeToClinicalDetection(person.getCurrentFacility().getType());
+	public void initializeEventDistributions() {
+		if (disease != null && person != null && person.getCurrentFacility() != null) {
+			double decolonizationRate = 1.0 / disease.getAvgDecolonizationTime();
+			double meanTimeToClinicalDetection = disease.getMeanTimeToClinicalDetection(person.getCurrentFacility().getType());
 
-            decolonizationDistribution = new ExponentialDistribution(decolonizationRate);
-            clinicalDetectionDistribution = new ExponentialDistribution(1.0 / meanTimeToClinicalDetection);
-        } else {
-            System.err.println("Cannot initialize distributions: disease, person, or current facility is null.");
-        }
+			decolonizationDistribution = new ExponentialDistribution(decolonizationRate);
+			clinicalDetectionDistribution = new ExponentialDistribution(1.0 / meanTimeToClinicalDetection);
+		} else {
+			System.err.println("Cannot initialize distributions: disease, person, or current facility is null.");
 		}
+	}
 	public void resetClinicalDetectionEvent() {
 		detected = false;
 		clinicallyDetectedDuringCurrentStay = false;
@@ -147,5 +147,4 @@ public class PersonDisease {
 	public boolean isInitialInfection() {
 		return initialInfection;
 	}
-	
 }
