@@ -73,7 +73,7 @@ public class Region extends AgentContainer{
 
     void importToFacility(Facility f){
 
-		Person p = add_people();
+		Person p = add_people(f);
 		p.region = this;
 		for(Disease d : diseases){
 			PersonDisease pd = p.add_diseases();
@@ -102,7 +102,7 @@ public class Region extends AgentContainer{
 
     void addInitialFacilityPatient(Facility f){
 		// Oct 4, 2024 WRR: This needs to be refactored to do non-Anylogic instantiation.
-		Person p = add_people();
+		Person p = add_people(f);
 		p.region = this;
 		for(Disease d : diseases){
 			PersonDisease pd = p.add_diseases();
@@ -124,10 +124,9 @@ public class Region extends AgentContainer{
 	double uniform() {
 		return Math.random();
 	}
-	
-	
-	public Person add_people() {
-		Person newPerson = new Person();
+
+	public Person add_people(Facility f) {
+		Person newPerson = new Person(f);
 		
 		newPerson.region = this;
 		people.add(newPerson);  

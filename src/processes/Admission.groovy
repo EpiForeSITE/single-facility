@@ -1,31 +1,37 @@
-package processes
+package processes;
 
-class Admission extends Process{
+import agentcontainers.Facility;
+import repast.simphony.engine.schedule.ScheduleParameters;
 
-    public Admission(double intra_event_time) {
-	super(intra_event_time);
-	// TODO Auto-generated constructor stub
-	// with whatever references are neceassry 
-    }
+public class Admission extends Process {
 
-    @Override
-    public void start() {
-	// TODO Auto-generated method stub
-	// Oct 4, 2024 WRR: Schedule the next admission
-	
-    }
+	private Facility facility;
 
-    @Override
-    public void fire() {
-	// TODO Auto-generated method stub
-	// Oct 4, 2024 WRR: call a method on the facility or the region to set up a new patient 
-	// and reschedule
-	
-    }
+	public Admission(double intra_event_time, Facility facility) {
+		super(intra_event_time);
+		this.facility = facility;  // Associate admission with a facility
+	}
 
-    @Override
-    public void stop() {
-	// TODO Auto-generated method stub
-	
-    }
+	@Override
+	public void start() {
+		// Schedule the first admission event
+		double nextAdmissionTime = distro.sample();
+		schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + nextAdmissionTime), this, "fire");
+	}
+
+	@Override
+	public void fire() {
+		// Trigger patient admission and reschedule next admission
+		facility.admitNewPatient(schedule); // Admit a new patient to the facility
+
+		// Reschedule the next admission
+		double nextAdmissionTime = distro.sample();
+		schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + nextAdmissionTime), this, "fire");
+	}
+
+	@Override
+	public void stop() {
+		// Logic to stop the admission process if needed
+		System.out.println("Stopping admission process.");
+	}
 }
