@@ -114,8 +114,10 @@ public class Region extends AgentContainer{
 		if(!facilities.contains(f)&&facilities.size()<1) {
 			facilities.add(f);
 		}
+		// Oct 25, 2024 WRR: This should say "adding patient", right?
 		System.out.println("Adding facility 2");
 		System.out.println(facilities);
+		// System.out.println(facilities.size);
 	}
 
 	void startActiveSurveillance(){

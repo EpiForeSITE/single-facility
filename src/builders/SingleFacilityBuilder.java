@@ -100,6 +100,9 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 				region.addInitialFacilityPatient(f);
 			}
 			f.admitNewPatient(schedule);
+			// Oct 25, 2024 WRR: I'm not seeing where you're adding the facility 
+			// itself to region.facilities.  This is why 
+			
 		}
 	}
 
