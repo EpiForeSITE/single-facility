@@ -31,36 +31,30 @@ public class Facility extends AgentContainer{
 	ISchedule schedule;
 	ISchedulableAction nextAction;
 	public ArrayList<FacilityOutbreak> outbreaks = new ArrayList<>();
-	LinkedList<Person> currentPatients = new LinkedList<>();
+	public LinkedList<Person> currentPatients = new LinkedList<>();
 	boolean stop = false
 	double meanIntraEventTime;
+	
 	public Facility() {
 		super()
-		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
-		region = new Region(this);
+		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
+		
+		
 	}
 
 	public void admitNewPatient(ISchedule sched) {
 		schedule = sched;
 		Person newPatient = new Person(this);
 		admitPatient(newPatient);
-
-		System.out.println("New patient admitted. Current population: " + currentPopulationSize);
+		System.out.println("New patient admitted. Current population: " + ++currentPopulationSize);
 	}
-	void doNewPatientAdmission(){
-		System.out.println("Do new patient admission");
-		region.importToFacility(this);
-		currentPopulationSize++;
-		if(!stop) {
-			admitPatient(new Person(this));
-		}
-	}
+	
 	void admitPatient(Person p){
 		p.admitToFacility(this);
 
 		p.startDischargeTimer(getRandomLOS());
 
-		currentPopulationSize++;
+		
 
 		for(PersonDisease pd : p.diseases){
 			if(pd.colonized){
@@ -74,6 +68,7 @@ public class Facility extends AgentContainer{
 			}
 		}
 		currentPatients.add(p);
+		region.people.add(p);
 
 		if(onActiveSurveillance && !p.isolated && timeBetweenMidstaySurveillanceTests > 0)
 			p.startNextPeriodicSurveillanceTimer();
@@ -192,6 +187,6 @@ public class Facility extends AgentContainer{
 		this.isolationEffectiveness = isolationEffectiveness;
 	}
 	public int getPopulationSize() {
-		return currentPopulationSize;
+		return currentPatients.size();
 	}
 }

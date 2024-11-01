@@ -10,13 +10,13 @@ import repast.simphony.engine.schedule.ScheduleParameters;
 
 public class Person extends Agent {
 
-	Region region;
+	public Region region;
 	private static ISchedule schedule
-	Facility currentFacility;
+	public Facility currentFacility;
 	boolean isolated = false;
 	double currentLOS = -1.0;
 	double admissionTime;
-	ArrayList<PersonDisease> diseases = new ArrayList<PersonDisease>();
+	public ArrayList<PersonDisease> diseases = new ArrayList<PersonDisease>();
 	boolean stop = false;
 	double dischargeTime;
 	ArrayList<Facility> facilities = new ArrayList<>();
@@ -44,8 +44,9 @@ public class Person extends Agent {
 	}
 
 	public void destroyMyself(Region r) {
-		region=r
-		region.remove_people(this);
+	    	System.out.println("Destroy Myself!  " + this.hashCode());
+		
+		r.remove_people(this);
 	}
 
 	public void startNextPeriodicSurveillanceTimer() {

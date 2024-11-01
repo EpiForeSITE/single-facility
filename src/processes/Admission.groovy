@@ -24,9 +24,12 @@ public class Admission extends Process {
 		// Trigger patient admission and reschedule next admission
 		facility.admitNewPatient(schedule); // Admit a new patient to the facility
 
-		// Reschedule the next admission
-		double nextAdmissionTime = distro.sample();
-		schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + nextAdmissionTime), this, "fire");
+		//Reschedule the next admission
+		//double nextAdmissionTime = distro.sample();
+		//schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + nextAdmissionTime), this, "fire");
+		
+		// Oct 25, 2024 WRR: Do it like this:
+		start()
 	}
 
 	@Override

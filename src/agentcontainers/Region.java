@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 
 public class Region extends AgentContainer{
-	boolean stop = false
+	boolean stop = false;
 
 	public boolean inBurnInPeriod = true;
 	int numImportations = 0;
@@ -29,8 +29,8 @@ public class Region extends AgentContainer{
 
 
 	public Region(Facility f) {
-	   super()
-	   schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
+	   super();
+	   schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 	   if(!facilities.contains(f)&&facilities.size()<1) {
 			facilities.add(f);
 		}
@@ -38,22 +38,22 @@ public class Region extends AgentContainer{
    }
    
    // make int
-   public dailyPopulationTally() {
-       System.out.println("daily population: " + people.size())
+   public int dailyPopulationTally() {
+       System.out.println("daily population: " + facilities.get(0).currentPopulationSize);
 		   	/*stop = false
 			double currTime = schedule.getTickCount()
 			double elapse = distro.sample()
 			ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse)
 			nextAction = schedule.schedule(params, this, "doPopulationTally")
 			*/
-      return people.size()
+      return people.size();
    }
 
 
-	void doPopulationTally(){
+	public void doPopulationTally(){
 		for(Facility f : facilities) {
-			f.updatePopulationTally() 
-			System.out.println(f.currentPopulationSize)
+			f.updatePopulationTally() ;
+			System.out.println("currpop" + f.currentPopulationSize);
 		}
 		//action.call()
 		if(!stop) {
@@ -62,7 +62,14 @@ public class Region extends AgentContainer{
 		//stop=true;
 	}
 	public void remove_people(Person person) {
-		if (people.remove(person)) {
+	    	System.out.println("removing person: " + person.hashCode());
+	    	System.out.println("people size:" + people.size());
+	    	
+	    	
+	    	
+		if (people.contains(person)) {
+		    people.remove(person);
+		    System.out.println("discharging person: " + person.hashCode());
 			if (person.currentFacility != null) {
 				person.currentFacility.dischargePatient(person); 
 			}
@@ -96,11 +103,11 @@ public class Region extends AgentContainer{
 			facilities.add(f);
 		}
 		System.out.println("Adding facility");
-		System.out.println(facilities);
+		
 	}
 
 
-    void addInitialFacilityPatient(Facility f){
+    public void addInitialFacilityPatient(Facility f){
 		// Oct 4, 2024 WRR: This needs to be refactored to do non-Anylogic instantiation.
 		Person p = add_people(f);
 		p.region = this;
@@ -115,9 +122,8 @@ public class Region extends AgentContainer{
 			facilities.add(f);
 		}
 		// Oct 25, 2024 WRR: This should say "adding patient", right?
-		System.out.println("Adding facility 2");
-		System.out.println(facilities);
-		// System.out.println(facilities.size);
+		System.out.println("Adding initial facility agent");
+		System.out.println(facilities.get(0).currentPatients.size());
 	}
 
 	void startActiveSurveillance(){
@@ -131,6 +137,7 @@ public class Region extends AgentContainer{
 		Person newPerson = new Person(f);
 		
 		newPerson.region = this;
+		System.out.println("Add person " + newPerson.hashCode());
 		people.add(newPerson);  
 		return newPerson;
 	}
@@ -140,7 +147,7 @@ public class Region extends AgentContainer{
 		Disease disease = diseases.get(0);
 		
 		for (int i=0;i<diseases.size()-1;i++) {
-			person.diseases.add(disease);
+			//person.diseases.add(disease);
 		}
 		return disease;
 	}
@@ -163,13 +170,13 @@ public class Region extends AgentContainer{
 
 
 	public void addDisease(Disease disease) {
-		diseases.add(disease)
+		diseases.add(disease);
 		// TODO Auto-generated method stub
 		
 	}
 
 
-	public Disease[] getDiseases() {
+	public ArrayList<Disease> getDiseases() {
 		// TODO Auto-generated method stub
 		return diseases;
 	}

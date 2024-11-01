@@ -21,11 +21,11 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private double daysBetweenTests = 14.0;
 	private PrintWriter facilityPrevalenceData;
 	private PrintWriter R0Data;
-	private Region region;
+	public Region region;
 	private double burnInTime = 10 * 365.0;
 	private double postBurnInTime = 5 * 365.0;
 	double totalTime = burnInTime + postBurnInTime;
-	private Facility facility;
+	public Facility facility;
 	boolean stop = false;
 
 	@Override
@@ -33,7 +33,8 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		System.out.println("Starting simulation build.");
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 		facility = new Facility();
-		region = new Region(facility);
+		this.region = new Region(facility);
+		facility.region = region;
 		setupAgents();
 
 		scheduleEvents();
@@ -100,8 +101,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 				region.addInitialFacilityPatient(f);
 			}
 			f.admitNewPatient(schedule);
-			// Oct 25, 2024 WRR: I'm not seeing where you're adding the facility 
-			// itself to region.facilities.  This is why 
+		
 			
 		}
 	}

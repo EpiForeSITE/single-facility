@@ -11,13 +11,13 @@ import repast.simphony.engine.schedule.ScheduledMethod;
 public class PersonDisease {
 
 
-	private Disease disease;
-	private Person person;
+	public Disease disease;
+	public Person person;
 	public boolean colonized = false;
 	private boolean detected = false;
 	private double transmissionRateContribution = 1.0;
 	private boolean clinicallyDetectedDuringCurrentStay = false;
-	private boolean initialInfection = false;
+	public boolean initialInfection = false;
 
 
 	private ISchedule schedule;
