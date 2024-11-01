@@ -6,6 +6,7 @@ import repast.simphony.engine.schedule.ScheduleParameters;
 public class Admission extends Process {
 
 	private Facility facility;
+	
 
 	public Admission(double intra_event_time, Facility facility) {
 		super(intra_event_time);
@@ -29,7 +30,7 @@ public class Admission extends Process {
 		//schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + nextAdmissionTime), this, "fire");
 		
 		// Oct 25, 2024 WRR: Do it like this:
-		start()
+		start();
 	}
 
 	@Override

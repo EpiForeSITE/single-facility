@@ -21,12 +21,12 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private double daysBetweenTests = 14.0;
 	private PrintWriter facilityPrevalenceData;
 	private PrintWriter R0Data;
-	public Region region;
+	private Region region;
 	private double burnInTime = 10 * 365.0;
 	private double postBurnInTime = 5 * 365.0;
-	double totalTime = burnInTime + postBurnInTime;
+	private double totalTime = burnInTime + postBurnInTime;
 	public Facility facility;
-	boolean stop = false;
+	private boolean stop = false;
 
 	@Override
 	public Context<Object> build(Context<Object> context) {
@@ -34,7 +34,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 		facility = new Facility();
 		this.region = new Region(facility);
-		facility.region = region;
+		facility.setRegion(region);
 		setupAgents();
 
 		scheduleEvents();
@@ -57,7 +57,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 
 	@ScheduledMethod(start = 1.0, interval = 1)
 	public void dailyEvents() {
-		if(facility.currentPopulationSize!=0) {
+		if(facility.getPopulationSize()!=0) {
 			region.doPopulationTally();
 		}
 	}
@@ -66,34 +66,34 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		System.out.println("Setting up AGENTS");
 
 		int numDiseases = 1;
-		int[] diseaseList = { (int) Disease.CRE };
+		int[] diseaseList = { (int) Disease.getCRE() };
 		for (int i = 0; i < numDiseases; i++) {
 			Disease disease = new Disease();
-			disease.simIndex = i;
-			disease.type = diseaseList[i];
-			region.diseases.add(disease);
+			disease.setSimIndex(i);
+			disease.setType(diseaseList[i]);
+			region.getDiseases().add(disease);
 		}
 
 		int[] facilitySize = { 75 };
 		int[] facilityType = { 0 };
 		double[] meanLOS = { 27.1199026 };
 
-		for (int i = 0; i < region.facilities.size(); i++) {
-			Facility f = region.facilities.get(i);
-			f.type = facilityType[i];
-			f.avgPopTarget = facilitySize[i];
-			f.meanLOS = meanLOS[i];
-			f.betaIsolationReduction = 1 - isolationEffectiveness;
-			f.newPatientAdmissionRate = facilitySize[i] / meanLOS[i];
+		for (int i = 0; i < region.getFacilities().size(); i++) {
+			Facility f = region.getFacilities().get(i);
+			f.setType(facilityType[i]);
+			f.setAvgPopTarget(facilitySize[i]);
+			f.setMeanLOS(meanLOS[i]);
+			f.setBetaIsolationReduction(1 - isolationEffectiveness);
+			f.setNewPatientAdmissionRate(facilitySize[i] / meanLOS[i]);
 
 			if (doActiveSurveillance) {
-				f.timeBetweenMidstaySurveillanceTests = daysBetweenTests;
+				f.setTimeBetweenMidstaySurveillanceTests(daysBetweenTests);
 			}
 
-			for (Disease d : region.diseases) {
+			for (Disease d : region.getDiseases()) {
 				FacilityOutbreak fo = f.addOutbreaks();
-				fo.disease = d;
-				fo.diseaseName = d.getDiseaseName();
+				fo.setDisease(d);
+				fo.setDiseaseName(d.getDiseaseName());
 				fo.facility = f;
 			}
 
@@ -131,7 +131,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 
 	public void doEndBurnInPeriod() {
 		System.out.println("Burn-in period ended at tick: " + schedule.getTickCount());
-		region.inBurnInPeriod = false;
+		region.setInBurnInPeriod(false);
 		region.startDailyPopulationTallyTimer();
 		doActiveSurveillance = true;
 		if (!stop) {
@@ -150,12 +150,108 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 
 	private void writeSimulationResults() {
 		System.out.println("Writing simulation results.");
-		for (Facility f : region.facilities) {
-			facilityPrevalenceData.printf("%d %d %d", f.outbreaks.get(0).getNumColonized(), f.currentPopulationSize,
-					f.outbreaks.get(0).transmissionsTally);
+		for (Facility f : region.getFacilities()) {
+			facilityPrevalenceData.printf("%d %d %d", f.getOutbreaks().get(0).getNumColonizedNow(), f.getCurrentPopulationSize(),
+					f.getOutbreaks().get(0).getTransmissionsTally());
 			facilityPrevalenceData.println();
 		}
 		R0Data.printf("%d", region.numTransmissionsFromInitialCase);
 		R0Data.println();
+	}
+
+	public ISchedule getSchedule() {
+	    return schedule;
+	}
+
+	public void setSchedule(ISchedule schedule) {
+	    this.schedule = schedule;
+	}
+
+	public double getIsolationEffectiveness() {
+	    return isolationEffectiveness;
+	}
+
+	public void setIsolationEffectiveness(double isolationEffectiveness) {
+	    this.isolationEffectiveness = isolationEffectiveness;
+	}
+
+	public boolean isDoActiveSurveillance() {
+	    return doActiveSurveillance;
+	}
+
+	public void setDoActiveSurveillance(boolean doActiveSurveillance) {
+	    this.doActiveSurveillance = doActiveSurveillance;
+	}
+
+	public double getDaysBetweenTests() {
+	    return daysBetweenTests;
+	}
+
+	public void setDaysBetweenTests(double daysBetweenTests) {
+	    this.daysBetweenTests = daysBetweenTests;
+	}
+
+	public PrintWriter getFacilityPrevalenceData() {
+	    return facilityPrevalenceData;
+	}
+
+	public void setFacilityPrevalenceData(PrintWriter facilityPrevalenceData) {
+	    this.facilityPrevalenceData = facilityPrevalenceData;
+	}
+
+	public PrintWriter getR0Data() {
+	    return R0Data;
+	}
+
+	public void setR0Data(PrintWriter r0Data) {
+	    R0Data = r0Data;
+	}
+
+	public Region getRegion() {
+	    return region;
+	}
+
+	public void setRegion(Region region) {
+	    this.region = region;
+	}
+
+	public double getBurnInTime() {
+	    return burnInTime;
+	}
+
+	public void setBurnInTime(double burnInTime) {
+	    this.burnInTime = burnInTime;
+	}
+
+	public double getPostBurnInTime() {
+	    return postBurnInTime;
+	}
+
+	public void setPostBurnInTime(double postBurnInTime) {
+	    this.postBurnInTime = postBurnInTime;
+	}
+
+	public double getTotalTime() {
+	    return totalTime;
+	}
+
+	public void setTotalTime(double totalTime) {
+	    this.totalTime = totalTime;
+	}
+
+	public Facility getFacility() {
+	    return facility;
+	}
+
+	public void setFacility(Facility facility) {
+	    this.facility = facility;
+	}
+
+	public boolean isStop() {
+	    return stop;
+	}
+
+	public void setStop(boolean stop) {
+	    this.stop = stop;
 	}
 }

@@ -11,13 +11,13 @@ import repast.simphony.engine.schedule.ScheduledMethod;
 public class PersonDisease {
 
 
-	public Disease disease;
-	public Person person;
-	public boolean colonized = false;
+	private Disease disease;
+	private Person person;
+	private boolean colonized = false;
 	private boolean detected = false;
 	private double transmissionRateContribution = 1.0;
 	private boolean clinicallyDetectedDuringCurrentStay = false;
-	public boolean initialInfection = false;
+	private boolean initialInfection = false;
 
 
 	private ISchedule schedule;
@@ -25,10 +25,10 @@ public class PersonDisease {
 	private ExponentialDistribution clinicalDetectionDistribution;
 
 
-	 public PersonDisease(Disease disease, Person person, ISchedule schedule) {
+	public PersonDisease(Disease disease, Person person, ISchedule schedule) {
         this.disease = disease;
         this.person = person;
-        this.schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule()
+        this.schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 		initializeEventDistributions();
 		double decolonizationRate = 1.0 / disease.getAvgDecolonizationTime();
 		if (person.getCurrentFacility() == null) {
@@ -83,7 +83,7 @@ public class PersonDisease {
 	}
 	public void updateTransmissionRateContribution(){
 		double score = 1.0;
-		if(person.isolated) score *= person.currentFacility.betaIsolationReduction;
+		if(person.isIsolated()) score *= person.getCurrentFacility().getBetaIsolationReduction();
 		transmissionRateContribution = score;
 	}
 

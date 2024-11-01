@@ -12,18 +12,18 @@ import java.util.ArrayList;
 
 
 public class Region extends AgentContainer{
-	boolean stop = false;
+	private boolean stop = false;
 
-	public boolean inBurnInPeriod = true;
-	int numImportations = 0;
-	boolean useSingleImportation = false;
+	private boolean inBurnInPeriod = true;
+	private int numImportations = 0;
+	private boolean useSingleImportation = false;
 	public int numTransmissionsFromInitialCase = 0;
-	double intra_event_time;
-	ISchedule schedule;
+	private double intra_event_time;
+	private ISchedule schedule;
 
-	public ArrayList<Facility> facilities = new ArrayList<Facility>();
-	public ArrayList<Disease> diseases = new ArrayList<Disease>();
-	public ArrayList<Person> people = new ArrayList<Person>();
+	private ArrayList<Facility> facilities = new ArrayList<Facility>();
+	private ArrayList<Disease> diseases = new ArrayList<Disease>();
+	private ArrayList<Person> people = new ArrayList<Person>();
 
 
 
@@ -39,7 +39,7 @@ public class Region extends AgentContainer{
    
    // make int
    public int dailyPopulationTally() {
-       System.out.println("daily population: " + facilities.get(0).currentPopulationSize);
+       System.out.println("daily population: " + facilities.get(0).getCurrentPopulationSize());
 		   	/*stop = false
 			double currTime = schedule.getTickCount()
 			double elapse = distro.sample()
@@ -53,7 +53,7 @@ public class Region extends AgentContainer{
 	public void doPopulationTally(){
 		for(Facility f : facilities) {
 			f.updatePopulationTally() ;
-			System.out.println("currpop" + f.currentPopulationSize);
+			System.out.println("currpop" + f.getCurrentPopulationSize());
 		}
 		//action.call()
 		if(!stop) {
@@ -70,27 +70,27 @@ public class Region extends AgentContainer{
 		if (people.contains(person)) {
 		    people.remove(person);
 		    System.out.println("discharging person: " + person.hashCode());
-			if (person.currentFacility != null) {
-				person.currentFacility.dischargePatient(person); 
+			if (person.getCurrentFacility() != null) {
+				person.getCurrentFacility().dischargePatient(person); 
 			}
 			
 		}
 	}
 
 
-    void importToFacility(Facility f){
+    public void importToFacility(Facility f){
 
 		Person p = add_people(f);
-		p.region = this;
+		p.setRegion(this);
 		for(Disease d : diseases){
 			PersonDisease pd = p.add_diseases();
-			pd.disease = d;
-			pd.person = p;
+			pd.setDisease(d);
+			pd.setPerson(p);
 			if(useSingleImportation){
 				if(!inBurnInPeriod){
 					if(++numImportations == 1){
 						pd.colonize();
-						pd.initialInfection = true;
+						pd.setInitialInfection(true);
 					}
 				}
 			}
@@ -110,11 +110,11 @@ public class Region extends AgentContainer{
     public void addInitialFacilityPatient(Facility f){
 		// Oct 4, 2024 WRR: This needs to be refactored to do non-Anylogic instantiation.
 		Person p = add_people(f);
-		p.region = this;
+		p.setRegion(this);
 		for(Disease d : diseases){
 			PersonDisease pd = p.add_diseases();
-			pd.disease = d;
-			pd.person = p;
+			pd.setDisease(d);
+			pd.setPerson(p);
 			if(!useSingleImportation && uniform() < 0.456) pd.colonize();
 		}
 		f.admitInitialPatient(p);
@@ -123,20 +123,20 @@ public class Region extends AgentContainer{
 		}
 		// Oct 25, 2024 WRR: This should say "adding patient", right?
 		System.out.println("Adding initial facility agent");
-		System.out.println(facilities.get(0).currentPatients.size());
+		System.out.println(facilities.get(0).getCurrentPatients().size());
 	}
 
-	void startActiveSurveillance(){
+	public void startActiveSurveillance(){
 		for(Facility f : facilities) f.startActiveSurveillance();
 	}
-	double uniform() {
+	public double uniform() {
 		return Math.random();
 	}
 
 	public Person add_people(Facility f) {
 		Person newPerson = new Person(f);
 		
-		newPerson.region = this;
+		newPerson.setRegion(this);
 		System.out.println("Add person " + newPerson.hashCode());
 		people.add(newPerson);  
 		return newPerson;
@@ -185,6 +185,78 @@ public class Region extends AgentContainer{
 	public void setInBurnInPeriod(boolean b) {
 		inBurnInPeriod = b;
 		
+	}
+
+	public boolean isStop() {
+	    return stop;
+	}
+
+	public void setStop(boolean stop) {
+	    this.stop = stop;
+	}
+
+	public int getNumImportations() {
+	    return numImportations;
+	}
+
+	public void setNumImportations(int numImportations) {
+	    this.numImportations = numImportations;
+	}
+
+	public boolean isUseSingleImportation() {
+	    return useSingleImportation;
+	}
+
+	public void setUseSingleImportation(boolean useSingleImportation) {
+	    this.useSingleImportation = useSingleImportation;
+	}
+
+	public int getNumTransmissionsFromInitialCase() {
+	    return numTransmissionsFromInitialCase;
+	}
+
+	public void setNumTransmissionsFromInitialCase(int numTransmissionsFromInitialCase) {
+	    this.numTransmissionsFromInitialCase = numTransmissionsFromInitialCase;
+	}
+
+	public double getIntra_event_time() {
+	    return intra_event_time;
+	}
+
+	public void setIntra_event_time(double intra_event_time) {
+	    this.intra_event_time = intra_event_time;
+	}
+
+	public ISchedule getSchedule() {
+	    return schedule;
+	}
+
+	public void setSchedule(ISchedule schedule) {
+	    this.schedule = schedule;
+	}
+
+	public ArrayList<Facility> getFacilities() {
+	    return facilities;
+	}
+
+	public void setFacilities(ArrayList<Facility> facilities) {
+	    this.facilities = facilities;
+	}
+
+	public ArrayList<Person> getPeople() {
+	    return people;
+	}
+
+	public void setPeople(ArrayList<Person> people) {
+	    this.people = people;
+	}
+
+	public boolean isInBurnInPeriod() {
+	    return inBurnInPeriod;
+	}
+
+	public void setDiseases(ArrayList<Disease> diseases) {
+	    this.diseases = diseases;
 	}
    
 }
