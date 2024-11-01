@@ -3,3 +3,4 @@ bin/*
 /populationTally.*
 /debug.*
 populationTally.*
+debug.log

@@ -17,7 +17,6 @@ public class Person extends Agent {
 	private static ISchedule schedule;
 	private Facility currentFacility;
 	private boolean isolated = false;
-	private double currentLOS = -1.0;
 	private double admissionTime;
 	private ArrayList<PersonDisease> diseases = new ArrayList<PersonDisease>();
 	private boolean stop = false;
@@ -90,7 +89,7 @@ public class Person extends Agent {
 	public void doSurveillanceTest() {
 		for (PersonDisease pd : diseases) {
 		    // Nov 1, 2024 WRR: Something wrong with this conditional.
-			if (!pd.isDetected() && uniform()< (double) pd.getDisease().isActiveSurveillanceAgent()) {
+			if (!pd.isDetected() && pd.getDisease().isActiveSurveillanceAgent()) {
 				if (pd.isColonized() && uniform() < pd.getDisease().getProbSurveillanceDetection() * currentFacility.getMidstaySurveillanceAdherence()) {
 					pd.setDetected(true);
 					if (!isolated) {
@@ -122,12 +121,13 @@ public class Person extends Agent {
 		return currentFacility;
 	}
 	public boolean isIsolated() {
-	    // TODO Auto-generated method stub
-	    return false;
+	   return isolated;
 	}
 	public double getCurrentLOS() {
-	    // TODO Auto-generated method stub
-	    return 0;
+	    if (getDischargeTime() == 0.0) {
+		return schedule.getTickCount() - getAdmissionTime();
+	    }
+	    return getDischargeTime() - getAdmissionTime();
 	}
 	public Region getRegion() {
 	    return region;
@@ -193,6 +193,5 @@ public class Person extends Agent {
 	    this.isolated = isolated;
 	}
 	public void setCurrentLOS(double currentLOS) {
-	    this.currentLOS = currentLOS;
 	}
 }
