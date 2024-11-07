@@ -18,11 +18,11 @@ public class Person extends Agent {
 	private Facility currentFacility;
 	private boolean isolated = false;
 	private double admissionTime;
-	private ArrayList<PersonDisease> diseases = new ArrayList<PersonDisease>();
+	public ArrayList<PersonDisease> personDiseases = new ArrayList<PersonDisease>();
 	private boolean stop = false;
 	private double dischargeTime;
 	private ArrayList<Facility> facilities = new ArrayList<>();
-	private ArrayList<Disease> diseasesNew = new ArrayList<>();
+	private ArrayList<Disease> diseases = new ArrayList<>();
 	private ArrayList<Person> people = new ArrayList<>();
 	private ExponentialDistribution distro;
 
@@ -63,7 +63,7 @@ public class Person extends Agent {
 	}
 
 	public void updateAllTransmissionRateContributions() {
-		for (PersonDisease pd : diseases) {
+		for (PersonDisease pd : personDiseases) {
 			pd.updateTransmissionRateContribution();
 		}
 		currentFacility.updateTransmissionRate();
@@ -87,7 +87,7 @@ public class Person extends Agent {
 		schedule.schedule(params, this, "doSurveillanceTest");
 	}
 	public void doSurveillanceTest() {
-		for (PersonDisease pd : diseases) {
+		for (PersonDisease pd : personDiseases) {
 		    // Nov 1, 2024 WRR: Something wrong with this conditional.
 			if (!pd.isDetected() && pd.getDisease().isActiveSurveillanceAgent()) {
 				if (pd.isColonized() && uniform() < pd.getDisease().getProbSurveillanceDetection() * currentFacility.getMidstaySurveillanceAdherence()) {
@@ -108,13 +108,13 @@ public class Person extends Agent {
 	}
 	public PersonDisease add_diseases() {
 		
-		Person person = region.getPeople().get(region.getPeople().size() - 1);
-		Disease disease = region.getDiseases().get(0);
+		Person person = region.people.get(region.people.size() - 1);
+		Disease disease = region.diseases.get(0);
 
 		PersonDisease pd = new PersonDisease(disease, person, schedule);
 		pd.setDisease(disease);
 		pd.setPerson(person);
-		person.diseases.add(pd);
+		person.personDiseases.add(pd);
 		return pd;
 	}
 	public Facility getCurrentFacility() {
@@ -142,10 +142,10 @@ public class Person extends Agent {
 	    this.admissionTime = admissionTime;
 	}
 	public ArrayList<PersonDisease> getDiseases() {
-	    return diseases;
+	    return personDiseases;
 	}
 	public void setDiseases(ArrayList<PersonDisease> diseases) {
-	    this.diseases = diseases;
+	    this.personDiseases = diseases;
 	}
 	public boolean isStop() {
 	    return stop;
@@ -166,10 +166,10 @@ public class Person extends Agent {
 	    this.facilities = facilities;
 	}
 	public ArrayList<Disease> getDiseasesNew() {
-	    return diseasesNew;
+	    return diseases;
 	}
-	public void setDiseasesNew(ArrayList<Disease> diseasesNew) {
-	    this.diseasesNew = diseasesNew;
+	public void setDiseasesNew(ArrayList<Disease> diseases) {
+	    this.diseases = diseases;
 	}
 	public ArrayList<Person> getPeople() {
 	    return people;

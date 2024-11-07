@@ -22,8 +22,8 @@ public class Region extends AgentContainer{
 	private ISchedule schedule;
 
 	private ArrayList<Facility> facilities = new ArrayList<Facility>();
-	private ArrayList<Disease> diseases = new ArrayList<Disease>();
-	private ArrayList<Person> people = new ArrayList<Person>();
+	public ArrayList<Disease> diseases = new ArrayList<Disease>();
+	public ArrayList<Person> people = new ArrayList<Person>();
 
 
 
@@ -39,7 +39,7 @@ public class Region extends AgentContainer{
    
    // make int
    public int dailyPopulationTally() {
-       System.out.println("daily population: " + facilities.get(0).getCurrentPopulationSize());
+       System.out.println("daily population: " + people.size());
 		   	/*stop = false
 			double currTime = schedule.getTickCount()
 			double elapse = distro.sample()
@@ -53,7 +53,7 @@ public class Region extends AgentContainer{
 	public void doPopulationTally(){
 		for(Facility f : facilities) {
 			f.updatePopulationTally() ;
-			System.out.println("currpop" + f.getCurrentPopulationSize());
+			System.out.println("currpop" + people.size());
 		}
 		//action.call()
 		if(!stop) {

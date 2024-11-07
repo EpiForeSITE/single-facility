@@ -1,5 +1,6 @@
 package agentcontainers;
 import agents.Person;
+import disease.Disease;
 import disease.FacilityOutbreak;
 import disease.PersonDisease;
 import org.apache.commons.math3.distribution.ExponentialDistribution;
@@ -15,7 +16,7 @@ public class Facility extends AgentContainer{
 
 
     private static final long serialVersionUID = -758171564017677907L;
-	private int currentPopulationSize = 0;
+	//private int currentPopulationSize = 0;
 	private double betaIsolationReduction;
 	private double timeBetweenMidstaySurveillanceTests = -1.0;
 	private boolean onActiveSurveillance = false;
@@ -44,13 +45,14 @@ public class Facility extends AgentContainer{
 	public Facility() {
 		super();
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
+		region = new Region(this);
 	}
 
 	public void admitNewPatient(ISchedule sched) {
 		schedule = sched;
 		Person newPatient = new Person(this);
 		admitPatient(newPatient);
-		System.out.println("New patient admitted. Current population: " + setCurrentPopulationSize(getCurrentPopulationSize() + 1));
+		System.out.println("New patient admitted. Current population: " + region.people.size());
 	}
 	
 	public void admitPatient(Person p){
@@ -82,7 +84,7 @@ public class Facility extends AgentContainer{
 		if(!getRegion().isInBurnInPeriod()) updateAdmissionTally(p);
 	}
 	public void dischargePatient(Person p){
-		setCurrentPopulationSize(getCurrentPopulationSize() - 1);
+		region.people.remove(p);
 		getCurrentPatients().remove(p);
 		updateTransmissionRate();
 		// Oct 4, 2024 WRR: This isn't deleting the patient from anywhere but this currentPatients collection.
@@ -92,7 +94,7 @@ public class Facility extends AgentContainer{
 	}
 
 	public void updateTransmissionRate(){
-		for(FacilityOutbreak fo : getOutbreaks()) fo.updateTransmissionRate();
+		for(FacilityOutbreak fo : outbreaks) fo.updateTransmissionRate();
 	}
 
 	public double getRandomLOS(){
@@ -116,10 +118,10 @@ public class Facility extends AgentContainer{
 		p.admitToFacility(this);
 		p.startDischargeTimer(exponential(1.0/getMeanLOS()));
 
-		setCurrentPopulationSize(getCurrentPopulationSize() + 1);
+		region.people.add(p);
 
-		boolean doSurveillanceTest = false;
-		if(onActiveSurveillance) doSurveillanceTest = true;
+		if(onActiveSurveillance) {
+		}
 
 		for(PersonDisease pd : p.getDiseases()){
 			if(pd.isColonized()){
@@ -129,28 +131,37 @@ public class Facility extends AgentContainer{
 		getCurrentPatients().add(p);
 
 		p.updateAllTransmissionRateContributions();
-		setCurrentPopulationSize(getCurrentPopulationSize() + 1);
 	}
 
 	public void updatePopulationTally(){
-		avgPopulation = (avgPopulation * numDaysTallied + getCurrentPopulationSize()) / (numDaysTallied + 1);
+		avgPopulation = (avgPopulation * numDaysTallied + region.people.size() / (numDaysTallied + 1));
 		numDaysTallied++;
 
-		for(FacilityOutbreak fo : getOutbreaks()) fo.updatePrevalenceTally();
+		for(FacilityOutbreak fo : outbreaks) fo.updatePrevalenceTally();
 	}
 
 	public void updateStayTally(Person p){
 		setPatientDays(getPatientDays() + p.getCurrentLOS());
-
-		for(int i=0; i<getOutbreaks().size(); i++)
-			getOutbreaks().get(i).updateStayTally(p.getDiseases().get(i));
+		
+		if(!outbreaks.isEmpty()&&!p.personDiseases.isEmpty()) {
+			System.out.print("COOOOOL11");
+		for(int i=0; i<outbreaks.size(); i++) {
+			System.out.print(outbreaks.get(i));
+			outbreaks.get(i).updateStayTally(p.personDiseases.get(i));
+			}
+		}
 	}
 
 	public void updateAdmissionTally(Person p){
-		setNumAdmissions(getNumAdmissions() + 1);
-
-		for(int i=0; i<getOutbreaks().size(); i++)
-			getOutbreaks().get(i).updateAdmissionTally(p.getDiseases().get(i));
+		numAdmissions++;
+		
+		if(!outbreaks.isEmpty()&&!p.personDiseases.isEmpty()) {
+			System.out.print("COOOOOL");
+			for(int i=0; i<outbreaks.size(); i++) {
+				System.out.print(outbreaks.get(i));
+				outbreaks.get(i).updateAdmissionTally(p.personDiseases.get(i));
+			}
+		}
 	}
 
 	public void startActiveSurveillance(){
@@ -167,11 +178,11 @@ public class Facility extends AgentContainer{
 		ExponentialDistribution exponentialDistribution = new ExponentialDistribution(rate);
 		return exponentialDistribution.sample();
 	}
-	public FacilityOutbreak addOutbreaks() {
-		FacilityOutbreak newOutbreak = new FacilityOutbreak(meanIntraEventTime);
+	public FacilityOutbreak addOutbreaks(Disease d) {
+		FacilityOutbreak newOutbreak = new FacilityOutbreak(meanIntraEventTime, d);
 		newOutbreak.setFacility(this);
 
-		getOutbreaks().add(newOutbreak);
+		outbreaks.add(newOutbreak);
 
 		return newOutbreak;
 	}
@@ -180,7 +191,7 @@ public class Facility extends AgentContainer{
 	}
 
 	public void addOutbreak(FacilityOutbreak outbreak) {
-		getOutbreaks().add(outbreak);
+		outbreaks.add(outbreak);
 	}
 
 	public int getCapacity() {
@@ -276,22 +287,5 @@ public class Facility extends AgentContainer{
 
 	public void setNumAdmissions(int numAdmissions) {
 	    this.numAdmissions = numAdmissions;
-	}
-
-	public int getCurrentPopulationSize() {
-	    return currentPopulationSize;
-	}
-
-	public int setCurrentPopulationSize(int currentPopulationSize) {
-	    this.currentPopulationSize = currentPopulationSize;
-	    return currentPopulationSize;
-	}
-
-	public ArrayList<FacilityOutbreak> getOutbreaks() {
-	    return outbreaks;
-	}
-
-	public void setOutbreaks(ArrayList<FacilityOutbreak> outbreaks) {
-	    this.outbreaks = outbreaks;
 	}
 }

@@ -42,12 +42,8 @@ public class FacilityOutbreak {
 	ISchedulableAction nextAction;
 	ExponentialDistribution distro;
 	double meanIntraEventTime;
-	public FacilityOutbreak(double intra_event_time) {
+	public FacilityOutbreak(double intra_event_time, Disease disease2) {
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
-	}
-
-
-	public FacilityOutbreak(Disease disease2) {
 		disease = disease2;
 	}
 
@@ -109,7 +105,7 @@ public class FacilityOutbreak {
 		double sScore = 0.0;
 		for (Person p : facility.getCurrentPatients()) {
 			if(p.getDiseases().size()!=0) {
-				PersonDisease pd = p.getDiseases().get(disease.getSimIndex());
+				PersonDisease pd = p.personDiseases.get(disease.getSimIndex());
 				if (pd.isColonized()) {
 					cScore += pd.getTransmissionRateContribution();
 					if (p.isIsolated()) nCI++;

@@ -91,7 +91,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 			}
 
 			for (Disease d : region.getDiseases()) {
-				FacilityOutbreak fo = f.addOutbreaks();
+				FacilityOutbreak fo = f.addOutbreaks(d);
 				fo.setDisease(d);
 				fo.setDiseaseName(d.getDiseaseName());
 				fo.facility = f;
@@ -147,6 +147,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		repast.simphony.engine.environment.RunEnvironment.getInstance().endAt(totalTime);
 
 	}
+	/*
 
 	private void writeSimulationResults() {
 		System.out.println("Writing simulation results.");
@@ -158,6 +159,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		R0Data.printf("%d", region.numTransmissionsFromInitialCase);
 		R0Data.println();
 	}
+	*/
 
 	public ISchedule getSchedule() {
 	    return schedule;
