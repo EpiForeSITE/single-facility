@@ -1,2 +1,6 @@
 bin/*
 /bin/
+/populationTally.*
+/debug.*
+populationTally.*
+debug.log

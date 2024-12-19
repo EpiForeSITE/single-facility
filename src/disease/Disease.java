@@ -1,21 +1,21 @@
-package disease
+package disease;
 
-import agents.Person
+import agents.Person;
 
 public class Disease {
 
-	public static CRE = 1;
-	public int type;
-	public int simIndex;	
+	private static int CRE = 1;
+	private int type;
+	private int simIndex;
 
-			
-	double getBaselineBetaValue(int facilityType){
+
+	public double getBaselineBetaValue(int facilityType){
 		double acuteCareBeta = -1.0;
 		double longTermAcuteCareBeta = -1.0;
 		double nursingHomeBeta = -1.0;
 		double nhReduction;
 
-		if(type == CRE){
+		if(type == getCRE()){
 			longTermAcuteCareBeta = 0.0615;
 			acuteCareBeta = 0.06;
 			nhReduction = 10.0;
@@ -31,14 +31,14 @@ public class Disease {
 		return betaVal;
 	}
 
-	double getMeanTimeToClinicalDetection(int facilityType){
+	public double getMeanTimeToClinicalDetection(int facilityType){
 		double acuteCareMean = -1.0;
 		double longTermAcuteCareMean = -1.0;
 		double nursingHomeMean = -1.0;
 		double nhChangeFactor = 1.0;
 
 
-		if(type == CRE){
+		if(type == getCRE()){
 			acuteCareMean = 122.0;
 			nhChangeFactor = 8.0;
 			longTermAcuteCareMean = 106.0;
@@ -55,43 +55,56 @@ public class Disease {
 	}
 
 
-	String getDiseaseName(){
-		if(type==CRE) return "CRE";
+	public String getDiseaseName(){
+		if(type==getCRE()) return "CRE";
 		return "";
 	}
 
-	double getAvgDecolonizationTime(){
-		if(type == CRE) return 387.0;
+	public double getAvgDecolonizationTime(){
+		if(type == getCRE()) return 387.0;
 		return 0;
 	}
 
-	double getProbSurveillanceDetection(){
-		return 0.8
-	}
-				
-	boolean allowImportationsDuringBurnIn(){
-		if(type == CRE) return false;
+	public double getProbSurveillanceDetection(){
+		return 0.8;
 	}
 
-	boolean isolatePatientWhenDetected(){
-		if(type == CRE) return true;
+	public boolean allowImportationsDuringBurnIn(){
+		if(type == getCRE()) 
+		    return false;
+		return true;
+	}
+
+	public boolean isolatePatientWhenDetected(){
+		if(type == getCRE()) return true;
 		return false;
 	}
 
-	boolean isActiveSurveillanceAgent(){
-		if(type == CRE) return true;
+	public boolean isActiveSurveillanceAgent(){
+		if(type == getCRE()) return true;
 		return false;
 	}
 
-	double getImportationProb(){
+	public double getImportationProb(){
 		return 0.206;
 	}
-	int getSimIndex() {
+	public int getSimIndex() {
 		return simIndex;
 	}
 
 	public void setType(int diseaseType) {
-		type = diseaseType
-		
+		type = diseaseType;
+	}
+
+	public static int getCRE() {
+	    return CRE;
+	}
+
+	public static void setCRE(int cRE) {
+	    CRE = cRE;
+	}
+
+	public void setSimIndex(int simIndex) {
+	    this.simIndex = simIndex;
 	}
 }

@@ -1,0 +1,31 @@
+<repast.simphony.data2.engine.DataSetDescriptor simphonyVersion="2.11.0">
+  <name>PopulationTally</name>
+  <type>NON_AGGREGATE</type>
+  <sourceType>agentcontainers.Region</sourceType>
+  <inclTick>true</inclTick>
+  <inclBatchRun>false</inclBatchRun>
+  <inclRandomSeed>false</inclRandomSeed>
+  <scheduleParams>
+    <start>1.0</start>
+    <interval>1.0</interval>
+    <priority>-Infinity</priority>
+    <pType>LAST</pType>
+    <duration>-1.0</duration>
+    <frequency>REPEAT</frequency>
+    <hashCode>1517761457</hashCode>
+  </scheduleParams>
+  <atEnd>false</atEnd>
+  <methodDataSources class="linked-hash-map">
+    <entry>
+      <string>dailyPopulationTally</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>dailyPopulationTally</id>
+        <className>agentcontainers.Region</className>
+        <methodName>dailyPopulationTally</methodName>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+  </methodDataSources>
+  <countSources class="linked-hash-map"/>
+  <customNADataSources class="linked-hash-map"/>
+  <customAggDataSources class="linked-hash-map"/>
+</repast.simphony.data2.engine.DataSetDescriptor>
