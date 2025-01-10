@@ -81,6 +81,7 @@ public class Region extends AgentContainer{
     public void importToFacility(Facility f){
 
 		Person p = add_people(f);
+		
 		p.setRegion(this);
 		for(Disease d : diseases){
 			PersonDisease pd = p.add_diseases();
@@ -95,7 +96,10 @@ public class Region extends AgentContainer{
 				}
 			}
 			else{
-				if(uniform() < d.getImportationProb()) pd.colonize();
+			    //// Jan 10, 2025 WRR: This needs to go in Facility.admitPerson() at the top
+				if(uniform() < d.getImportationProb()) {
+				    pd.colonize();
+				}
 			}
 		}
 		f.admitPatient(p);
@@ -108,13 +112,13 @@ public class Region extends AgentContainer{
 
 
     public void addInitialFacilityPatient(Facility f){
-		// Oct 4, 2024 WRR: This needs to be refactored to do non-Anylogic instantiation.
 		Person p = add_people(f);
 		p.setRegion(this);
 		for(Disease d : diseases){
 			PersonDisease pd = p.add_diseases();
 			pd.setDisease(d);
 			pd.setPerson(p);
+			//todo get this parameterized
 			if(!useSingleImportation && uniform() < 0.456) pd.colonize();
 		}
 		f.admitInitialPatient(p);

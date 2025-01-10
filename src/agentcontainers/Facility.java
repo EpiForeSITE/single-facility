@@ -53,9 +53,18 @@ public class Facility extends AgentContainer{
 		Person newPatient = new Person(this);
 		admitPatient(newPatient);
 		System.out.println("New patient admitted. Current population: " + region.people.size());
+		
+		
+		
+		
+		
+	
 	}
 	
 	public void admitPatient(Person p){
+	    
+	    	
+	    
 		p.admitToFacility(this);
 
 		p.startDischargeTimer(getRandomLOS());
