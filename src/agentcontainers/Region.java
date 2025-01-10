@@ -53,7 +53,7 @@ public class Region extends AgentContainer{
 	public void doPopulationTally(){
 		for(Facility f : facilities) {
 			f.updatePopulationTally() ;
-			System.out.println("currpop" + people.size());
+			
 		}
 		//action.call()
 		if(!stop) {

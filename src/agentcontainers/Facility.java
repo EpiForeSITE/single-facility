@@ -94,7 +94,7 @@ public class Facility extends AgentContainer{
 	}
 
 	public void updateTransmissionRate(){
-		for(FacilityOutbreak fo : outbreaks) fo.updateTransmissionRate();
+		for(FacilityOutbreak fo : outbreaks) fo.updateTransmissionRate(region);
 	}
 
 	public double getRandomLOS(){
@@ -137,11 +137,16 @@ public class Facility extends AgentContainer{
 		avgPopulation = (avgPopulation * numDaysTallied + region.people.size() / (numDaysTallied + 1));
 		numDaysTallied++;
 
-		for(FacilityOutbreak fo : outbreaks) fo.updatePrevalenceTally();
+		for(FacilityOutbreak fo : outbreaks) {
+			fo.updatePrevalenceTally();
+			System.out.println("Verification: "+(fo.getNumColonizedNow())/region.people.size());
+		}
+			
 	}
 
 	public void updateStayTally(Person p){
 		setPatientDays(getPatientDays() + p.getCurrentLOS());
+		
 		
 		if(!outbreaks.isEmpty()&&!p.personDiseases.isEmpty()) {
 			System.out.print("COOOOOL11");

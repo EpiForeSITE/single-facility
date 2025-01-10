@@ -1,5 +1,6 @@
 package disease;
 import agentcontainers.Facility;
+import agentcontainers.Region;
 import agents.Person;
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.ode.events.EventHandler;
@@ -37,6 +38,7 @@ public class FacilityOutbreak {
 	private double transmissionRate = 0.0;
 	private ISchedule schedule;
 	private boolean stop = false;
+	private Region region;
 
 
 	ISchedulableAction nextAction;
@@ -90,7 +92,8 @@ public class FacilityOutbreak {
 		else if (pdC.isInitialInfection()) facility.getRegion().numTransmissionsFromInitialCase++;
 		transmissionsTally++;
 	}
-	public void updateTransmissionRate() {
+	public void updateTransmissionRate(Region r) {
+		region=r;
 		double newTransmissionRate;
 		/*
 		 C = colonized
@@ -123,12 +126,14 @@ public class FacilityOutbreak {
 		numColonizedIsoNow = nCI;
 		numSusceptibleNow = nS + nSI;
 		numColonizedNow = nC + nCI;
-		if(facility.getPopulationSize()!=0) {
-			prevalence = 1.0 * numColonizedNow / facility.getPopulationSize();
+		if(region.people.size()!=0) {
+			prevalence = 1.0 * numColonizedNow / region.people.size();
+			System.out.println("Num colonized: "+numColonizedNow);
+			System.out.println("Prevalence:"+prevalence);
 		}
 		numContagiousEffective = cScore;
 		numSusceptibleEffective = sScore;
-		newTransmissionRate = disease.getBaselineBetaValue(facility.getType()) * numContagiousEffective * numSusceptibleEffective / facility.getCurrentPatients().size();
+		newTransmissionRate = disease.getBaselineBetaValue(facility.getType()) * numContagiousEffective * numSusceptibleEffective / region.people.size();
 		setTransmissionRate(newTransmissionRate);
 	}
 	public void setTransmissionRate(double newTransmissionRate) {
@@ -147,13 +152,13 @@ public class FacilityOutbreak {
 	private void error(String message, double... values) {
 		System.err.printf(message, values);
 	}
-	int getNumColonized() {
-		return numColonizedNow;
-	}
 	public void updatePrevalenceTally() {
-		popTallied += facility.getPopulationSize();
+		popTallied = region.people.size();
 		popTalliedColonized += numColonizedNow;
-		avgPrevalence = 1.0 * popTalliedColonized / popTallied;
+		avgPrevalence = 1.0 * popTalliedColonized / (double)popTallied;
+		System.out.println("Current Colonized (numColonizedNow): " + numColonizedNow);
+		 System.out.println("Total Tallied Colonized: " + popTalliedColonized);
+		System.out.println("Average Prevalence: "+avgPrevalence);
 	}
 	public void updateStayTally(PersonDisease pd) {
 		if (pd.isClinicallyDetectedDuringCurrentStay()) {
@@ -169,6 +174,7 @@ public class FacilityOutbreak {
 			numAdmissionsColonized++;
 		}
 		importationRate = 1.0 * numAdmissionsColonized / facility.getNumAdmissions();
+		System.out.println("Importation Rate: "+importationRate);
 	}
 	double uniform() {
 		return Math.random();
@@ -200,11 +206,6 @@ public class FacilityOutbreak {
 
 	public int getNumColonizedNow() {
 	    return numColonizedNow;
-	}
-
-
-	public void setNumColonizedNow(int numColonizedNow) {
-	    this.numColonizedNow = numColonizedNow;
 	}
 
 
