@@ -167,6 +167,10 @@ public class Facility extends AgentContainer{
 	}
 
 	public void updateAdmissionTally(Person p){
+	    // Jan 10, 2025 WRR: it's appropriate to count the number of admissions in an int...
+	    // because it's a total count of all the admissions EVER, and most of them have been 
+	    // discharged.  Things like current population size, or percentage of patients colonized
+	    // should wherever possible be calculated from the relevant collection of "live" patients
 		numAdmissions++;
 		
 		if(!outbreaks.isEmpty()&&!p.personDiseases.isEmpty()) {
@@ -281,6 +285,10 @@ public class Facility extends AgentContainer{
 
 	public LinkedList<Person> getCurrentPatients() {
 	    return currentPatients;
+	}
+	
+	public int getCurrentPatientCount() {
+	    return currentPatients.size();
 	}
 
 	public void setCurrentPatients(LinkedList<Person> currentPatients) {

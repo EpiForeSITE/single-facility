@@ -1,9 +1,9 @@
 <repast.simphony.chart2.engine.TimeSeriesChartDescriptor simphonyVersion="2.11.0">
-  <name>Time Series Chart</name>
+  <name>Occupancy</name>
   <dataSet>A Data Set</dataSet>
   <xAxisLabel>Tick Count</xAxisLabel>
-  <yAxisLabel></yAxisLabel>
-  <chartTitle></chartTitle>
+  <yAxisLabel>Count</yAxisLabel>
+  <chartTitle>Occupancy</chartTitle>
   <type>TIME_SERIES</type>
   <background>
     <red>192</red>
@@ -21,18 +21,14 @@
   <showLegend>true</showLegend>
   <seriesIds>
     <entry>
-      <string>people</string>
+      <string>CurrentPatientCount</string>
       <SeriesData>
-        <label>people</label>
-        <color>
-          <red>0</red>
-          <green>0</green>
-          <blue>255</blue>
-          <alpha>255</alpha>
-        </color>
+        <label></label>
       </SeriesData>
     </entry>
   </seriesIds>
-  <dataValueIds/>
+  <dataValueIds>
+    <string>CurrentPatientCount</string>
+  </dataValueIds>
   <plotRangeLength>-1</plotRangeLength>
 </repast.simphony.chart2.engine.TimeSeriesChartDescriptor>

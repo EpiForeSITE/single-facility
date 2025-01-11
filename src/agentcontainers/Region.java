@@ -96,7 +96,7 @@ public class Region extends AgentContainer{
 				}
 			}
 			else{
-			    //// Jan 10, 2025 WRR: This needs to go in Facility.admitPerson() at the top
+			    // Jan 10, 2025 WRR: This needs to go in Facility.admitPerson() at the top
 				if(uniform() < d.getImportationProb()) {
 				    pd.colonize();
 				}

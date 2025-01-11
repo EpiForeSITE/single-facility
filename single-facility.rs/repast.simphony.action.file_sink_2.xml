@@ -1,12 +1,12 @@
 <repast.simphony.data2.engine.FileSinkDescriptor simphonyVersion="2.11.0">
-  <name>populationTally</name>
-  <dataSet>PopulationTally</dataSet>
+  <name>A File Sink</name>
+  <dataSet>A Data Set</dataSet>
   <delimiter>,</delimiter>
   <format>TABULAR</format>
   <sourceIds class="linked-hash-set">
-    <string>dailyPopulationTally</string>
+    <string>CurrentPatientCount</string>
     <string>tick</string>
   </sourceIds>
-  <fileName>populationTally.txt</fileName>
+  <fileName>ModelOutput.txt</fileName>
   <addTimeStamp>true</addTimeStamp>
 </repast.simphony.data2.engine.FileSinkDescriptor>
