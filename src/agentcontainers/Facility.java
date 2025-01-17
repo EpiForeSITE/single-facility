@@ -40,6 +40,8 @@ public class Facility extends AgentContainer{
 	private double meanIntraEventTime;
 	private int capacity;
 	private double isolationEffectiveness;
+	private int totalAdmissions;
+	private int totalImports;
 	
 	// Constructor
 	public Facility() {
@@ -53,10 +55,14 @@ public class Facility extends AgentContainer{
 		Person newPatient = new Person(this);
 		admitPatient(newPatient);
 		System.out.println("New patient admitted. Current population: " + region.people.size());
+		totalAdmissions++;
 	}
 	
 	public void admitPatient(Person p){
+		region.importToFacilityNew(this,p);
+	    
 		p.admitToFacility(this);
+		
 
 		p.startDischargeTimer(getRandomLOS());
 
@@ -64,6 +70,7 @@ public class Facility extends AgentContainer{
 
 		for(PersonDisease pd : p.getDiseases()){
 			if(pd.isColonized()){
+				
 				if(pd.getDisease().isActiveSurveillanceAgent() && onActiveSurveillance){
 					if(uniform() < pd.getDisease().getProbSurveillanceDetection() * admissionSurveillanceAdherence){
 						pd.setDetected(true);
@@ -94,7 +101,7 @@ public class Facility extends AgentContainer{
 	}
 
 	public void updateTransmissionRate(){
-		for(FacilityOutbreak fo : outbreaks) fo.updateTransmissionRate();
+		for(FacilityOutbreak fo : outbreaks) fo.updateTransmissionRate(region);
 	}
 
 	public double getRandomLOS(){
@@ -137,11 +144,18 @@ public class Facility extends AgentContainer{
 		avgPopulation = (avgPopulation * numDaysTallied + region.people.size() / (numDaysTallied + 1));
 		numDaysTallied++;
 
-		for(FacilityOutbreak fo : outbreaks) fo.updatePrevalenceTally();
+		for(FacilityOutbreak fo : outbreaks) {
+			fo.updatePrevalenceTally();
+			System.out.println("Verification: "+(fo.getPopTalliedColonized())/region.people.size());
+			System.out.println("Total admissions: "+totalAdmissions);
+			System.out.println("Total imports"+region.getTotalImports());
+		}
+			
 	}
 
 	public void updateStayTally(Person p){
 		setPatientDays(getPatientDays() + p.getCurrentLOS());
+		
 		
 		if(!outbreaks.isEmpty()&&!p.personDiseases.isEmpty()) {
 			System.out.print("COOOOOL11");
@@ -287,5 +301,9 @@ public class Facility extends AgentContainer{
 
 	public void setNumAdmissions(int numAdmissions) {
 	    this.numAdmissions = numAdmissions;
+	}
+
+	public ArrayList<FacilityOutbreak> getOutbreaks() {
+		return outbreaks;
 	}
 }

@@ -3,6 +3,7 @@ package agentcontainers;
 
 import agents.Person;
 import disease.Disease;
+import disease.FacilityOutbreak;
 import disease.PersonDisease;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
@@ -18,12 +19,14 @@ public class Region extends AgentContainer{
 	private int numImportations = 0;
 	private boolean useSingleImportation = false;
 	public int numTransmissionsFromInitialCase = 0;
+	public int colonizedCount;
 	private double intra_event_time;
 	private ISchedule schedule;
 
 	private ArrayList<Facility> facilities = new ArrayList<Facility>();
 	public ArrayList<Disease> diseases = new ArrayList<Disease>();
 	public ArrayList<Person> people = new ArrayList<Person>();
+	private int totalImports;
 
 
 
@@ -53,7 +56,7 @@ public class Region extends AgentContainer{
 	public void doPopulationTally(){
 		for(Facility f : facilities) {
 			f.updatePopulationTally() ;
-			System.out.println("currpop" + people.size());
+			
 		}
 		//action.call()
 		if(!stop) {
@@ -81,6 +84,7 @@ public class Region extends AgentContainer{
     public void importToFacility(Facility f){
 
 		Person p = add_people(f);
+		
 		p.setRegion(this);
 		for(Disease d : diseases){
 			PersonDisease pd = p.add_diseases();
@@ -95,7 +99,10 @@ public class Region extends AgentContainer{
 				}
 			}
 			else{
-				if(uniform() < d.getImportationProb()) pd.colonize();
+			    //// Jan 10, 2025 WRR: This needs to go in Facility.admitPerson() at the top
+				if(uniform() < d.getImportationProb()) {
+				    pd.colonize();
+				}
 			}
 		}
 		f.admitPatient(p);
@@ -105,16 +112,30 @@ public class Region extends AgentContainer{
 		System.out.println("Adding facility");
 		
 	}
+    public void importToFacilityNew(Facility f, Person p) {
+		
+		p.setRegion(this);
+		for(Disease d : diseases){
+			PersonDisease pd = p.add_diseases();
+			pd.setDisease(d);
+			pd.setPerson(p);
+			if(uniform() < d.getImportationProb()) {
+			    pd.colonize();
+			    totalImports++;
+			}
+		}
+    }
+
 
 
     public void addInitialFacilityPatient(Facility f){
-		// Oct 4, 2024 WRR: This needs to be refactored to do non-Anylogic instantiation.
 		Person p = add_people(f);
 		p.setRegion(this);
 		for(Disease d : diseases){
 			PersonDisease pd = p.add_diseases();
 			pd.setDisease(d);
 			pd.setPerson(p);
+			//todo get this parameterized
 			if(!useSingleImportation && uniform() < 0.456) pd.colonize();
 		}
 		f.admitInitialPatient(p);
@@ -257,6 +278,10 @@ public class Region extends AgentContainer{
 
 	public void setDiseases(ArrayList<Disease> diseases) {
 	    this.diseases = diseases;
+	}
+
+	public int getTotalImports() {
+		return totalImports;
 	}
    
 }
