@@ -26,6 +26,7 @@ public class Region extends AgentContainer{
 	private ArrayList<Facility> facilities = new ArrayList<Facility>();
 	public ArrayList<Disease> diseases = new ArrayList<Disease>();
 	public ArrayList<Person> people = new ArrayList<Person>();
+	private int totalImports;
 
 
 
@@ -120,6 +121,7 @@ public class Region extends AgentContainer{
 			pd.setPerson(p);
 			if(uniform() < d.getImportationProb()) {
 			    pd.colonize();
+			    totalImports++;
 			}
 		}
     }
@@ -276,6 +278,10 @@ public class Region extends AgentContainer{
 
 	public void setDiseases(ArrayList<Disease> diseases) {
 	    this.diseases = diseases;
+	}
+
+	public int getTotalImports() {
+		return totalImports;
 	}
    
 }
