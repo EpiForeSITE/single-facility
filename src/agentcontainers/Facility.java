@@ -53,19 +53,13 @@ public class Facility extends AgentContainer{
 		Person newPatient = new Person(this);
 		admitPatient(newPatient);
 		System.out.println("New patient admitted. Current population: " + region.people.size());
-		
-		
-		
-		
-		
-	
 	}
 	
 	public void admitPatient(Person p){
-	    
-	    	
+		region.importToFacilityNew(this,p);
 	    
 		p.admitToFacility(this);
+		
 
 		p.startDischargeTimer(getRandomLOS());
 
@@ -148,7 +142,7 @@ public class Facility extends AgentContainer{
 
 		for(FacilityOutbreak fo : outbreaks) {
 			fo.updatePrevalenceTally();
-			System.out.println("Verification: "+(fo.getNumColonizedNow())/region.people.size());
+			System.out.println("Verification: "+(fo.getPopTalliedColonized())/region.people.size());
 		}
 			
 	}
@@ -301,5 +295,9 @@ public class Facility extends AgentContainer{
 
 	public void setNumAdmissions(int numAdmissions) {
 	    this.numAdmissions = numAdmissions;
+	}
+
+	public ArrayList<FacilityOutbreak> getOutbreaks() {
+		return outbreaks;
 	}
 }
