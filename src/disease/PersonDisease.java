@@ -44,7 +44,9 @@ public class PersonDisease {
 
 	public void doDecolonization() {
 		if (!colonized) {
-			throw new IllegalStateException("Decolonizing an agent that is not colonized");
+			//throw new IllegalStateException("Decolonizing an agent that is not colonized");
+			//System.out.println();
+			//System.exit(1);
 		}
 		colonized = false;
 		resetClinicalDetectionEvent();

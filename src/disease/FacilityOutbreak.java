@@ -1,4 +1,5 @@
 package disease;
+
 import agentcontainers.Facility;
 import agentcontainers.Region;
 import agents.Person;
@@ -40,13 +41,14 @@ public class FacilityOutbreak {
 	private boolean stop = false;
 	private Region region;
 
-
 	ISchedulableAction nextAction;
 	ExponentialDistribution distro;
 	double meanIntraEventTime;
+
 	public FacilityOutbreak(double intra_event_time, Disease disease2) {
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 		disease = disease2;
+		//transmission();
 	}
 
 	public void transmission() {
@@ -56,6 +58,7 @@ public class FacilityOutbreak {
 		ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse);
 		nextAction = schedule.schedule(params, this, "doTransmission");
 	}
+
 	public void doTransmission() {
 		System.out.println("Hi");
 		PersonDisease pdS = null;
@@ -78,27 +81,28 @@ public class FacilityOutbreak {
 					pdS = pd;
 				System.out.println("pdS set");
 			}
-			if(pdS!=null) {
+			if (pdS != null) {
 				pdS.colonize();
 				pdS.addAcquisition();
 			}
-			if (uC > unifC && uS > unifS) break;
+			if (uC > unifC && uS > unifS)
+				break;
 		}
 		if (pdC == null || pdS == null) {
-			error("Transmission pair choice failure\nuS = %f; unifS = %f; nS = %f;\nuC = %f; unifC = %f; nC = %f\n",
-					uS, unifS, numSusceptibleEffective, uC, unifC, numContagiousEffective);
+			error("Transmission pair choice failure\nuS = %f; unifS = %f; nS = %f;\nuC = %f; unifC = %f; nC = %f\n", uS,
+					unifS, numSusceptibleEffective, uC, unifC, numContagiousEffective);
 		}
 
-		else if (pdC.isInitialInfection()) facility.getRegion().numTransmissionsFromInitialCase++;
+		else if (pdC.isInitialInfection())
+			facility.getRegion().numTransmissionsFromInitialCase++;
 		transmissionsTally++;
 	}
+
 	public void updateTransmissionRate(Region r) {
-		region=r;
+		region = r;
 		double newTransmissionRate;
 		/*
-		 C = colonized
-		 S = susceptible
-		 I = isolated
+		 * C = colonized S = susceptible I = isolated
 		 */
 		int nC = 0;
 		int nS = 0;
@@ -107,16 +111,20 @@ public class FacilityOutbreak {
 		double cScore = 0.0;
 		double sScore = 0.0;
 		for (Person p : facility.getCurrentPatients()) {
-			if(p.getDiseases().size()!=0) {
+			if (p.getDiseases().size() != 0) {
 				PersonDisease pd = p.personDiseases.get(disease.getSimIndex());
 				if (pd.isColonized()) {
 					cScore += pd.getTransmissionRateContribution();
-					if (p.isIsolated()) nCI++;
-					else nC++;
+					if (p.isIsolated())
+						nCI++;
+					else
+						nC++;
 				} else {
 					sScore += pd.getTransmissionRateContribution();
-					if (p.isIsolated()) nSI++;
-					else nS++;
+					if (p.isIsolated())
+						nSI++;
+					else
+						nS++;
 				}
 			}
 		}
@@ -126,22 +134,30 @@ public class FacilityOutbreak {
 		numColonizedIsoNow = nCI;
 		numSusceptibleNow = nS + nSI;
 		numColonizedNow = nC + nCI;
-		if(region.people.size()!=0) {
+		if (region.people.size() != 0) {
 			prevalence = 1.0 * numColonizedNow / region.people.size();
 		}
 		numContagiousEffective = cScore;
 		numSusceptibleEffective = sScore;
-		newTransmissionRate = disease.getBaselineBetaValue(facility.getType()) * numContagiousEffective * numSusceptibleEffective / region.people.size();
+		newTransmissionRate = disease.getBaselineBetaValue(facility.getType()) * numContagiousEffective
+				* numSusceptibleEffective / region.people.size();
 		setTransmissionRate(newTransmissionRate);
 	}
+
 	public void setTransmissionRate(double newTransmissionRate) {
 		if (transmissionRate != newTransmissionRate) {
 			if (nextAction != null) {
 				schedule.removeAction(nextAction);
 			}
-			transmissionRate = newTransmissionRate;
+			System.out.println("Transmission rate: " + this.transmissionRate);
+			System.out.println("New Transmission rate: " + newTransmissionRate);
+			this.transmissionRate = newTransmissionRate;
 			if (transmissionRate > 0) {
-				ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + 10); // or any time-based logic
+				distro = new ExponentialDistribution(1/transmissionRate);
+				double timeToNextEvent = distro.sample();
+				ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() +timeToNextEvent); // or any
+																											// time-based
+																											// logic
 				nextAction = schedule.schedule(params, this, "doTransmission");
 			}
 		}
@@ -150,316 +166,265 @@ public class FacilityOutbreak {
 	private void error(String message, double... values) {
 		System.err.printf(message, values);
 	}
+
 	public void updatePrevalenceTally() {
 		popTallied = region.people.size();
 		popTalliedColonized += numColonizedNow;
-		avgPrevalence = 1.0 * popTalliedColonized / (double)popTallied;
+		avgPrevalence = 1.0 * popTalliedColonized / (double) popTallied;
 	}
+
 	public void updateStayTally(PersonDisease pd) {
 		if (pd.isClinicallyDetectedDuringCurrentStay()) {
 			clinicalDetectionsTallied++;
 		}
 		clinicalDetectionsPer10000PatientDays = 10000 * clinicalDetectionsTallied / facility.getPatientDays();
 		dischargesTallied++;
-		if (pd.isColonized()) colonizedDischargesTallied++;
+		if (pd.isColonized())
+			colonizedDischargesTallied++;
 		avgDischargePrevalence = 1.0 * colonizedDischargesTallied / dischargesTallied;
 	}
+
 	public void updateAdmissionTally(PersonDisease pd) {
 		if (pd.isColonized()) {
 			numAdmissionsColonized++;
 		}
 		importationRate = 1.0 * numAdmissionsColonized / facility.getNumAdmissions();
-		System.out.println("Importation Rate: "+importationRate);
+		System.out.println("Importation Rate: " + importationRate);
 	}
+
 	double uniform() {
 		return Math.random();
 	}
+
 	public void setFacility(Facility f) {
 		facility = f;
 	}
 
-
 	public Disease getDisease() {
-	    return disease;
+		return disease;
 	}
-
 
 	public void setDisease(Disease disease) {
-	    this.disease = disease;
+		this.disease = disease;
 	}
-
 
 	public double getNumSusceptibleNow() {
-	    return numSusceptibleNow;
+		return numSusceptibleNow;
 	}
-
 
 	public void setNumSusceptibleNow(double numSusceptibleNow) {
-	    this.numSusceptibleNow = numSusceptibleNow;
+		this.numSusceptibleNow = numSusceptibleNow;
 	}
-
 
 	public int getNumColonizedNow() {
-	    return numColonizedNow;
+		return numColonizedNow;
 	}
-
 
 	public double getNumSusceptibleEffective() {
-	    return numSusceptibleEffective;
+		return numSusceptibleEffective;
 	}
-
 
 	public void setNumSusceptibleEffective(double numSusceptibleEffective) {
-	    this.numSusceptibleEffective = numSusceptibleEffective;
+		this.numSusceptibleEffective = numSusceptibleEffective;
 	}
-
 
 	public double getNumContagiousEffective() {
-	    return numContagiousEffective;
+		return numContagiousEffective;
 	}
-
 
 	public void setNumContagiousEffective(double numContagiousEffective) {
-	    this.numContagiousEffective = numContagiousEffective;
+		this.numContagiousEffective = numContagiousEffective;
 	}
-
 
 	public int getTransmissionsTally() {
-	    return transmissionsTally;
+		return transmissionsTally;
 	}
-
 
 	public void setTransmissionsTally(int transmissionsTally) {
-	    this.transmissionsTally = transmissionsTally;
+		this.transmissionsTally = transmissionsTally;
 	}
-
 
 	public int getNumAdmissionsColonized() {
-	    return numAdmissionsColonized;
+		return numAdmissionsColonized;
 	}
-
 
 	public void setNumAdmissionsColonized(int numAdmissionsColonized) {
-	    this.numAdmissionsColonized = numAdmissionsColonized;
+		this.numAdmissionsColonized = numAdmissionsColonized;
 	}
-
 
 	public double getImportationRate() {
-	    return importationRate;
+		return importationRate;
 	}
-
 
 	public void setImportationRate(double importationRate) {
-	    this.importationRate = importationRate;
+		this.importationRate = importationRate;
 	}
-
 
 	public double getPrevalence() {
-	    return prevalence;
+		return prevalence;
 	}
-
 
 	public void setPrevalence(double prevalence) {
-	    this.prevalence = prevalence;
+		this.prevalence = prevalence;
 	}
-
 
 	public String getDiseaseName() {
-	    return diseaseName;
+		return diseaseName;
 	}
-
 
 	public void setDiseaseName(String diseaseName) {
-	    this.diseaseName = diseaseName;
+		this.diseaseName = diseaseName;
 	}
-
 
 	public int getNumAdmissionsTallied() {
-	    return numAdmissionsTallied;
+		return numAdmissionsTallied;
 	}
-
 
 	public void setNumAdmissionsTallied(int numAdmissionsTallied) {
-	    this.numAdmissionsTallied = numAdmissionsTallied;
+		this.numAdmissionsTallied = numAdmissionsTallied;
 	}
-
 
 	public int getPopTallied() {
-	    return popTallied;
+		return popTallied;
 	}
-
 
 	public void setPopTallied(int popTallied) {
-	    this.popTallied = popTallied;
+		this.popTallied = popTallied;
 	}
-
 
 	public double getPopTalliedColonized() {
-	    return popTalliedColonized;
+		return popTalliedColonized;
 	}
-
 
 	public void setPopTalliedColonized(double popTalliedColonized) {
-	    this.popTalliedColonized = popTalliedColonized;
+		this.popTalliedColonized = popTalliedColonized;
 	}
-
 
 	public double getAvgPrevalence() {
-	    return avgPrevalence;
+		return avgPrevalence;
 	}
-
 
 	public void setAvgPrevalence(double avgPrevalence) {
-	    this.avgPrevalence = avgPrevalence;
+		this.avgPrevalence = avgPrevalence;
 	}
-
 
 	public int getNumSusceptibleNonIsoNow() {
-	    return numSusceptibleNonIsoNow;
+		return numSusceptibleNonIsoNow;
 	}
-
 
 	public void setNumSusceptibleNonIsoNow(int numSusceptibleNonIsoNow) {
-	    this.numSusceptibleNonIsoNow = numSusceptibleNonIsoNow;
+		this.numSusceptibleNonIsoNow = numSusceptibleNonIsoNow;
 	}
-
 
 	public int getNumSusceptibleIsoNow() {
-	    return numSusceptibleIsoNow;
+		return numSusceptibleIsoNow;
 	}
-
 
 	public void setNumSusceptibleIsoNow(int numSusceptibleIsoNow) {
-	    this.numSusceptibleIsoNow = numSusceptibleIsoNow;
+		this.numSusceptibleIsoNow = numSusceptibleIsoNow;
 	}
-
 
 	public int getNumColonizedNonIsoNow() {
-	    return numColonizedNonIsoNow;
+		return numColonizedNonIsoNow;
 	}
-
 
 	public void setNumColonizedNonIsoNow(int numColonizedNonIsoNow) {
-	    this.numColonizedNonIsoNow = numColonizedNonIsoNow;
+		this.numColonizedNonIsoNow = numColonizedNonIsoNow;
 	}
-
 
 	public int getNumColonizedIsoNow() {
-	    return numColonizedIsoNow;
+		return numColonizedIsoNow;
 	}
-
 
 	public void setNumColonizedIsoNow(int numColonizedIsoNow) {
-	    this.numColonizedIsoNow = numColonizedIsoNow;
+		this.numColonizedIsoNow = numColonizedIsoNow;
 	}
-
 
 	public double getClinicalDetectionsTallied() {
-	    return clinicalDetectionsTallied;
+		return clinicalDetectionsTallied;
 	}
-
 
 	public void setClinicalDetectionsTallied(double clinicalDetectionsTallied) {
-	    this.clinicalDetectionsTallied = clinicalDetectionsTallied;
+		this.clinicalDetectionsTallied = clinicalDetectionsTallied;
 	}
-
 
 	public double getClinicalDetectionsPer10000PatientDays() {
-	    return clinicalDetectionsPer10000PatientDays;
+		return clinicalDetectionsPer10000PatientDays;
 	}
-
 
 	public void setClinicalDetectionsPer10000PatientDays(double clinicalDetectionsPer10000PatientDays) {
-	    this.clinicalDetectionsPer10000PatientDays = clinicalDetectionsPer10000PatientDays;
+		this.clinicalDetectionsPer10000PatientDays = clinicalDetectionsPer10000PatientDays;
 	}
-
 
 	public int getDischargesTallied() {
-	    return dischargesTallied;
+		return dischargesTallied;
 	}
-
 
 	public void setDischargesTallied(int dischargesTallied) {
-	    this.dischargesTallied = dischargesTallied;
+		this.dischargesTallied = dischargesTallied;
 	}
-
 
 	public int getColonizedDischargesTallied() {
-	    return colonizedDischargesTallied;
+		return colonizedDischargesTallied;
 	}
-
 
 	public void setColonizedDischargesTallied(int colonizedDischargesTallied) {
-	    this.colonizedDischargesTallied = colonizedDischargesTallied;
+		this.colonizedDischargesTallied = colonizedDischargesTallied;
 	}
-
 
 	public double getAvgDischargePrevalence() {
-	    return avgDischargePrevalence;
+		return avgDischargePrevalence;
 	}
-
 
 	public void setAvgDischargePrevalence(double avgDischargePrevalence) {
-	    this.avgDischargePrevalence = avgDischargePrevalence;
+		this.avgDischargePrevalence = avgDischargePrevalence;
 	}
-
 
 	public ISchedule getSchedule() {
-	    return schedule;
+		return schedule;
 	}
-
 
 	public void setSchedule(ISchedule schedule) {
-	    this.schedule = schedule;
+		this.schedule = schedule;
 	}
-
 
 	public boolean isStop() {
-	    return stop;
+		return stop;
 	}
-
 
 	public void setStop(boolean stop) {
-	    this.stop = stop;
+		this.stop = stop;
 	}
-
 
 	public ISchedulableAction getNextAction() {
-	    return nextAction;
+		return nextAction;
 	}
-
 
 	public void setNextAction(ISchedulableAction nextAction) {
-	    this.nextAction = nextAction;
+		this.nextAction = nextAction;
 	}
-
 
 	public ExponentialDistribution getDistro() {
-	    return distro;
+		return distro;
 	}
-
 
 	public void setDistro(ExponentialDistribution distro) {
-	    this.distro = distro;
+		this.distro = distro;
 	}
-
 
 	public double getMeanIntraEventTime() {
-	    return meanIntraEventTime;
+		return meanIntraEventTime;
 	}
-
 
 	public void setMeanIntraEventTime(double meanIntraEventTime) {
-	    this.meanIntraEventTime = meanIntraEventTime;
+		this.meanIntraEventTime = meanIntraEventTime;
 	}
-
 
 	public Facility getFacility() {
-	    return facility;
+		return facility;
 	}
 
-
 	public double getTransmissionRate() {
-	    return transmissionRate;
+		return transmissionRate;
 	}
 }

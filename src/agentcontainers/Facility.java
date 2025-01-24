@@ -146,9 +146,8 @@ public class Facility extends AgentContainer{
 
 		for(FacilityOutbreak fo : outbreaks) {
 			fo.updatePrevalenceTally();
-			System.out.println("Verification: "+(fo.getPopTalliedColonized())/region.people.size());
 			System.out.println("Total admissions: "+totalAdmissions);
-			System.out.println("Total imports"+region.getTotalImports());
+			System.out.println("Total imports: "+region.getTotalImports());
 		}
 			
 	}

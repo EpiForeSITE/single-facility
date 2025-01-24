@@ -191,7 +191,6 @@ public class Facility{
 	//Event action code: doNewPatientAdmission();
 
 	void doNewPatientAdmission(){
-		region.importToFacility(this);
 		admitNewPatient.restart();
 	}
 
