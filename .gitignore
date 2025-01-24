@@ -4,3 +4,4 @@ bin/*
 /debug.*
 populationTally.*
 debug.log
+Repast.settings
