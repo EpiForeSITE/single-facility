@@ -128,8 +128,6 @@ public class FacilityOutbreak {
 		numColonizedNow = nC + nCI;
 		if(region.people.size()!=0) {
 			prevalence = 1.0 * numColonizedNow / region.people.size();
-			System.out.println("Num colonized: "+numColonizedNow);
-			System.out.println("Prevalence:"+prevalence);
 		}
 		numContagiousEffective = cScore;
 		numSusceptibleEffective = sScore;
@@ -156,9 +154,6 @@ public class FacilityOutbreak {
 		popTallied = region.people.size();
 		popTalliedColonized += numColonizedNow;
 		avgPrevalence = 1.0 * popTalliedColonized / (double)popTallied;
-		System.out.println("Current Colonized (numColonizedNow): " + numColonizedNow);
-		 System.out.println("Total Tallied Colonized: " + popTalliedColonized);
-		System.out.println("Average Prevalence: "+avgPrevalence);
 	}
 	public void updateStayTally(PersonDisease pd) {
 		if (pd.isClinicallyDetectedDuringCurrentStay()) {
