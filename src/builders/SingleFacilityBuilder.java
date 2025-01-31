@@ -45,7 +45,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 
 		// Oct 4, 2024 WRR: schedule annotated methods on this builder class.
 		schedule.schedule(this);
-
+		context.add(region);
 		// Oct 4, 2024 WRR: return facility?
 		return context;
 	}
@@ -83,6 +83,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 			f.setType(facilityType[i]);
 			f.setAvgPopTarget(facilitySize[i]);
 			f.setMeanLOS(meanLOS[i]);
+			
 			f.setBetaIsolationReduction(1 - isolationEffectiveness);
 			f.setNewPatientAdmissionRate(facilitySize[i] / meanLOS[i]);
 

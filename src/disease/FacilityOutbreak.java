@@ -10,6 +10,7 @@ import repast.simphony.engine.schedule.ISchedulableAction;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
 import repast.simphony.engine.schedule.ScheduledMethod;
+import utils.TimeUtils;
 
 public class FacilityOutbreak {
 	private Disease disease;
@@ -139,11 +140,16 @@ public class FacilityOutbreak {
 		numContagiousEffective = cScore;
 		numSusceptibleEffective = sScore;
 		newTransmissionRate = disease.getBaselineBetaValue(facility.getType()) * numContagiousEffective
-				* numSusceptibleEffective / region.people.size();
-		setTransmissionRate(newTransmissionRate);
+				* numSusceptibleEffective /  facility.getCurrentPatients().size();
+		
+		System.out.println("");
+		System.out.println(TimeUtils.getSchedule().getTickCount());
+		System.out.println("Cscore: " + cScore + ", sScore: " + sScore);
 		System.out.println("Disease beta: "+disease.getBaselineBetaValue(facility.getType()));
 		System.out.println("Contagious: "+numContagiousEffective);
 		System.out.println("Subsceptible: "+numSusceptibleEffective);
+		System.out.println("betaIsolationReductio: " + facility.getBetaIsolationReduction());
+		setTransmissionRate(newTransmissionRate);
 	}
 
 	public void setTransmissionRate(double newTransmissionRate) {

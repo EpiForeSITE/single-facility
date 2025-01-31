@@ -4,3 +4,5 @@ bin/*
 /debug.*
 populationTally.*
 debug.log
+.metadata/
+single-facility.rs/launch.props
