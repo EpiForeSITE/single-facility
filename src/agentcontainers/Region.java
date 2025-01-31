@@ -42,13 +42,6 @@ public class Region extends AgentContainer{
    
    // make int
    public int dailyPopulationTally() {
-       System.out.println("daily population: " + people.size());
-		   	/*stop = false
-			double currTime = schedule.getTickCount()
-			double elapse = distro.sample()
-			ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse)
-			nextAction = schedule.schedule(params, this, "doPopulationTally")
-			*/
       return people.size();
    }
 
@@ -65,14 +58,10 @@ public class Region extends AgentContainer{
 		//stop=true;
 	}
 	public void remove_people(Person person) {
-	    	System.out.println("removing person: " + person.hashCode());
-	    	System.out.println("people size:" + people.size());
-	    	
 	    	
 	    	
 		if (people.contains(person)) {
 		    people.remove(person);
-		    System.out.println("discharging person: " + person.hashCode());
 			if (person.getCurrentFacility() != null) {
 				person.getCurrentFacility().dischargePatient(person); 
 			}
@@ -142,9 +131,6 @@ public class Region extends AgentContainer{
 		if(!facilities.contains(f)&&facilities.size()<1) {
 			facilities.add(f);
 		}
-		// Oct 25, 2024 WRR: This should say "adding patient", right?
-		System.out.println("Adding initial facility agent");
-		System.out.println(facilities.get(0).getCurrentPatients().size());
 	}
 
 	public void startActiveSurveillance(){
@@ -158,7 +144,6 @@ public class Region extends AgentContainer{
 		Person newPerson = new Person(f);
 		
 		newPerson.setRegion(this);
-		System.out.println("Add person " + newPerson.hashCode());
 		people.add(newPerson);  
 		return newPerson;
 	}

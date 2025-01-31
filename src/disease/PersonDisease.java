@@ -43,14 +43,11 @@ public class PersonDisease {
     }
 
 	public void doDecolonization() {
-		if (!colonized) {
-			//throw new IllegalStateException("Decolonizing an agent that is not colonized");
-			//System.out.println();
-			//System.exit(1);
+		if (colonized) {
+			colonized = false;
+			resetClinicalDetectionEvent();
+			person.updateAllTransmissionRateContributions();
 		}
-		colonized = false;
-		resetClinicalDetectionEvent();
-		person.updateAllTransmissionRateContributions();
 	}
 	public boolean isColonized() {
 		return colonized;
@@ -95,12 +92,11 @@ public class PersonDisease {
 			System.err.println("Decolonization distribution is not initialized.");
 			return;
 		}
-		double decolonizationRate = 1.0 / disease.getAvgDecolonizationTime();
-		double timeToDecolonization = decolonizationDistribution.sample();
-
-
-		ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDecolonization);
-		schedule.schedule(params, this, "doDecolonization");
+			double decolonizationRate = 1.0 / disease.getAvgDecolonizationTime();
+			double timeToDecolonization = decolonizationDistribution.sample();
+			ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDecolonization);
+			schedule.schedule(params, this, "doDecolonization");
+		
 	}
 	public void addAcquisition() {
 		startClinicalDetectionTimer();

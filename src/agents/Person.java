@@ -46,7 +46,6 @@ public class Person extends Agent {
 	}
 
 	public void destroyMyself(Region r) {
-	    	System.out.println("Destroy Myself!  " + this.hashCode());
 		
 		r.remove_people(this);
 	}

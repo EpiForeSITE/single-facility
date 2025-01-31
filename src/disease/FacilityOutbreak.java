@@ -60,7 +60,6 @@ public class FacilityOutbreak {
 	}
 
 	public void doTransmission() {
-		System.out.println("Hi");
 		PersonDisease pdS = null;
 		PersonDisease pdC = null;
 		double unifS = uniform() * numSusceptibleEffective;
@@ -142,6 +141,9 @@ public class FacilityOutbreak {
 		newTransmissionRate = disease.getBaselineBetaValue(facility.getType()) * numContagiousEffective
 				* numSusceptibleEffective / region.people.size();
 		setTransmissionRate(newTransmissionRate);
+		System.out.println("Disease beta: "+disease.getBaselineBetaValue(facility.getType()));
+		System.out.println("Contagious: "+numContagiousEffective);
+		System.out.println("Subsceptible: "+numSusceptibleEffective);
 	}
 
 	public void setTransmissionRate(double newTransmissionRate) {
@@ -151,7 +153,7 @@ public class FacilityOutbreak {
 			}
 			System.out.println("Transmission rate: " + this.transmissionRate);
 			System.out.println("New Transmission rate: " + newTransmissionRate);
-			this.transmissionRate = newTransmissionRate;
+			transmissionRate = newTransmissionRate;
 			if (transmissionRate > 0) {
 				distro = new ExponentialDistribution(1/transmissionRate);
 				double timeToNextEvent = distro.sample();
@@ -189,7 +191,6 @@ public class FacilityOutbreak {
 			numAdmissionsColonized++;
 		}
 		importationRate = 1.0 * numAdmissionsColonized / facility.getNumAdmissions();
-		System.out.println("Importation Rate: " + importationRate);
 	}
 
 	double uniform() {
