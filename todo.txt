@@ -1,0 +1,45 @@
+punchlist
+
+verify:
+	endBurnInPeriod
+	endSimulation
+	dailyPopulationTally
+	
+	
+	admitNewPatient
+	discharge
+	transmission
+	deColonize
+	clinicallyDetect
+	
+	
+	one file for each of admitNewPatient-clinicallyDetect
+	
+	# of times each event gets triggered (>0)
+	Count number of transmissions per time (between burn-in and endSim)
+	Count transmissions and clinical detections
+	
+	Intervention is a surveillance
+	
+	Leave builder.doActiveSurveillanceAfterBurnIn = true
+		verify that it's happening
+		
+		
+	
+	files:
+		admissions.txt
+			time, patientid (hashCode), (boolean) importation
+	
+		transmission.txt
+			time, patient1, patient2, 
+		
+		decolonize.txt
+			time, patient
+			
+		clinicalDetection.txt
+			time, patient
+			
+		surveillance.txt
+			time, patient, patientDiseaseState, result 
+	
+	

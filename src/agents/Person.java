@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
+import utils.TimeUtils;
 
 public class Person extends Agent {
 
@@ -86,6 +87,7 @@ public class Person extends Agent {
 		schedule.schedule(params, this, "doSurveillanceTest");
 	}
 	public void doSurveillanceTest() {
+	    System.out.println("do surveillance, time:  " + TimeUtils.getSchedule().getTickCount() + "pt: " + this.hashCode());
 		for (PersonDisease pd : personDiseases) {
 		    // Nov 1, 2024 WRR: Something wrong with this conditional.
 			if (!pd.isDetected() && pd.getDisease().isActiveSurveillanceAgent()) {
