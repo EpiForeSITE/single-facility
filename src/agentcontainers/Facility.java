@@ -54,7 +54,6 @@ public class Facility extends AgentContainer{
 		schedule = sched;
 		Person newPatient = new Person(this);
 		admitPatient(newPatient);
-		System.out.println("New patient admitted. Current population: " + region.people.size());
 		totalAdmissions++;
 	}
 	
@@ -146,9 +145,6 @@ public class Facility extends AgentContainer{
 
 		for(FacilityOutbreak fo : outbreaks) {
 			fo.updatePrevalenceTally();
-			System.out.println("Verification: "+(fo.getPopTalliedColonized())/region.people.size());
-			System.out.println("Total admissions: "+totalAdmissions);
-			System.out.println("Total imports"+region.getTotalImports());
 		}
 			
 	}
@@ -158,9 +154,7 @@ public class Facility extends AgentContainer{
 		
 		
 		if(!outbreaks.isEmpty()&&!p.personDiseases.isEmpty()) {
-			System.out.print("COOOOOL11");
 		for(int i=0; i<outbreaks.size(); i++) {
-			System.out.print(outbreaks.get(i));
 			outbreaks.get(i).updateStayTally(p.personDiseases.get(i));
 			}
 		}
@@ -174,9 +168,7 @@ public class Facility extends AgentContainer{
 		numAdmissions++;
 		
 		if(!outbreaks.isEmpty()&&!p.personDiseases.isEmpty()) {
-			System.out.print("COOOOOL");
 			for(int i=0; i<outbreaks.size(); i++) {
-				System.out.print(outbreaks.get(i));
 				outbreaks.get(i).updateAdmissionTally(p.personDiseases.get(i));
 			}
 		}

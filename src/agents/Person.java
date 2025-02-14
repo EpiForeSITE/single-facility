@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
+import utils.TimeUtils;
 
 public class Person extends Agent {
 
@@ -46,7 +47,6 @@ public class Person extends Agent {
 	}
 
 	public void destroyMyself(Region r) {
-	    	System.out.println("Destroy Myself!  " + this.hashCode());
 		
 		r.remove_people(this);
 	}
@@ -87,6 +87,7 @@ public class Person extends Agent {
 		schedule.schedule(params, this, "doSurveillanceTest");
 	}
 	public void doSurveillanceTest() {
+	    System.out.println("do surveillance, time:  " + TimeUtils.getSchedule().getTickCount() + "pt: " + this.hashCode());
 		for (PersonDisease pd : personDiseases) {
 		    // Nov 1, 2024 WRR: Something wrong with this conditional.
 			if (!pd.isDetected() && pd.getDisease().isActiveSurveillanceAgent()) {
@@ -108,13 +109,12 @@ public class Person extends Agent {
 	}
 	public PersonDisease add_diseases() {
 		
-		Person person = region.people.get(region.people.size() - 1);
+		//Person person = region.people.get(region.people.size() - 1);
 		Disease disease = region.diseases.get(0);
 
-		PersonDisease pd = new PersonDisease(disease, person, schedule);
-		pd.setDisease(disease);
-		pd.setPerson(person);
-		person.personDiseases.add(pd);
+		PersonDisease pd = new PersonDisease(disease, this, schedule);
+
+		this.personDiseases.add(pd);
 		return pd;
 	}
 	public Facility getCurrentFacility() {

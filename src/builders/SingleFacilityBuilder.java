@@ -18,6 +18,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private ISchedule schedule;
 	private double isolationEffectiveness = 0.5;
 	private boolean doActiveSurveillance = false;
+	private boolean doActiveSurveillanceAfterBurnIn = true;
 	private double daysBetweenTests = 14.0;
 	private PrintWriter facilityPrevalenceData;
 	private PrintWriter R0Data;
@@ -30,7 +31,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 
 	@Override
 	public Context<Object> build(Context<Object> context) {
-		System.out.println("Starting simulation build.");
+		// System.out.println("Starting simulation build.");
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 		facility = new Facility();
 		this.region = new Region(facility);
@@ -45,7 +46,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 
 		// Oct 4, 2024 WRR: schedule annotated methods on this builder class.
 		schedule.schedule(this);
-
+		context.add(region);
 		// Oct 4, 2024 WRR: return facility?
 		return context;
 	}
@@ -63,7 +64,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	}
 
 	public void setupAgents() {
-		System.out.println("Setting up AGENTS");
+		// System.out.println("Setting up AGENTS");
 
 		int numDiseases = 1;
 		int[] diseaseList = { (int) Disease.getCRE() };
@@ -83,6 +84,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 			f.setType(facilityType[i]);
 			f.setAvgPopTarget(facilitySize[i]);
 			f.setMeanLOS(meanLOS[i]);
+			
 			f.setBetaIsolationReduction(1 - isolationEffectiveness);
 			f.setNewPatientAdmissionRate(facilitySize[i] / meanLOS[i]);
 
@@ -107,7 +109,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	}
 
 	public void scheduleEvents() {
-		System.out.println("Scheduling events.");
+		// System.out.println("Scheduling events.");
 		schedule.schedule(ScheduleParameters.createOneTime(burnInTime), this, "doEndBurnInPeriod");
 
 		System.out.println("Scheduled burn-in end at tick: " + burnInTime);
@@ -133,7 +135,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		System.out.println("Burn-in period ended at tick: " + schedule.getTickCount());
 		region.setInBurnInPeriod(false);
 		region.startDailyPopulationTallyTimer();
-		doActiveSurveillance = true;
+		doActiveSurveillance = doActiveSurveillanceAfterBurnIn;
 		if (!stop) {
 			scheduleSimulationEnd();
 		}
