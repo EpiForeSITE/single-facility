@@ -4,7 +4,11 @@ bin/*
 /debug.*
 populationTally.*
 debug.log
+
 .metadata/
 single-facility.rs/launch.props
 Repast.settings
 debug.log
+
+Repast.settings
+
