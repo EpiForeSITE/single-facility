@@ -1,7 +1,7 @@
 <repast.simphony.data2.engine.DataSetDescriptor simphonyVersion="2.11.0">
-  <name>PopulationTally</name>
+  <name>A Data Set</name>
   <type>NON_AGGREGATE</type>
-  <sourceType>agentcontainers.Region</sourceType>
+  <sourceType>agentcontainers.Facility</sourceType>
   <inclTick>true</inclTick>
   <inclBatchRun>false</inclBatchRun>
   <inclRandomSeed>false</inclRandomSeed>
@@ -12,16 +12,16 @@
     <pType>LAST</pType>
     <duration>-1.0</duration>
     <frequency>REPEAT</frequency>
-    <hashCode>1517761457</hashCode>
+    <hashCode>1297901983</hashCode>
   </scheduleParams>
   <atEnd>false</atEnd>
   <methodDataSources class="linked-hash-map">
     <entry>
-      <string>dailyPopulationTally</string>
+      <string>CurrentPatientCount</string>
       <repast.simphony.data2.engine.MethodDataSourceDefinition>
-        <id>dailyPopulationTally</id>
-        <className>agentcontainers.Region</className>
-        <methodName>dailyPopulationTally</methodName>
+        <id>CurrentPatientCount</id>
+        <className>agentcontainers.Facility</className>
+        <methodName>getCurrentPatientCount</methodName>
       </repast.simphony.data2.engine.MethodDataSourceDefinition>
     </entry>
   </methodDataSources>
