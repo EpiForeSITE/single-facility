@@ -111,8 +111,7 @@ public class Person extends Agent {
 		Disease disease = region.diseases.get(0);
 
 		PersonDisease pd = new PersonDisease(disease, this, schedule);
-		pd.setDisease(disease);
-		pd.setPerson(this);
+
 		this.personDiseases.add(pd);
 		return pd;
 	}
