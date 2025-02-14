@@ -9,6 +9,9 @@ import repast.simphony.engine.schedule.ISchedulableAction;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
 import repast.simphony.random.RandomHelper;
+
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -42,12 +45,20 @@ public class Facility extends AgentContainer{
 	private double isolationEffectiveness;
 	private int totalAdmissions;
 	private int totalImports;
+	private PrintWriter admissionsWriter;
+	public boolean importation;
 	
 	// Constructor
 	public Facility() {
 		super();
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 		region = new Region(this);
+		try {
+            admissionsWriter = new PrintWriter("admissions.txt");
+        } 
+	 catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 	}
 
 	public void admitNewPatient(ISchedule sched) {
@@ -58,6 +69,7 @@ public class Facility extends AgentContainer{
 	}
 	
 	public void admitPatient(Person p){
+		logPatientAdmission(schedule.getTickCount(), p.hashCode(), importation);
 		region.importToFacilityNew(this,p);
 	    
 		p.admitToFacility(this);
@@ -306,4 +318,7 @@ public class Facility extends AgentContainer{
 	public ArrayList<FacilityOutbreak> getOutbreaks() {
 		return outbreaks;
 	}
+	public void logPatientAdmission(double time, int patientID, boolean importation) {
+          admissionsWriter.printf("Time: %.2f, Patient ID: %d, Importation: %b%n", time, patientID, importation);
+    }
 }

@@ -32,6 +32,7 @@ public class Person extends Agent {
 		currentFacility = f;
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 	}
+
 	public static void setSchedule(ISchedule sched) {
 		schedule = sched;
 	}
@@ -43,18 +44,20 @@ public class Person extends Agent {
 
 	public void startDischargeTimer(double timeToDischarge) {
 		dischargeTime = timeToDischarge;
-		schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + dischargeTime), this, "doPatientDischarge");
+		schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + dischargeTime), this,
+				"doPatientDischarge");
 	}
 
 	public void destroyMyself(Region r) {
-		
+
 		r.remove_people(this);
 	}
 
 	public void startNextPeriodicSurveillanceTimer() {
 		double timeToNextSurveillance = currentFacility.getTimeBetweenMidstaySurveillanceTests();
 		if (timeToNextSurveillance < dischargeTime) {
-			schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + timeToNextSurveillance), this, "doSurveillanceTest");
+			schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + timeToNextSurveillance), this,
+					"doSurveillanceTest");
 		}
 	}
 
@@ -68,9 +71,11 @@ public class Person extends Agent {
 		}
 		currentFacility.updateTransmissionRate();
 	}
+
 	public void doPatientDischarge() {
 		currentFacility.dischargePatient(this);
 	}
+
 	public void discharge() {
 		this.stop = false;
 		double currTime = schedule.getTickCount();
@@ -86,12 +91,15 @@ public class Person extends Agent {
 		ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse);
 		schedule.schedule(params, this, "doSurveillanceTest");
 	}
+
 	public void doSurveillanceTest() {
-	    System.out.println("do surveillance, time:  " + TimeUtils.getSchedule().getTickCount() + "pt: " + this.hashCode());
+		System.out.println(
+				"do surveillance, time:  " + TimeUtils.getSchedule().getTickCount() + "pt: " + this.hashCode());
 		for (PersonDisease pd : personDiseases) {
-		    // Nov 1, 2024 WRR: Something wrong with this conditional.
+			// Nov 1, 2024 WRR: Something wrong with this conditional.
 			if (!pd.isDetected() && pd.getDisease().isActiveSurveillanceAgent()) {
-				if (pd.isColonized() && uniform() < pd.getDisease().getProbSurveillanceDetection() * currentFacility.getMidstaySurveillanceAdherence()) {
+				if (pd.isColonized() && uniform() < pd.getDisease().getProbSurveillanceDetection()
+						* currentFacility.getMidstaySurveillanceAdherence()) {
 					pd.setDetected(true);
 					if (!isolated) {
 						isolate();
@@ -107,9 +115,10 @@ public class Person extends Agent {
 	public double uniform() {
 		return Math.random();
 	}
+
 	public PersonDisease add_diseases() {
-		
-		//Person person = region.people.get(region.people.size() - 1);
+
+		// Person person = region.people.get(region.people.size() - 1);
 		Disease disease = region.diseases.get(0);
 
 		PersonDisease pd = new PersonDisease(disease, this, schedule);
@@ -117,81 +126,106 @@ public class Person extends Agent {
 		this.personDiseases.add(pd);
 		return pd;
 	}
+
 	public Facility getCurrentFacility() {
 		return currentFacility;
 	}
+
 	public boolean isIsolated() {
-	   return isolated;
+		return isolated;
 	}
+
 	public double getCurrentLOS() {
-	    if (getDischargeTime() == 0.0) {
-		return schedule.getTickCount() - getAdmissionTime();
-	    }
-	    return getDischargeTime() - getAdmissionTime();
+		if (getDischargeTime() == 0.0) {
+			return schedule.getTickCount() - getAdmissionTime();
+		}
+		return getDischargeTime() - getAdmissionTime();
 	}
+
 	public Region getRegion() {
-	    return region;
+		return region;
 	}
+
 	public void setRegion(Region region) {
-	    this.region = region;
+		this.region = region;
 	}
+
 	public double getAdmissionTime() {
-	    return admissionTime;
+		return admissionTime;
 	}
+
 	public void setAdmissionTime(double admissionTime) {
-	    this.admissionTime = admissionTime;
+		this.admissionTime = admissionTime;
 	}
+
 	public ArrayList<PersonDisease> getDiseases() {
-	    return personDiseases;
+		return personDiseases;
 	}
+
 	public void setDiseases(ArrayList<PersonDisease> diseases) {
-	    this.personDiseases = diseases;
+		this.personDiseases = diseases;
 	}
+
 	public boolean isStop() {
-	    return stop;
+		return stop;
 	}
+
 	public void setStop(boolean stop) {
-	    this.stop = stop;
+		this.stop = stop;
 	}
+
 	public double getDischargeTime() {
-	    return dischargeTime;
+		return dischargeTime;
 	}
+
 	public void setDischargeTime(double dischargeTime) {
-	    this.dischargeTime = dischargeTime;
+		this.dischargeTime = dischargeTime;
 	}
+
 	public ArrayList<Facility> getFacilities() {
-	    return facilities;
+		return facilities;
 	}
+
 	public void setFacilities(ArrayList<Facility> facilities) {
-	    this.facilities = facilities;
+		this.facilities = facilities;
 	}
+
 	public ArrayList<Disease> getDiseasesNew() {
-	    return diseases;
+		return diseases;
 	}
+
 	public void setDiseasesNew(ArrayList<Disease> diseases) {
-	    this.diseases = diseases;
+		this.diseases = diseases;
 	}
+
 	public ArrayList<Person> getPeople() {
-	    return people;
+		return people;
 	}
+
 	public void setPeople(ArrayList<Person> people) {
-	    this.people = people;
+		this.people = people;
 	}
+
 	public ExponentialDistribution getDistro() {
-	    return distro;
+		return distro;
 	}
+
 	public void setDistro(ExponentialDistribution distro) {
-	    this.distro = distro;
+		this.distro = distro;
 	}
+
 	public static ISchedule getSchedule() {
-	    return schedule;
+		return schedule;
 	}
+
 	public void setCurrentFacility(Facility currentFacility) {
-	    this.currentFacility = currentFacility;
+		this.currentFacility = currentFacility;
 	}
+
 	public void setIsolated(boolean isolated) {
-	    this.isolated = isolated;
+		this.isolated = isolated;
 	}
+
 	public void setCurrentLOS(double currentLOS) {
 	}
 }
