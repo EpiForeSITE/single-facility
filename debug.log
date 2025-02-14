@@ -917,3 +917,219 @@ Caused by: java.lang.IllegalStateException: Decolonizing an agent that is not co
 	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
 	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
 	... 6 more
+FATAL [Thread-1] 2025-01-31T20:43:43,680 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (2469.065398517544)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64) ~[?:?]
+	at jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70) ~[?:?]
+	at jdk.internal.util.Preconditions.checkIndex(Preconditions.java:266) ~[?:?]
+	at java.util.Objects.checkIndex(Objects.java:361) ~[?:?]
+	at java.util.ArrayList.get(ArrayList.java:427) ~[?:?]
+	at disease.FacilityOutbreak.doTransmission(FacilityOutbreak.java:71) ~[?:?]
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2025-02-07T12:55:39,104 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (11.09298335037719)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.util.IllegalFormatConversionException: f != [D
+	at java.util.Formatter$FormatSpecifier.failConversion(Formatter.java:4442) ~[?:?]
+	at java.util.Formatter$FormatSpecifier.printFloat(Formatter.java:2976) ~[?:?]
+	at java.util.Formatter$FormatSpecifier.print(Formatter.java:2924) ~[?:?]
+	at java.util.Formatter.format(Formatter.java:2689) ~[?:?]
+	at java.io.PrintStream.format(PrintStream.java:1209) ~[?:?]
+	at java.io.PrintStream.printf(PrintStream.java:1105) ~[?:?]
+	at disease.FacilityOutbreak.error(FacilityOutbreak.java:178) ~[?:?]
+	at disease.FacilityOutbreak.doTransmission(FacilityOutbreak.java:93) ~[?:?]
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2025-02-07T12:56:49,982 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (2937.472824699491)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.util.IllegalFormatConversionException: f != [D
+	at java.util.Formatter$FormatSpecifier.failConversion(Formatter.java:4442) ~[?:?]
+	at java.util.Formatter$FormatSpecifier.printFloat(Formatter.java:2976) ~[?:?]
+	at java.util.Formatter$FormatSpecifier.print(Formatter.java:2924) ~[?:?]
+	at java.util.Formatter.format(Formatter.java:2689) ~[?:?]
+	at java.io.PrintStream.format(PrintStream.java:1209) ~[?:?]
+	at java.io.PrintStream.printf(PrintStream.java:1105) ~[?:?]
+	at disease.FacilityOutbreak.error(FacilityOutbreak.java:179) ~[?:?]
+	at disease.FacilityOutbreak.doTransmission(FacilityOutbreak.java:94) ~[?:?]
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2025-02-07T12:58:33,219 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (521.2836830373433)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.util.IllegalFormatConversionException: f != [D
+	at java.util.Formatter$FormatSpecifier.failConversion(Formatter.java:4442) ~[?:?]
+	at java.util.Formatter$FormatSpecifier.printFloat(Formatter.java:2976) ~[?:?]
+	at java.util.Formatter$FormatSpecifier.print(Formatter.java:2924) ~[?:?]
+	at java.util.Formatter.format(Formatter.java:2689) ~[?:?]
+	at java.io.PrintStream.format(PrintStream.java:1209) ~[?:?]
+	at java.io.PrintStream.printf(PrintStream.java:1105) ~[?:?]
+	at disease.FacilityOutbreak.error(FacilityOutbreak.java:181) ~[?:?]
+	at disease.FacilityOutbreak.doTransmission(FacilityOutbreak.java:98) ~[?:?]
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2025-02-13T17:58:14,139 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (3590.924567213588)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64) ~[?:?]
+	at jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70) ~[?:?]
+	at jdk.internal.util.Preconditions.checkIndex(Preconditions.java:266) ~[?:?]
+	at java.util.Objects.checkIndex(Objects.java:361) ~[?:?]
+	at java.util.ArrayList.get(ArrayList.java:427) ~[?:?]
+	at disease.FacilityOutbreak.doTransmission(FacilityOutbreak.java:71) ~[?:?]
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2025-02-13T18:02:36,160 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (3432.7265939501444)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.util.IllegalFormatConversionException: f != [D
+	at java.util.Formatter$FormatSpecifier.failConversion(Formatter.java:4442) ~[?:?]
+	at java.util.Formatter$FormatSpecifier.printFloat(Formatter.java:2976) ~[?:?]
+	at java.util.Formatter$FormatSpecifier.print(Formatter.java:2924) ~[?:?]
+	at java.util.Formatter.format(Formatter.java:2689) ~[?:?]
+	at java.io.PrintStream.format(PrintStream.java:1209) ~[?:?]
+	at java.io.PrintStream.printf(PrintStream.java:1105) ~[?:?]
+	at disease.FacilityOutbreak.error(FacilityOutbreak.java:182) ~[?:?]
+	at disease.FacilityOutbreak.doTransmission(FacilityOutbreak.java:99) ~[?:?]
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2025-02-13T18:06:33,730 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (541.1377597743488)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64) ~[?:?]
+	at jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70) ~[?:?]
+	at jdk.internal.util.Preconditions.checkIndex(Preconditions.java:266) ~[?:?]
+	at java.util.Objects.checkIndex(Objects.java:361) ~[?:?]
+	at java.util.ArrayList.get(ArrayList.java:427) ~[?:?]
+	at disease.FacilityOutbreak.doTransmission(FacilityOutbreak.java:71) ~[?:?]
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+FATAL [Thread-1] 2025-02-13T18:07:04,620 GUIScheduleRunner - RunTimeException when running the schedule
+Current tick (4489.87981701985)
+java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:129) ~[?:?]
+	at repast.simphony.engine.schedule.DefaultAction.execute(DefaultAction.java:38) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.executeList(ScheduleGroup.java:205) ~[?:?]
+	at repast.simphony.engine.schedule.ScheduleGroup.execute(ScheduleGroup.java:231) ~[?:?]
+	at repast.simphony.engine.schedule.Schedule.execute(Schedule.java:375) ~[?:?]
+	at repast.simphony.ui.GUIScheduleRunner$ScheduleLoopRunnable.run(GUIScheduleRunner.java:52) ~[?:?]
+	at java.lang.Thread.run(Thread.java:840) ~[?:?]
+Caused by: java.lang.reflect.InvocationTargetException
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more
+Caused by: java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64) ~[?:?]
+	at jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70) ~[?:?]
+	at jdk.internal.util.Preconditions.checkIndex(Preconditions.java:266) ~[?:?]
+	at java.util.Objects.checkIndex(Objects.java:361) ~[?:?]
+	at java.util.ArrayList.get(ArrayList.java:427) ~[?:?]
+	at disease.FacilityOutbreak.doTransmission(FacilityOutbreak.java:71) ~[?:?]
+	at disease.FacilityOutbreak$$FastClassByCGLIB$$7d796886.invoke(<generated>) ~[?:?]
+	at net.sf.cglib.reflect.FastMethod.invoke(FastMethod.java:53) ~[?:?]
+	at repast.simphony.engine.schedule.CallBackAction.execute(CallBackAction.java:127) ~[?:?]
+	... 6 more

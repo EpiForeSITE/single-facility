@@ -49,7 +49,7 @@ public class FacilityOutbreak {
 	public FacilityOutbreak(double intra_event_time, Disease disease2) {
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 		disease = disease2;
-		//transmission();
+		// transmission();
 	}
 
 	public void transmission() {
@@ -68,33 +68,36 @@ public class FacilityOutbreak {
 		double uS = 0.0;
 		double uC = 0.0;
 		for (Person p : facility.getCurrentPatients()) {
-			PersonDisease pd = p.getDiseases().get(disease.getSimIndex());
+			PersonDisease pd = p.getDiseases().get(disease.getSimIndex());//Fix
 			if (pd.isColonized() && uC < unifC) {
 				uC += pd.getTransmissionRateContribution();
-				if (uC > unifC)
+				if (uC > unifC) {
 					pdC = pd;
+				}
 				System.out.println("pdC set");
 			}
 			if (!pd.isColonized() && uS <= unifS) {
 				uS += pd.getTransmissionRateContribution();
-				if (uS > unifS)
+				if (uS > unifS) {
 					pdS = pd;
+				}
 				System.out.println("pdS set");
 			}
 			if (pdS != null) {
 				pdS.colonize();
 				pdS.addAcquisition();
 			}
-			if (uC > unifC && uS > unifS)
+			if (uC > unifC && uS > unifS) {
 				break;
+			}
+
 		}
 		if (pdC == null || pdS == null) {
 			error("Transmission pair choice failure\nuS = %f; unifS = %f; nS = %f;\nuC = %f; unifC = %f; nC = %f\n", uS,
 					unifS, numSusceptibleEffective, uC, unifC, numContagiousEffective);
-		}
-
-		else if (pdC.isInitialInfection())
+		} else if (pdC.isInitialInfection()) {
 			facility.getRegion().numTransmissionsFromInitialCase++;
+		}
 		transmissionsTally++;
 	}
 
@@ -112,7 +115,7 @@ public class FacilityOutbreak {
 		double sScore = 0.0;
 		for (Person p : facility.getCurrentPatients()) {
 			if (p.getDiseases().size() != 0) {
-				PersonDisease pd = p.personDiseases.get(disease.getSimIndex());
+				PersonDisease pd = p.getDiseases().get(disease.getSimIndex());
 				if (pd.isColonized()) {
 					cScore += pd.getTransmissionRateContribution();
 					if (p.isIsolated())
@@ -140,14 +143,14 @@ public class FacilityOutbreak {
 		numContagiousEffective = cScore;
 		numSusceptibleEffective = sScore;
 		newTransmissionRate = disease.getBaselineBetaValue(facility.getType()) * numContagiousEffective
-				* numSusceptibleEffective /  facility.getCurrentPatients().size();
-		
+				* numSusceptibleEffective / facility.getCurrentPatients().size();
+
 		System.out.println("");
 		System.out.println(TimeUtils.getSchedule().getTickCount());
 		System.out.println("Cscore: " + cScore + ", sScore: " + sScore);
-		System.out.println("Disease beta: "+disease.getBaselineBetaValue(facility.getType()));
-		System.out.println("Contagious: "+numContagiousEffective);
-		System.out.println("Subsceptible: "+numSusceptibleEffective);
+		System.out.println("Disease beta: " + disease.getBaselineBetaValue(facility.getType()));
+		System.out.println("Contagious: " + numContagiousEffective);
+		System.out.println("Subsceptible: " + numSusceptibleEffective);
 		System.out.println("betaIsolationReductio: " + facility.getBetaIsolationReduction());
 		setTransmissionRate(newTransmissionRate);
 	}
@@ -161,11 +164,12 @@ public class FacilityOutbreak {
 			System.out.println("New Transmission rate: " + newTransmissionRate);
 			transmissionRate = newTransmissionRate;
 			if (transmissionRate > 0) {
-				distro = new ExponentialDistribution(1/transmissionRate);
+				distro = new ExponentialDistribution(1 / transmissionRate);
 				double timeToNextEvent = distro.sample();
-				ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() +timeToNextEvent); // or any
-																											// time-based
-																											// logic
+				ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + timeToNextEvent); // or
+																															// any
+				// time-based
+				// logic
 				nextAction = schedule.schedule(params, this, "doTransmission");
 			}
 		}
