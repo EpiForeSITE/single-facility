@@ -107,13 +107,13 @@ public class Person extends Agent {
 	}
 	public PersonDisease add_diseases() {
 		
-		Person person = region.people.get(region.people.size() - 1);
+		//Person person = region.people.get(region.people.size() - 1);
 		Disease disease = region.diseases.get(0);
 
-		PersonDisease pd = new PersonDisease(disease, person, schedule);
+		PersonDisease pd = new PersonDisease(disease, this, schedule);
 		pd.setDisease(disease);
-		pd.setPerson(person);
-		person.personDiseases.add(pd);
+		pd.setPerson(this);
+		this.personDiseases.add(pd);
 		return pd;
 	}
 	public Facility getCurrentFacility() {
