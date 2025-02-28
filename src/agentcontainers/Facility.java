@@ -69,9 +69,9 @@ public class Facility extends AgentContainer{
 	}
 	
 	public void admitPatient(Person p){
-		logPatientAdmission(schedule.getTickCount(), p.hashCode(), importation);
 		region.importToFacilityNew(this,p);
 	    
+		logPatientAdmission(schedule.getTickCount(), p.hashCode(), (boolean) p.getProperty("importation"));
 		p.admitToFacility(this);
 		
 

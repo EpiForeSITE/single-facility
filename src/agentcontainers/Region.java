@@ -102,7 +102,6 @@ public class Region extends AgentContainer{
 		
 	}
     public void importToFacilityNew(Facility f, Person p) {
-    	f.importation=true;
 		
 		p.setRegion(this);
 		for(Disease d : diseases){
@@ -110,8 +109,11 @@ public class Region extends AgentContainer{
 			pd.setDisease(d);
 			pd.setPerson(p);
 			if(uniform() < d.getImportationProb()) {
+			    p.setProperty("importation", true);
 			    pd.colonize();
 			    totalImports++;
+			} else {
+			    p.setProperty("importation", false);
 			}
 		}
     }

@@ -6,6 +6,7 @@ import disease.Disease;
 import disease.PersonDisease;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import repast.simphony.engine.schedule.ISchedule;
@@ -26,11 +27,13 @@ public class Person extends Agent {
 	private ArrayList<Disease> diseases = new ArrayList<>();
 	private ArrayList<Person> people = new ArrayList<>();
 	private ExponentialDistribution distro;
+	private HashMap<String, Object> properties;
 
 	public Person(Facility f) {
 		super();
 		currentFacility = f;
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
+		properties = new HashMap<String, Object>();
 	}
 
 	public static void setSchedule(ISchedule sched) {
@@ -228,4 +231,13 @@ public class Person extends Agent {
 
 	public void setCurrentLOS(double currentLOS) {
 	}
+	
+	public void setProperty(String s, Object o) {
+	    this.properties.put(s, o);
+	  
+	}
+	
+	public Object getProperty(String s) {
+	    return this.properties.get(s);
+	    }
 }
