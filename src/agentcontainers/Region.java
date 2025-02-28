@@ -102,6 +102,7 @@ public class Region extends AgentContainer{
 		
 	}
     public void importToFacilityNew(Facility f, Person p) {
+    	f.importation=true;
 		
 		p.setRegion(this);
 		for(Disease d : diseases){
