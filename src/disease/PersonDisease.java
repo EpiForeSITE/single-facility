@@ -2,6 +2,10 @@ package disease;
 
 
 import agents.Person;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import repast.simphony.engine.schedule.ScheduleParameters;
 import repast.simphony.engine.schedule.ISchedule;
@@ -24,12 +28,21 @@ public class PersonDisease {
 	private ISchedule schedule;
 	private ExponentialDistribution decolonizationDistribution;
 	private ExponentialDistribution clinicalDetectionDistribution;
+	private static PrintWriter logWriter;
 
+	static {
+        try {
+            logWriter = new PrintWriter("decolonization.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	public PersonDisease(Disease disease, Person person, ISchedule schedule) {
         this.disease = disease;
         this.person = person;
         this.schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
+       
 		initializeEventDistributions();
 		double decolonizationRate = 1.0 / disease.getAvgDecolonizationTime();
 		if (person.getCurrentFacility() == null) {
@@ -44,9 +57,13 @@ public class PersonDisease {
     }
 
 	public void doDecolonization() {
-	    	System.out.println(person.hashCode() + ": decol at " + TimeUtils.getSchedule().getTickCount());
+		double currentTime = schedule.getTickCount();
+        System.out.println(person.hashCode() + ": Decolonized at " + currentTime);
+        
+        
 		if (colonized) {
 			colonized = false;
+			logWriter.printf("Time: %.2f, Decolonized Patient: %d%n", currentTime, person.hashCode());
 			resetClinicalDetectionEvent();
 			person.updateAllTransmissionRateContributions();
 		}
