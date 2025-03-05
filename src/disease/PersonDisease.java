@@ -28,11 +28,13 @@ public class PersonDisease {
 	private ISchedule schedule;
 	private ExponentialDistribution decolonizationDistribution;
 	private ExponentialDistribution clinicalDetectionDistribution;
-	private static PrintWriter logWriter;
+	private static PrintWriter decolWriter;
+	private static PrintWriter clinicalWriter;
 
 	static {
         try {
-            logWriter = new PrintWriter("decolonization.txt");
+            decolWriter = new PrintWriter("decolonization.txt");
+            clinicalWriter = new PrintWriter("clinicalDetection.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,7 +65,7 @@ public class PersonDisease {
         
 		if (colonized) {
 			colonized = false;
-			logWriter.printf("Time: %.2f, Decolonized Patient: %d%n", currentTime, person.hashCode());
+			decolWriter.printf("Time: %.2f, Decolonized Patient: %d%n", currentTime, person.hashCode());
 			resetClinicalDetectionEvent();
 			person.updateAllTransmissionRateContributions();
 		}
@@ -78,8 +80,10 @@ public class PersonDisease {
 		this.disease = disease;
 	}
 	public void doClinicalDetection() {
+		double currentTime = schedule.getTickCount();
 		detected = true;
 		clinicallyDetectedDuringCurrentStay = true;
+		clinicalWriter.printf("Time: %.2f, Detected Patient: %d%n", currentTime, person.hashCode());
 		if (!person.isIsolated() && disease.isolatePatientWhenDetected()) {
 			person.isolate();
 			person.updateAllTransmissionRateContributions();
