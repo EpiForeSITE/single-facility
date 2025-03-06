@@ -91,6 +91,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 			f.setNewPatientAdmissionRate(facilitySize[i] / meanLOS[i]);
 
 			if (doActiveSurveillance) {
+				System.out.println("Setting active surveillance for facility: " + f);
 				f.setTimeBetweenMidstaySurveillanceTests(daysBetweenTests);
 			}
 
@@ -138,6 +139,12 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		region.setInBurnInPeriod(false);
 		region.startDailyPopulationTallyTimer();
 		doActiveSurveillance = doActiveSurveillanceAfterBurnIn;
+		 if (doActiveSurveillance) {
+		        for (Facility f : region.getFacilities()) {
+		            System.out.println("Activating surveillance for facility: " + f);
+		            f.setTimeBetweenMidstaySurveillanceTests(daysBetweenTests);
+		        }
+		    }
 		if (!stop) {
 			scheduleSimulationEnd();
 		}

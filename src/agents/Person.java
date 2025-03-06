@@ -5,6 +5,8 @@ import agentcontainers.Region;
 import disease.Disease;
 import disease.PersonDisease;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -28,6 +30,15 @@ public class Person extends Agent {
 	private ArrayList<Person> people = new ArrayList<>();
 	private ExponentialDistribution distro;
 	private HashMap<String, Object> properties;
+	private static PrintWriter surveillanceWriter;
+
+    static {
+        try {
+            surveillanceWriter = new PrintWriter("surveillance.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	public Person(Facility f) {
 		super();
@@ -59,6 +70,7 @@ public class Person extends Agent {
 	public void startNextPeriodicSurveillanceTimer() {
 		double timeToNextSurveillance = currentFacility.getTimeBetweenMidstaySurveillanceTests();
 		if (timeToNextSurveillance < dischargeTime) {
+			System.out.println("Time to next surveillance: " + timeToNextSurveillance);
 			schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + timeToNextSurveillance), this,
 					"doSurveillanceTest");
 		}
@@ -96,6 +108,7 @@ public class Person extends Agent {
 	}
 
 	public void doSurveillanceTest() {
+		double currentTime = schedule.getTickCount();
 		System.out.println(
 				"do surveillance, time:  " + TimeUtils.getSchedule().getTickCount() + "pt: " + this.hashCode());
 		for (PersonDisease pd : personDiseases) {
@@ -111,6 +124,8 @@ public class Person extends Agent {
 				} else {
 					startNextPeriodicSurveillanceTimer();
 				}
+				surveillanceWriter.printf("Time: %.2f, Patient: %d, Colonized: %b, Detected: %b%n",
+                        currentTime, this.hashCode(), pd.isColonized(), pd.isDetected());
 			}
 		}
 	}
