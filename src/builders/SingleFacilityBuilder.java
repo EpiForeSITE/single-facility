@@ -9,16 +9,18 @@ import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
 import repast.simphony.engine.schedule.ScheduledMethod;
+import repast.simphony.parameter.Parameters;
 import utils.TimeUtils;
 import agentcontainers.Facility;
 import agentcontainers.Region;
+
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
 public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private ISchedule schedule;
-	private double isolationEffectiveness = 0.5;
+	private double isolationEffectiveness;
 	private boolean doActiveSurveillance = false;
 	private boolean doActiveSurveillanceAfterBurnIn = true;
 	private double daysBetweenTests = 14.0;
@@ -30,11 +32,17 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private double totalTime = burnInTime + postBurnInTime;
 	public Facility facility;
 	private boolean stop = false;
+	private Parameters params;
+	
 
 	@Override
 	public Context<Object> build(Context<Object> context) {
 		// System.out.println("Starting simulation build.");
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
+		
+		params = repast.simphony.engine.environment.RunEnvironment.getInstance().getParameters();
+		isolationEffectiveness = params.getDouble("isolationEffectiveness");
+		
 		facility = new Facility();
 		this.region = new Region(facility);
 		facility.setRegion(region);
@@ -91,6 +99,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 			f.setNewPatientAdmissionRate(facilitySize[i] / meanLOS[i]);
 
 			if (doActiveSurveillance) {
+				System.out.println("Setting active surveillance for facility: " + f);
 				f.setTimeBetweenMidstaySurveillanceTests(daysBetweenTests);
 			}
 
@@ -138,6 +147,12 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		region.setInBurnInPeriod(false);
 		region.startDailyPopulationTallyTimer();
 		doActiveSurveillance = doActiveSurveillanceAfterBurnIn;
+		 if (doActiveSurveillance) {
+		        for (Facility f : region.getFacilities()) {
+		            System.out.println("Activating surveillance for facility: " + f);
+		            f.setTimeBetweenMidstaySurveillanceTests(daysBetweenTests);
+		        }
+		    }
 		if (!stop) {
 			scheduleSimulationEnd();
 		}

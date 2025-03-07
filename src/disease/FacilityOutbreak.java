@@ -3,6 +3,10 @@ package disease;
 import agentcontainers.Facility;
 import agentcontainers.Region;
 import agents.Person;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.ode.events.EventHandler;
 
@@ -45,10 +49,16 @@ public class FacilityOutbreak {
 	ISchedulableAction nextAction;
 	ExponentialDistribution distro;
 	double meanIntraEventTime;
+	private PrintWriter logWriter;
 
 	public FacilityOutbreak(double intra_event_time, Disease disease2) {
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 		disease = disease2;
+		try {
+			logWriter = new PrintWriter("transmissions.txt");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		// transmission();
 	}
 
@@ -68,7 +78,7 @@ public class FacilityOutbreak {
 		double uS = 0.0;
 		double uC = 0.0;
 		for (Person p : facility.getCurrentPatients()) {
-			PersonDisease pd = p.getDiseases().get(disease.getSimIndex());//Fix
+			PersonDisease pd = p.getDiseases().get(disease.getSimIndex());// Fix
 			if (pd.isColonized() && uC < unifC) {
 				uC += pd.getTransmissionRateContribution();
 				if (uC > unifC) {
@@ -97,6 +107,14 @@ public class FacilityOutbreak {
 					unifS, numSusceptibleEffective, uC, unifC, numContagiousEffective);
 		} else if (pdC.isInitialInfection()) {
 			facility.getRegion().numTransmissionsFromInitialCase++;
+		}
+		
+		if (pdC != null && pdS != null) {
+			transmissionsTally++;
+			double transmissionTime = schedule.getTickCount();
+
+			logWriter.printf("Time: %.2f, Patient1: %d, Patient2: %d%n", transmissionTime,
+					pdC.hashCode(), pdS.hashCode());
 		}
 		transmissionsTally++;
 	}
