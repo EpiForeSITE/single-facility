@@ -96,6 +96,8 @@ public class Facility extends AgentContainer{
 
 		if(onActiveSurveillance && !p.isIsolated() && getTimeBetweenMidstaySurveillanceTests() > 0)
 			System.out.print("Surv");
+			
+			p.doSurveillanceTest();
 			p.startNextPeriodicSurveillanceTimer();
 
 		p.updateAllTransmissionRateContributions();

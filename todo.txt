@@ -25,21 +25,10 @@ verify:
 		verify that it's happening
 		
 		
+Create a file that has one row in it, generated at the end of the run
+surveillanceAfterBurnin, isolation_effectiveness, time_between_tests, number_of_transmission
+
 	
-	files:
-		admissions.txt
-			time, patientid (hashCode), (boolean) importation
-	
-		transmission.txt
-			time, patient1, patient2, 
-		
-		decolonize.txt
-			time, patient
-			
-		clinicalDetection.txt
-			time, patient
-			
-		surveillance.txt
-			time, patient, patientDiseaseState, result 
+
 	
 	
