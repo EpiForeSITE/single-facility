@@ -60,7 +60,6 @@ public class PersonDisease {
 
 	public void doDecolonization() {
 		double currentTime = schedule.getTickCount();
-        System.out.println(person.hashCode() + ": Decolonized at " + currentTime);
         
         
 		if (colonized) {
@@ -92,7 +91,6 @@ public class PersonDisease {
 
 
 	public void colonize() {
-	    	System.out.println(person.hashCode() + ": Colonized at " + TimeUtils.getSchedule().getTickCount());
 		colonized = true;
 		startDecolonizationTimer();
 		person.updateAllTransmissionRateContributions();

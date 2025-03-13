@@ -98,7 +98,6 @@ public class Region extends AgentContainer{
 		if(!facilities.contains(f)&&facilities.size()<1) {
 			facilities.add(f);
 		}
-		System.out.println("Adding facility");
 		
 	}
     public void importToFacilityNew(Facility f, Person p) {

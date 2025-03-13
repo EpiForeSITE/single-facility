@@ -70,7 +70,6 @@ public class Person extends Agent {
 	public void startNextPeriodicSurveillanceTimer() {
 		double timeToNextSurveillance = currentFacility.getTimeBetweenMidstaySurveillanceTests();
 		if (timeToNextSurveillance < dischargeTime) {
-			System.out.println("Time to next surveillance: " + timeToNextSurveillance);
 			schedule.schedule(ScheduleParameters.createOneTime(schedule.getTickCount() + timeToNextSurveillance), this,
 					"doSurveillanceTest");
 		}
@@ -109,8 +108,6 @@ public class Person extends Agent {
 
 	public void doSurveillanceTest() {
 		double currentTime = schedule.getTickCount();
-		System.out.println(
-				"do surveillance, time:  " + TimeUtils.getSchedule().getTickCount() + "pt: " + this.hashCode());
 		for (PersonDisease pd : personDiseases) {
 			// Nov 1, 2024 WRR: Something wrong with this conditional.
 			if (!pd.isDetected() && pd.getDisease().isActiveSurveillanceAgent()) {

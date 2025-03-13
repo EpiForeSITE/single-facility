@@ -95,7 +95,6 @@ public class Facility extends AgentContainer{
 		getRegion().getPeople().add(p);
 
 		if(onActiveSurveillance && !p.isIsolated() && getTimeBetweenMidstaySurveillanceTests() > 0)
-			System.out.print("Surv");
 			
 			p.doSurveillanceTest();
 			p.startNextPeriodicSurveillanceTimer();
