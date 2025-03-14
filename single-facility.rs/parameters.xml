@@ -5,6 +5,11 @@
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 											/>
+				<parameter name="extraIteration" displayName="Extra Iterations" type="int" 
+						defaultValue="1" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+											/>
 				<parameter name="doActiveSurveillanceAfterBurnIn" displayName="doActiveSurveillanceAfterBurnIn" type="boolean" 
 						defaultValue="true" 
 						isReadOnly="false" 
