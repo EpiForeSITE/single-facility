@@ -5,6 +5,26 @@
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 											/>
+				<parameter name="extraIteration" displayName="Extra Iterations" type="int" 
+						defaultValue="1" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+											/>
+				<parameter name="batchRun" displayName="Batch Run" type="boolean" 
+						defaultValue="false" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
+											/>
+				<parameter name="doActiveSurveillanceAfterBurnIn" displayName="doActiveSurveillanceAfterBurnIn" type="boolean" 
+						defaultValue="true" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
+											/>
+				<parameter name="daysBetweenTests" displayName="daysBetweenTests" type="double" 
+						defaultValue="14.0" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+											/>
 				<parameter name="isolationEffectiveness" displayName="isolationEffectiveness" type="double" 
 						defaultValue="0.5" 
 						isReadOnly="false" 

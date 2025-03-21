@@ -98,7 +98,6 @@ public class Region extends AgentContainer{
 		if(!facilities.contains(f)&&facilities.size()<1) {
 			facilities.add(f);
 		}
-		System.out.println("Adding facility");
 		
 	}
     public void importToFacilityNew(Facility f, Person p) {
@@ -165,7 +164,7 @@ public class Region extends AgentContainer{
 	public void startDailyPopulationTallyTimer() {
 		stop = false;
 		double currTime = schedule.getTickCount();
-		ScheduleParameters params = ScheduleParameters.createOneTime(currTime, intra_event_time);
+		ScheduleParameters params = ScheduleParameters.createOneTime(currTime, 1);
 		schedule.schedule(params, this, "doPopulationTally");
 }
 

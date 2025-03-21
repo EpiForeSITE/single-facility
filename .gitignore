@@ -13,3 +13,7 @@ debug.log
 Repast.settings
 
 ModelOutput*.txt
+debug.log ssh_remote_model.log velocity.log
+output/*
+/batch_configuration.properties*
+ssh_remote_model.log

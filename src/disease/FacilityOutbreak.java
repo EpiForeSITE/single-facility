@@ -84,14 +84,12 @@ public class FacilityOutbreak {
 				if (uC > unifC) {
 					pdC = pd;
 				}
-				System.out.println("pdC set");
 			}
 			if (!pd.isColonized() && uS <= unifS) {
 				uS += pd.getTransmissionRateContribution();
 				if (uS > unifS) {
 					pdS = pd;
 				}
-				System.out.println("pdS set");
 			}
 			if (pdS != null) {
 				pdS.colonize();
@@ -162,14 +160,6 @@ public class FacilityOutbreak {
 		numSusceptibleEffective = sScore;
 		newTransmissionRate = disease.getBaselineBetaValue(facility.getType()) * numContagiousEffective
 				* numSusceptibleEffective / facility.getCurrentPatients().size();
-
-		System.out.println("");
-		System.out.println(TimeUtils.getSchedule().getTickCount());
-		System.out.println("Cscore: " + cScore + ", sScore: " + sScore);
-		System.out.println("Disease beta: " + disease.getBaselineBetaValue(facility.getType()));
-		System.out.println("Contagious: " + numContagiousEffective);
-		System.out.println("Subsceptible: " + numSusceptibleEffective);
-		System.out.println("betaIsolationReductio: " + facility.getBetaIsolationReduction());
 		setTransmissionRate(newTransmissionRate);
 	}
 
@@ -178,8 +168,6 @@ public class FacilityOutbreak {
 			if (nextAction != null) {
 				schedule.removeAction(nextAction);
 			}
-			System.out.println("Transmission rate: " + this.transmissionRate);
-			System.out.println("New Transmission rate: " + newTransmissionRate);
 			transmissionRate = newTransmissionRate;
 			if (transmissionRate > 0) {
 				distro = new ExponentialDistribution(1 / transmissionRate);

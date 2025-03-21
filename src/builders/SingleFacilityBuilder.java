@@ -33,6 +33,9 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	public Facility facility;
 	private boolean stop = false;
 	private Parameters params;
+	private PrintWriter simulationOutputFile;
+	private boolean writeSingleIterationOutputs;
+	
 	
 
 	@Override
@@ -42,6 +45,11 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		
 		params = repast.simphony.engine.environment.RunEnvironment.getInstance().getParameters();
 		isolationEffectiveness = params.getDouble("isolationEffectiveness");
+		doActiveSurveillanceAfterBurnIn = params.getBoolean("doActiveSurveillanceAfterBurnIn");
+		daysBetweenTests = params.getDouble("daysBetweenTests");
+		
+		writeSingleIterationOutputs = !params.getBoolean("batchRun");
+		
 		
 		facility = new Facility();
 		this.region = new Region(facility);
@@ -99,7 +107,6 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 			f.setNewPatientAdmissionRate(facilitySize[i] / meanLOS[i]);
 
 			if (doActiveSurveillance) {
-				System.out.println("Setting active surveillance for facility: " + f);
 				f.setTimeBetweenMidstaySurveillanceTests(daysBetweenTests);
 			}
 
@@ -143,13 +150,11 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	}
 
 	public void doEndBurnInPeriod() {
-		System.out.println("Burn-in period ended at tick: " + schedule.getTickCount());
 		region.setInBurnInPeriod(false);
 		region.startDailyPopulationTallyTimer();
 		doActiveSurveillance = doActiveSurveillanceAfterBurnIn;
 		 if (doActiveSurveillance) {
 		        for (Facility f : region.getFacilities()) {
-		            System.out.println("Activating surveillance for facility: " + f);
 		            f.setTimeBetweenMidstaySurveillanceTests(daysBetweenTests);
 		        }
 		    }
@@ -159,8 +164,32 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	}
 
 	public void doSimulationEnd() {
+		try {
+		    if (writeSingleIterationOutputs) {
+            simulationOutputFile = new PrintWriter("simulation_results.txt");
+            simulationOutputFile.println("surveillance_after_burn_in, isolation_effectiveness, days_between_tests, number_of_transmissions");
+		    }
+
+            int numberOfTransmissions = 0;
+            for (Facility f : region.getFacilities()) {
+                for (FacilityOutbreak outbreak : f.getOutbreaks()) {
+                    numberOfTransmissions += outbreak.getTransmissionsTally();
+                }
+            }
+            if (writeSingleIterationOutputs) {
+            simulationOutputFile.printf("%b, %.4f, %.2f, %d\n", doActiveSurveillanceAfterBurnIn, isolationEffectiveness, daysBetweenTests, numberOfTransmissions);
+            }
+            
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+		 if (writeSingleIterationOutputs) {
+		simulationOutputFile.flush(); 
+		simulationOutputFile.close();
+		 }
 		stop = true;
 		System.out.println("Ending simulation at tick: " + schedule.getTickCount());
+		
 		// writeSimulationResults();
 		region.finishSimulation();
 		repast.simphony.engine.environment.RunEnvironment.getInstance().endAt(totalTime);

@@ -1,3 +1,1 @@
-<?xml version="1.0"?>
-<sweep runs="1">
-</sweep>
+<?xml version="1.0" ?><sweep runs="1"><parameter name="extraIteration" type="constant" constant_type="int" value="0"></parameter><parameter name="batchRun" type="constant" constant_type="boolean" value="true"></parameter><parameter name="doActiveSurveillanceAfterBurnIn" type="constant" constant_type="boolean" value="true"></parameter><parameter name="daysBetweenTests" type="constant" constant_type="double" value="14"></parameter><parameter name="isolationEffectiveness" type="number" number_type="double" start="0" end="0.5" step="0.025"></parameter></sweep>
