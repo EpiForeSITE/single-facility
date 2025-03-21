@@ -164,7 +164,7 @@ public class Region extends AgentContainer{
 	public void startDailyPopulationTallyTimer() {
 		stop = false;
 		double currTime = schedule.getTickCount();
-		ScheduleParameters params = ScheduleParameters.createOneTime(currTime, intra_event_time);
+		ScheduleParameters params = ScheduleParameters.createOneTime(currTime, 1);
 		schedule.schedule(params, this, "doPopulationTally");
 }
 

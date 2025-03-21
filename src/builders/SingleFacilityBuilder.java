@@ -34,6 +34,8 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private boolean stop = false;
 	private Parameters params;
 	private PrintWriter simulationOutputFile;
+	private boolean writeSingleIterationOutputs;
+	
 	
 
 	@Override
@@ -45,6 +47,9 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		isolationEffectiveness = params.getDouble("isolationEffectiveness");
 		doActiveSurveillanceAfterBurnIn = params.getBoolean("doActiveSurveillanceAfterBurnIn");
 		daysBetweenTests = params.getDouble("daysBetweenTests");
+		
+		writeSingleIterationOutputs = !params.getBoolean("batchRun");
+		
 		
 		facility = new Facility();
 		this.region = new Region(facility);
@@ -160,8 +165,10 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 
 	public void doSimulationEnd() {
 		try {
+		    if (writeSingleIterationOutputs) {
             simulationOutputFile = new PrintWriter("simulation_results.txt");
             simulationOutputFile.println("surveillance_after_burn_in, isolation_effectiveness, days_between_tests, number_of_transmissions");
+		    }
 
             int numberOfTransmissions = 0;
             for (Facility f : region.getFacilities()) {
@@ -169,13 +176,17 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
                     numberOfTransmissions += outbreak.getTransmissionsTally();
                 }
             }
+            if (writeSingleIterationOutputs) {
             simulationOutputFile.printf("%b, %.4f, %.2f, %d\n", doActiveSurveillanceAfterBurnIn, isolationEffectiveness, daysBetweenTests, numberOfTransmissions);
+            }
             
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+		 if (writeSingleIterationOutputs) {
 		simulationOutputFile.flush(); 
 		simulationOutputFile.close();
+		 }
 		stop = true;
 		System.out.println("Ending simulation at tick: " + schedule.getTickCount());
 		
