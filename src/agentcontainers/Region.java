@@ -199,8 +199,8 @@ public class Region extends AgentContainer {
 
 	public void finishSimulation() {
 		stop = true;
-		System.out.println("Simulation has been finished and cleaned up.");
 		schedule.setFinishing(true);
+		System.out.println("Simulation has been finished and cleaned up.");
 
 	}
 

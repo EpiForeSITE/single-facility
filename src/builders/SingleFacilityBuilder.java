@@ -137,9 +137,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		// Oct 4, 2024 WRR:this should be rolled into scheduleEvents(). The schedule is
 		// an
 		// event queuing system. It holds and sorts as many events as you give it.
-		if (schedule.getTickCount() == 3650) {
 			schedule.schedule(ScheduleParameters.createOneTime(totalTime), this, "doSimulationEnd");
-		}
 
 	}
 
@@ -153,7 +151,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 				f.setTimeBetweenMidstaySurveillanceTests(daysBetweenTests);
 			}
 		}
-		if (!stop) {
+		if (schedule.getTickCount() >= burnInTime) {
 			scheduleSimulationEnd();
 		}
 	}
@@ -183,7 +181,9 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 
 		// writeSimulationResults();
 		region.finishSimulation();
-		repast.simphony.engine.environment.RunEnvironment.getInstance().endAt(totalTime);
+		//repast.simphony.engine.environment.RunEnvironment.getInstance().endAt(totalTime);
+		repast.simphony.engine.environment.RunEnvironment.getInstance().endRun();
+		System.out.println("Simulation ended.");
 
 	}
 	/*
