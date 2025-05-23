@@ -151,9 +151,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 				f.setTimeBetweenMidstaySurveillanceTests(daysBetweenTests);
 			}
 		}
-		if (schedule.getTickCount() >= burnInTime) {
-			scheduleSimulationEnd();
-		}
+		scheduleSimulationEnd();
 	}
 
 	public void doSimulationEnd() {
