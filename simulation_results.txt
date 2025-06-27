@@ -1,2 +1,0 @@
-surveillance_after_burn_in, isolation_effectiveness, days_between_tests, number_of_transmissions
-true, 0.5000, 14.00, 12886

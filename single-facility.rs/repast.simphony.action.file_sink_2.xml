@@ -1,0 +1,15 @@
+<repast.simphony.data2.engine.FileSinkDescriptor simphonyVersion="2.11.0">
+  <name>sim_results</name>
+  <dataSet>doSimulationEnd</dataSet>
+  <delimiter>,</delimiter>
+  <format>TABULAR</format>
+  <sourceIds class="linked-hash-set">
+    <string>DoActiveSurveillance</string>
+    <string>IsolationEffectiveness</string>
+    <string>DaysBetweenTests</string>
+    <string>tick</string>
+    <string>NumberOfTransmissions</string>
+  </sourceIds>
+  <fileName>sim_modeloutputs.txt</fileName>
+  <addTimeStamp>true</addTimeStamp>
+</repast.simphony.data2.engine.FileSinkDescriptor>

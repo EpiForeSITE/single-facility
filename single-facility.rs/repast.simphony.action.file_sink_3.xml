@@ -1,0 +1,15 @@
+<repast.simphony.data2.engine.FileSinkDescriptor simphonyVersion="2.11.0">
+  <name>sim_results_agg</name>
+  <dataSet>doSimulationEndAgg</dataSet>
+  <delimiter>,</delimiter>
+  <format>TABULAR</format>
+  <sourceIds class="linked-hash-set">
+    <string>active</string>
+    <string>days</string>
+    <string>isolEffectiveness</string>
+    <string>transmissions</string>
+    <string>tick</string>
+  </sourceIds>
+  <fileName>sim_results_agg.txt</fileName>
+  <addTimeStamp>true</addTimeStamp>
+</repast.simphony.data2.engine.FileSinkDescriptor>

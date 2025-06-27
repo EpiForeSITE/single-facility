@@ -1,0 +1,55 @@
+<repast.simphony.data2.engine.DataSetDescriptor simphonyVersion="2.11.0">
+  <name>doSimulationEnd</name>
+  <type>NON_AGGREGATE</type>
+  <sourceType>builders.SingleFacilityBuilder</sourceType>
+  <inclTick>true</inclTick>
+  <inclBatchRun>false</inclBatchRun>
+  <inclRandomSeed>false</inclRandomSeed>
+  <scheduleParams>
+    <start>5474.0</start>
+    <interval>0.0</interval>
+    <priority>Infinity</priority>
+    <pType>FIRST</pType>
+    <duration>-1.0</duration>
+    <frequency>ONE_TIME</frequency>
+    <hashCode>1892735450</hashCode>
+  </scheduleParams>
+  <atEnd>false</atEnd>
+  <methodDataSources class="linked-hash-map">
+    <entry>
+      <string>DoActiveSurveillance</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>DoActiveSurveillance</id>
+        <className>builders.SingleFacilityBuilder</className>
+        <methodName>isDoActiveSurveillance</methodName>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+    <entry>
+      <string>IsolationEffectiveness</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>IsolationEffectiveness</id>
+        <className>builders.SingleFacilityBuilder</className>
+        <methodName>getIsolationEffectiveness</methodName>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+    <entry>
+      <string>DaysBetweenTests</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>DaysBetweenTests</id>
+        <className>builders.SingleFacilityBuilder</className>
+        <methodName>getDaysBetweenTests</methodName>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+    <entry>
+      <string>NumberOfTransmissions</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>NumberOfTransmissions</id>
+        <className>builders.SingleFacilityBuilder</className>
+        <methodName>getNumberOfTransmissions</methodName>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+  </methodDataSources>
+  <countSources class="linked-hash-map"/>
+  <customNADataSources class="linked-hash-map"/>
+  <customAggDataSources class="linked-hash-map"/>
+</repast.simphony.data2.engine.DataSetDescriptor>

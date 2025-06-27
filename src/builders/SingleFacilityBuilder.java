@@ -16,7 +16,10 @@ import agentcontainers.Facility;
 import agentcontainers.Region;
 
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 
 public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private ISchedule schedule;
@@ -33,7 +36,8 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	public Facility facility;
 	private boolean stop = false;
 	private Parameters params;
-	private PrintWriter simulationOutputFile;
+
+	private Writer simulationOutputFile;
 
 	@Override
 	public Context<Object> build(Context<Object> context) {
@@ -60,6 +64,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		schedule.schedule(this);
 
 		context.add(region);
+		context.add(this);
 		// Oct 4, 2024 WRR: return facility?
 		return context;
 	}
@@ -138,7 +143,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		// Oct 4, 2024 WRR:this should be rolled into scheduleEvents(). The schedule is
 		// an
 		// event queuing system. It holds and sorts as many events as you give it.
-			schedule.schedule(ScheduleParameters.createOneTime(totalTime), this, "doSimulationEnd");
+		schedule.schedule(ScheduleParameters.createOneTime(totalTime), this, "doSimulationEnd");
 
 	}
 
@@ -152,29 +157,28 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 				f.setTimeBetweenMidstaySurveillanceTests(daysBetweenTests);
 			}
 		}
+		
+		
 		scheduleSimulationEnd();
 	}
 
-	public void doSimulationEnd() {
-		try {
-			simulationOutputFile = new PrintWriter("simulation_results.txt");
-			simulationOutputFile.println(
-					"surveillance_after_burn_in, isolation_effectiveness, days_between_tests, number_of_transmissions");
+	public void doSimulationEnd() throws IOException {
+		
+			
+			    simulationOutputFile = new FileWriter("simulation_results.txt", true);
+			   
+			
+			//simulationOutputFile.println(
+			//		"surveillance_after_burn_in, isolation_effectiveness, days_between_tests, number_of_transmissions");
 
-			int numberOfTransmissions = 0;
-			for (Facility f : region.getFacilities()) {
-				for (FacilityOutbreak outbreak : f.getOutbreaks()) {
-					numberOfTransmissions += outbreak.getTransmissionsTally();
-				}
-			}
-			simulationOutputFile.printf("%b, %.4f, %.2f, %d\n", doActiveSurveillanceAfterBurnIn, isolationEffectiveness,
-					daysBetweenTests, numberOfTransmissions);
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		simulationOutputFile.flush();
-		simulationOutputFile.close();
+		
+			
+			    simulationOutputFile.append(doActiveSurveillanceAfterBurnIn + "," + isolationEffectiveness + "," + daysBetweenTests +","+ getNumberOfTransmissions() + "\n");
+			
+			
+			
+		
+		
 		stop = true;
 		System.out.println("Ending simulation at tick: " + schedule.getTickCount());
 
@@ -195,6 +199,16 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	 * facilityPrevalenceData.println(); } R0Data.printf("%d",
 	 * region.numTransmissionsFromInitialCase); R0Data.println(); }
 	 */
+	
+	public int getNumberOfTransmissions() {
+		int numberOfTransmissions = 0;
+		for (Facility f : region.getFacilities()) {
+			for (FacilityOutbreak outbreak : f.getOutbreaks()) {
+				numberOfTransmissions += outbreak.getTransmissionsTally();
+			}
+		}
+		return numberOfTransmissions;
+	}
 
 	public ISchedule getSchedule() {
 		return schedule;
