@@ -14,6 +14,8 @@ Repast.settings
 
 ModelOutput*.txt
 debug.log ssh_remote_model.log velocity.log
-output/*
+output/*.jar
+output/*.props
+output/*.txt
 /batch_configuration.properties*
 ssh_remote_model.log

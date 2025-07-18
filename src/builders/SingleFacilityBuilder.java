@@ -21,6 +21,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 
+// Notes for TODO items:
+//find output number of clinicical detections to add to the batch outputs (raw number)
+//+ mean Daily Prevalence (patients with infection / total patients) sampled once per day
+//+ mean discharge prevalence ( patients infected at discharge / total patients discharged
+//+ importation prevalence(patients importing at admission / total patients admitted)
+//these all go in 
+// Do several batches with days betweeen and DoActiveSurveillanceAfterBurnIn
+
+
+
 public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private ISchedule schedule;
 	private double isolationEffectiveness;
