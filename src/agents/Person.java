@@ -2,6 +2,7 @@ package agents;
 
 import agentcontainers.Facility;
 import agentcontainers.Region;
+import builders.SingleFacilityBuilder;
 import disease.Disease;
 import disease.PersonDisease;
 
@@ -121,8 +122,10 @@ public class Person extends Agent {
 				} else {
 					startNextPeriodicSurveillanceTimer();
 				}
+				if(!SingleFacilityBuilder.isBatchRun) {
 				surveillanceWriter.printf("Time: %.2f, Patient: %d, Colonized: %b, Detected: %b%n",
                         currentTime, this.hashCode(), pd.isColonized(), pd.isDetected());
+				}
 			}
 		}
 	}

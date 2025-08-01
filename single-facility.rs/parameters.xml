@@ -15,6 +15,11 @@
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
 											/>
+				<parameter name="isBatchRun" displayName="isBatchRun" type="boolean" 
+						defaultValue="false" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
+											/>
 				<parameter name="doActiveSurveillanceAfterBurnIn" displayName="doActiveSurveillanceAfterBurnIn" type="boolean" 
 						defaultValue="true" 
 						isReadOnly="false" 

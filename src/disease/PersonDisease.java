@@ -2,6 +2,7 @@ package disease;
 
 
 import agents.Person;
+import builders.SingleFacilityBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -65,7 +66,9 @@ public class PersonDisease {
         
 		if (colonized) {
 			colonized = false;
+			if(!SingleFacilityBuilder.isBatchRun) {
 			decolWriter.printf("Time: %.2f, Decolonized Patient: %d%n", currentTime, person.hashCode());
+			}
 			resetClinicalDetectionEvent();
 			person.updateAllTransmissionRateContributions();
 		}
@@ -83,7 +86,9 @@ public class PersonDisease {
 		double currentTime = schedule.getTickCount();
 		detected = true;
 		clinicallyDetectedDuringCurrentStay = true;
-		clinicalWriter.printf("Time: %.2f, Detected Patient: %d%n", currentTime, person.hashCode());
+		if(!SingleFacilityBuilder.isBatchRun) {
+			clinicalWriter.printf("Time: %.2f, Detected Patient: %d%n", currentTime, person.hashCode());
+		}
 		clinicalOutputNum++;
 		if (!person.isIsolated() && disease.isolatePatientWhenDetected()) {
 			person.isolate();
