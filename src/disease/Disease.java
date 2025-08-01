@@ -16,8 +16,9 @@ public class Disease {
 		double nhReduction;
 
 		if(type == getCRE()){
+		    
 			longTermAcuteCareBeta = 0.0615;
-			acuteCareBeta = 0.06;
+			acuteCareBeta = longTermAcuteCareBeta;
 			nhReduction = 10.0;
 			nursingHomeBeta = acuteCareBeta / nhReduction;
 		}

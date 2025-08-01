@@ -29,7 +29,10 @@ Create a file that has one row in it, generated at the end of the run
 surveillanceAfterBurnin, isolation_effectiveness, time_between_tests, number_of_transmission
 
 File with the daily population that is colonized, detected, and isolated
-	
 
-	
-	
+
+Tuning parameter?
+Add a parameter for Disease.longTermAcuteCareBeta to sweep	
+Add a parameter for importation rate to sweep
+
+wr:  Think about what it would take to ship this as a finished product on CFA.

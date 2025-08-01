@@ -188,7 +188,9 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	}
 
 	public void doSimulationEnd() throws IOException {
-
+		System.out.println("Simulation ending at tick: " + schedule.getTickCount());
+		    
+		
 		simulationOutputFile = new PrintWriter("simulation_results.txt");
 
 		simulationOutputFile.println(
