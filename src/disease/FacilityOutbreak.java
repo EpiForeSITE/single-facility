@@ -3,6 +3,7 @@ package disease;
 import agentcontainers.Facility;
 import agentcontainers.Region;
 import agents.Person;
+import builders.SingleFacilityBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -110,9 +111,10 @@ public class FacilityOutbreak {
 		if (pdC != null && pdS != null) {
 			transmissionsTally++;
 			double transmissionTime = schedule.getTickCount();
-
+			if(!SingleFacilityBuilder.isBatchRun) {
 			logWriter.printf("Time: %.2f, Patient1: %d, Patient2: %d%n", transmissionTime,
 					pdC.hashCode(), pdS.hashCode());
+			}
 		}
 		transmissionsTally++;
 	}

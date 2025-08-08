@@ -49,6 +49,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private List<Double> dailyPrevalenceSamples = new ArrayList<>();
 
 	private PrintWriter simulationOutputFile;
+	public static boolean isBatchRun;
 
 	@Override
 	public Context<Object> build(Context<Object> context) {
@@ -59,6 +60,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		isolationEffectiveness = params.getDouble("isolationEffectiveness");
 		doActiveSurveillanceAfterBurnIn = params.getBoolean("doActiveSurveillanceAfterBurnIn");
 		daysBetweenTests = params.getDouble("daysBetweenTests");
+		isBatchRun = params.getBoolean("isBatchRun");
 
 		facility = new Facility();
 		this.region = new Region(facility);
@@ -233,9 +235,11 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	}
 
 	public double getMeanDailyPrevalence() {
-	    if (dailyPrevalenceSamples.isEmpty()) return 0.0;
+	    if (dailyPrevalenceSamples.isEmpty()) {
+	    	return 0.0;
+	    }
 	    double sum = 0.0;
-	    for (double val : dailyPrevalenceSamples) sum += val;
+	    for (double val : dailyPrevalenceSamples) { sum += val;}
 	    return sum / dailyPrevalenceSamples.size();
 	}
 
