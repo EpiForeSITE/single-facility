@@ -36,6 +36,7 @@ public class PersonDisease {
 	static {
         try {
 			if(!SingleFacilityBuilder.isBatchRun) {
+				
             decolWriter = new PrintWriter("decolonization.txt");
             clinicalWriter = new PrintWriter("clinicalDetection.txt");
 			}

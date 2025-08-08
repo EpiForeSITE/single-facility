@@ -57,6 +57,8 @@ public class FacilityOutbreak {
 		disease = disease2;
 		try {
 			if(!SingleFacilityBuilder.isBatchRun) {
+		
+				
 			logWriter = new PrintWriter("transmissions.txt");
 			}
 		} catch (IOException e) {
