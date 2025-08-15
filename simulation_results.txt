@@ -1,3 +1,3 @@
-surveillance_after_burn_in, isolation_effectiveness, days_between_tests, clinical_detections, mean_daily_prevalence, mean_discharge_prevalence, importation_prevalence, number_of_transmissions
-true,0.5,14.0,93248,0.37060077516408546,0.37653562653562656,0.20688595142944974,12122
+surveillance_after_burn_in,imporationRate,longTermAcuteCareBeta,isolation_effectiveness,days_between_tests,clinical_detections,mean_daily_prevalence,mean_discharge_prevalence,importation_prevalence,number_of_transmissions
+true,0.206,0.0615,0.5,14.0,94526,0.38305809178196987,0.40649666059502126,0.21693121693121692,12598
 

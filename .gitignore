@@ -19,3 +19,5 @@ output/*.props
 output/*.txt
 /batch_configuration.properties*
 ssh_remote_model.log
+*.txt
+build_model_archive.log
