@@ -56,7 +56,11 @@ public class FacilityOutbreak {
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 		disease = disease2;
 		try {
+			if(!SingleFacilityBuilder.isBatchRun) {
+		
+				
 			logWriter = new PrintWriter("transmissions.txt");
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

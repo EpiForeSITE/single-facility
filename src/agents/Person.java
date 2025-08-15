@@ -35,7 +35,9 @@ public class Person extends Agent {
 
     static {
         try {
+			if(!SingleFacilityBuilder.isBatchRun) {
             surveillanceWriter = new PrintWriter("surveillance.txt");
+			}
         } catch (IOException e) {
             e.printStackTrace();
         }

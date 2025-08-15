@@ -1,5 +1,6 @@
 package agentcontainers;
 import agents.Person;
+import builders.SingleFacilityBuilder;
 import disease.Disease;
 import disease.FacilityOutbreak;
 import disease.PersonDisease;
@@ -54,7 +55,9 @@ public class Facility extends AgentContainer{
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 		region = new Region(this);
 		try {
+			if(!SingleFacilityBuilder.isBatchRun) {
             admissionsWriter = new PrintWriter("admissions.txt");
+			}
         } 
 	 catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -321,6 +324,8 @@ public class Facility extends AgentContainer{
 		return outbreaks;
 	}
 	public void logPatientAdmission(double time, int patientID, boolean importation) {
+		if(!SingleFacilityBuilder.isBatchRun) {
           admissionsWriter.printf("Time: %.2f, Patient ID: %d, Importation: %b%n", time, patientID, importation);
+		}
     }
 }
