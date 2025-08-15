@@ -1,6 +1,7 @@
 package agentcontainers;
 
 import agents.Person;
+import builders.SingleFacilityBuilder;
 import disease.Disease;
 import disease.FacilityOutbreak;
 import disease.PersonDisease;
@@ -36,7 +37,10 @@ public class Region extends AgentContainer {
 			facilities.add(f);
 		}
 		try {
+			if(!SingleFacilityBuilder.isBatchRun) {
+
 			writer = new PrintWriter("daily_population_stats.txt");
+			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -192,8 +196,10 @@ public class Region extends AgentContainer {
 
 		double currentTime = schedule.getTickCount();
 		if (currentTime > 3650) {
+			if(!SingleFacilityBuilder.isBatchRun) {
 			writer.printf("Time: %.2f, Colonized: %d, Detected: %d, Isolated: %d%n", currentTime, totalColonized,
 					totalDetected, totalIsolated);
+			}
 		}
 	}
 
