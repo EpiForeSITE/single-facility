@@ -14,6 +14,7 @@ import repast.simphony.parameter.Parameters;
 import utils.TimeUtils;
 import agentcontainers.Facility;
 import agentcontainers.Region;
+import agents.Person;
 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -50,6 +51,9 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 
 	private PrintWriter simulationOutputFile;
 	public static boolean isBatchRun;
+	private PrintWriter dailyStatsWriter;
+	private int sumDailyInfected = 0;
+	private int sumDailyClinicalDetections = 0;
 
 	@Override
 	public Context<Object> build(Context<Object> context) {
@@ -79,6 +83,13 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		context.add(region);
 		context.add(this);
 		// Oct 4, 2024 WRR: return facility?
+		if (!isBatchRun) {
+			try {
+				dailyStatsWriter = new PrintWriter("daily_stats.txt");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		return context;
 	}
 
@@ -92,6 +103,22 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		if (facility.getPopulationSize() != 0) {
 			region.doPopulationTally();
 			region.logDailyPopulationStats();
+		}
+		// Calculate daily infected and clinical detections
+		int dailyInfected = 0;
+		int dailyClinicalDetections = 0;
+		for (agents.Person p : region.getPeople()) {
+			for (PersonDisease pd : p.getDiseases()) {
+				if (pd.isColonized()) dailyInfected++;
+				if (pd.isClinicallyDetectedDuringCurrentStay()) dailyClinicalDetections++;
+			}
+		}
+		sumDailyInfected += dailyInfected;
+		sumDailyClinicalDetections += dailyClinicalDetections;
+		if (!isBatchRun && dailyStatsWriter != null) {
+			double currentTime = schedule.getTickCount();
+			dailyStatsWriter.printf("Time: %.2f, Infected: %d, ClinicalDetections: %d%n", currentTime, dailyInfected, dailyClinicalDetections);
+			dailyStatsWriter.flush();
 		}
 		double dailyPrevalence = 0.0;
         int count = 0;
@@ -192,15 +219,17 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	public void doSimulationEnd() throws IOException {
 
 		simulationOutputFile = new PrintWriter("simulation_results.txt");
-
 		simulationOutputFile.println(
-				"surveillance_after_burn_in, isolation_effectiveness, days_between_tests, clinical_detections, mean_daily_prevalence, mean_discharge_prevalence, importation_prevalence, number_of_transmissions");
-
+				"surveillance_after_burn_in, isolation_effectiveness, days_between_tests, clinical_detections, mean_daily_prevalence, mean_discharge_prevalence, importation_prevalence, number_of_transmissions, sum_daily_infected, sum_daily_clinical_detections"
+		);
 		simulationOutputFile.println(doActiveSurveillanceAfterBurnIn + "," + isolationEffectiveness + ","
-				+ daysBetweenTests + "," + getClinicalDetections() + "," +getMeanDailyPrevalence() +","+getMeanDischargePrevalence()+","+getImportationPrevalence()+","+getNumberOfTransmissions() + "\n");
+				+ daysBetweenTests + "," + getClinicalDetections() + "," + getMeanDailyPrevalence() + "," + getMeanDischargePrevalence() + "," + getImportationPrevalence() + "," + getNumberOfTransmissions()
+				+ "," + sumDailyInfected + "," + sumDailyClinicalDetections + "\n");
 		simulationOutputFile.flush();
 		simulationOutputFile.close();
-
+		if (dailyStatsWriter != null) {
+			dailyStatsWriter.close();
+		}
 		stop = true;
 		System.out.println("Ending simulation at tick: " + schedule.getTickCount());
 
