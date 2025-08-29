@@ -21,3 +21,4 @@ output/*.txt
 ssh_remote_model.log
 *.txt
 build_model_archive.log
+*.txt
