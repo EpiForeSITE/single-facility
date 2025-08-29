@@ -1,12 +1,15 @@
 package disease;
 
 import agents.Person;
+import repast.simphony.parameter.Parameters;
 
 public class Disease {
 
 	private static int CRE = 1;
 	private int type;
 	private int simIndex;
+	private Parameters params = repast.simphony.engine.environment.RunEnvironment.getInstance().getParameters();
+	
 
 
 	public double getBaselineBetaValue(int facilityType){
@@ -16,8 +19,9 @@ public class Disease {
 		double nhReduction;
 
 		if(type == getCRE()){
-			longTermAcuteCareBeta = 0.0615;
-			acuteCareBeta = 0.06;
+		    
+			longTermAcuteCareBeta = params.getDouble("longTermAcuteCareBeta");
+			acuteCareBeta = longTermAcuteCareBeta;
 			nhReduction = 10.0;
 			nursingHomeBeta = acuteCareBeta / nhReduction;
 		}
@@ -86,7 +90,14 @@ public class Disease {
 	}
 
 	public double getImportationProb(){
-		return 0.206;
+	    params = repast.simphony.engine.environment.RunEnvironment.getInstance().getParameters();
+	    if(type == getCRE()) {
+		return (Double) params.getValue("importationRate");
+	    } else {
+		return 0.0;
+	   }
+	    
+		
 	}
 	public int getSimIndex() {
 		return simIndex;

@@ -10,7 +10,17 @@
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 											/>
+				<parameter name="longTermAcuteCareBeta" displayName="Long Term AcuteCareBeta" type="double" 
+						defaultValue="0.0615" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+											/>
 				<parameter name="batchRun" displayName="Batch Run" type="boolean" 
+						defaultValue="false" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
+											/>
+				<parameter name="isBatchRun" displayName="isBatchRun" type="boolean" 
 						defaultValue="false" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
@@ -19,6 +29,11 @@
 						defaultValue="true" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
+											/>
+				<parameter name="importationRate" displayName="Importation Rate" type="double" 
+						defaultValue="0.075" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 											/>
 				<parameter name="daysBetweenTests" displayName="daysBetweenTests" type="double" 
 						defaultValue="14.0" 

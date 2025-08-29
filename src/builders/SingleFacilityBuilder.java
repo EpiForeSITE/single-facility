@@ -48,7 +48,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private boolean stop = false;
 	private Parameters params;
 	private List<Double> dailyPrevalenceSamples = new ArrayList<>();
-
+	public ArrayList<String> dailyPrev = new ArrayList<String>();
 	private PrintWriter simulationOutputFile;
 	public static boolean isBatchRun;
 	private PrintWriter dailyStatsWriter;
@@ -131,6 +131,31 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
         if (count > 0) {
             dailyPrevalenceSamples.add(dailyPrevalence / count);
         }
+        
+        int colonized = 0;
+        for (Person p : facility.getCurrentPatients()) {
+		if (p.personDiseases.get(0).isColonized()) {
+			colonized++;
+		}
+	}
+        // do the same for p.personDiseases.get(0).isDetected()
+       int detected = 0;
+       for (Person p : facility.getCurrentPatients()) {
+	   
+	   if (p.personDiseases.get(0).isDetected()) {
+	   detected++;
+       }
+       }
+       
+       int isolated = 0;
+       for (Person p : facility.getCurrentPatients()) {
+	   if (p.isIsolated()) {
+	       isolated++;
+       }
+       }
+	 
+        
+        dailyPrev.add(facility.getPopulationSize() + "," + colonized  + "," + detected +"," + isolated + ",\n");
 	}
 
 	public void setupAgents() {
@@ -215,8 +240,26 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	public int getClinicalDetections() {
 		return PersonDisease.clinicalOutputNum;
 	}
+	
+	public void writeDailyPrevToFile() {
+	    try (PrintWriter writer = new PrintWriter(new FileWriter("daily_prevalence.txt"))) {
+	        writer.println("TotalPatients,Colonized,Detected,Isolated");
+	        for (String line : dailyPrev) {
+	            writer.print(line);
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	}
 
 	public void doSimulationEnd() throws IOException {
+	    System.out.println("Simulation ending at tick: " + schedule.getTickCount());
+	    
+	    if (!params.getBoolean("isBatchRun")) {
+	        writeDailyPrevToFile();
+	    }
+
+
 
 		simulationOutputFile = new PrintWriter("simulation_results.txt");
 		simulationOutputFile.println(
@@ -233,11 +276,12 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 		stop = true;
 		System.out.println("Ending simulation at tick: " + schedule.getTickCount());
 
-		// writeSimulationResults();
-		region.finishSimulation();
-		// repast.simphony.engine.environment.RunEnvironment.getInstance().endAt(totalTime);
-		repast.simphony.engine.environment.RunEnvironment.getInstance().endRun();
-		System.out.println("Simulation ended.");
+
+	    // writeSimulationResults();
+	    region.finishSimulation();
+	    // repast.simphony.engine.environment.RunEnvironment.getInstance().endAt(totalTime);
+	    repast.simphony.engine.environment.RunEnvironment.getInstance().endRun();
+	    System.out.println("Simulation ended.");
 
 	}
 	/*
