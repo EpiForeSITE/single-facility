@@ -1,1 +1,17 @@
-This is the single-facility model. Please contact the developers for more information.
+Single Facility Disease Transmission Model
+
+This is an agent-based model (ABM) built with Repast Simphony for simulating disease transmission 
+in healthcare facilities. The model focuses on Carbapenem-resistant Enterobacteriaceae (CRE) and 
+other healthcare-associated infections.
+
+Key Features:
+- Patient admission/discharge with realistic flow patterns
+- Disease importation, transmission, colonization, and decolonization
+- Active surveillance testing and patient isolation interventions
+- Configurable parameters for different facility types and pathogens
+- Comprehensive output metrics for epidemiological analysis
+
+For detailed documentation, installation instructions, and usage guide, 
+please see the README.md file in the project root directory.
+
+Contact the developers for technical support and collaboration opportunities.
