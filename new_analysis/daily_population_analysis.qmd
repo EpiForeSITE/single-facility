@@ -1,0 +1,198 @@
+---
+title: "Daily Population Statistics Analysis"
+author: "Single-Facility Analysis"
+date: "`r Sys.Date()`"
+format:
+  pdf:
+    documentclass: article
+    geometry: margin=1in
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(readr)
+library(tidyr)
+```
+
+```{r load-data}
+# Read the daily population stats data
+pop_stats_raw <- readLines("daily_population_stats.txt")
+
+# Parse the data
+parse_pop_stats <- function(line) {
+  time_match <- regexpr("Time: ([0-9.-]+)", line)
+  if (time_match == -1) return(NULL)
+  time_str <- regmatches(line, time_match)
+  time <- as.numeric(sub("Time: ", "", time_str))
+  
+  total_match <- regexpr("Total: ([0-9]+)", line)
+  if (total_match == -1) return(NULL)
+  total_str <- regmatches(line, total_match)
+  total <- as.numeric(sub("Total: ", "", total_str))
+  
+  colonized_match <- regexpr("Colonized: ([0-9]+)", line)
+  if (colonized_match == -1) return(NULL)
+  colonized_str <- regmatches(line, colonized_match)
+  colonized <- as.numeric(sub("Colonized: ", "", colonized_str))
+  
+  detected_match <- regexpr("Detected: ([0-9]+)", line)
+  if (detected_match == -1) return(NULL)
+  detected_str <- regmatches(line, detected_match)
+  detected <- as.numeric(sub("Detected: ", "", detected_str))
+  
+  isolated_match <- regexpr("Isolated: ([0-9]+)", line)
+  if (isolated_match == -1) return(NULL)
+  isolated_str <- regmatches(line, isolated_match)
+  isolated <- as.numeric(sub("Isolated: ", "", isolated_str))
+  
+  data.frame(time = time, total = total, colonized = colonized, detected = detected, isolated = isolated)
+}
+
+# Parse all lines
+pop_stats_list <- lapply(pop_stats_raw, parse_pop_stats)
+pop_stats_list <- pop_stats_list[!sapply(pop_stats_list, is.null)]
+pop_stats <- do.call(rbind, pop_stats_list)
+
+# Convert time to day (floor of time)
+pop_stats$day <- floor(pop_stats$time)
+
+# Get unique daily values (remove duplicates)
+daily_pop_stats <- pop_stats %>%
+  group_by(day) %>%
+  slice(1) %>%
+  ungroup()
+```
+
+## Data Summary
+
+```{r data-summary}
+# Basic data info
+total_days <- nrow(daily_pop_stats)
+date_range <- paste("Day", min(daily_pop_stats$day), "to Day", max(daily_pop_stats$day))
+
+cat("Total days recorded:", total_days, "\n")
+cat("Simulation period:", date_range, "\n")
+cat("Mean total population:", round(mean(daily_pop_stats$total), 2), "\n")
+cat("Mean colonized patients:", round(mean(daily_pop_stats$colonized), 2), "\n")
+cat("Mean detected patients:", round(mean(daily_pop_stats$detected), 2), "\n")
+cat("Mean isolated patients:", round(mean(daily_pop_stats$isolated), 2), "\n")
+```
+
+## Descriptive Statistics
+
+### Population Statistics Summary
+
+```{r descriptive-stats}
+# Calculate descriptive statistics for each population type
+stats_summary <- daily_pop_stats %>%
+  summarise(
+    across(c(total, colonized, detected, isolated), 
+           list(
+             Mean = ~round(mean(.x), 2),
+             Median = ~median(.x),
+             SD = ~round(sd(.x), 2),
+             Min = ~min(.x),
+             Max = ~max(.x)
+           ),
+           .names = "{.col}_{.fn}")
+  ) %>%
+  pivot_longer(everything(), names_to = "stat", values_to = "value") %>%
+  separate(stat, into = c("population", "statistic"), sep = "_") %>%
+  pivot_wider(names_from = statistic, values_from = value)
+
+kable(stats_summary, caption = "Descriptive Statistics for Daily Population Counts")
+```
+
+### Correlation Analysis
+
+```{r correlation}
+# Calculate correlations between population types
+cor_matrix <- cor(daily_pop_stats[, c("total", "colonized", "detected", "isolated")])
+cor_df <- as.data.frame(cor_matrix)
+cor_df$Variable <- rownames(cor_df)
+cor_df <- cor_df[, c("Variable", "total", "colonized", "detected", "isolated")]
+
+kable(cor_df, digits = 3, caption = "Correlation Matrix of Population Types")
+```
+
+## Visualizations
+
+### Distribution of Population Types
+
+```{r histogram, fig.cap="Distribution of Daily Population Counts"}
+pop_long <- daily_pop_stats %>%
+  select(day, total, colonized, detected, isolated) %>%
+  pivot_longer(cols = c(total, colonized, detected, isolated),
+               names_to = "population_type", values_to = "count")
+
+ggplot(pop_long, aes(x = count, fill = population_type)) +
+  geom_histogram(bins = 20, alpha = 0.7, position = "identity") +
+  facet_wrap(~ population_type, scales = "free") +
+  labs(
+    x = "Daily Count",
+    y = "Frequency",
+    title = "Distribution of Daily Population Counts by Type",
+    fill = "Population Type"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "none")
+```
+
+### Population Trends Over Time
+
+```{r total-trend, fig.cap="Total Population Trend Over Time"}
+ggplot(daily_pop_stats, aes(x = day, y = total)) +
+  geom_line(color = "black", alpha = 0.7) +
+  labs(
+    x = "Day",
+    y = "Total Population",
+    title = "Total Population Trend Over Time"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r colonized-trend, fig.cap="Colonized Population Trend Over Time"}
+ggplot(daily_pop_stats, aes(x = day, y = colonized)) +
+  geom_line(color = "red", alpha = 0.7) +
+  labs(
+    x = "Day",
+    y = "Colonized Count",
+    title = "Colonized Population Trend Over Time"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r detected-trend, fig.cap="Detected Population Trend Over Time"}
+ggplot(daily_pop_stats, aes(x = day, y = detected)) +
+  geom_line(color = "blue", alpha = 0.7) +
+  labs(
+    x = "Day",
+    y = "Detected Count",
+    title = "Detected Population Trend Over Time"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r isolated-trend, fig.cap="Isolated Population Trend Over Time"}
+ggplot(daily_pop_stats, aes(x = day, y = isolated)) +
+  geom_line(color = "green", alpha = 0.7) +
+  labs(
+    x = "Day",
+    y = "Isolated Count",
+    title = "Isolated Population Trend Over Time"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
