@@ -1,0 +1,155 @@
+---
+title: "Daily Patient Admissions Descriptive Statistics"
+author: "Single-Facility Analysis"
+date: "`r Sys.Date()`"
+format:
+  pdf:
+    documentclass: article
+    geometry: margin=1in
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(readr)
+```
+
+
+
+
+
+```{r load-data}
+# Read the admissions data
+admissions_raw <- readLines("admissions.txt")
+
+# Parse the data
+parse_admission <- function(line) {
+  time_match <- regexpr("Time: ([0-9.-]+)", line)
+  time_str <- regmatches(line, time_match)
+  time <- as.numeric(sub("Time: ", "", time_str))
+  
+  patient_match <- regexpr("Patient ID: ([0-9]+)", line)
+  patient_str <- regmatches(line, patient_match)
+  patient_id <- sub("Patient ID: ", "", patient_str)
+  
+  importation <- grepl("Importation: true", line)
+  
+  data.frame(time = time, patient_id = patient_id, importation = importation)
+}
+
+# Parse all lines
+admissions <- do.call(rbind, lapply(admissions_raw, parse_admission))
+
+# Convert time to day (floor of time)
+admissions$day <- floor(admissions$time)
+
+# Count admissions per day
+daily_admissions <- admissions %>%
+  group_by(day) %>%
+  summarise(
+    total_admissions = n(),
+    importations = sum(importation),
+    non_importations = sum(!importation),
+    .groups = 'drop'
+  )
+```
+
+## Data Summary
+
+```{r data-summary}
+# Basic data info
+total_patients <- nrow(admissions)
+total_days <- max(daily_admissions$day) - min(daily_admissions$day) + 1
+date_range <- paste("Day", min(daily_admissions$day), "to Day", max(daily_admissions$day))
+
+cat("Total patients admitted:", total_patients, "\n")
+cat("Simulation period:", date_range, "\n")
+cat("Total days:", total_days, "\n")
+```
+
+## Descriptive Statistics
+
+### Daily Admissions Summary
+
+```{r descriptive-stats}
+# Calculate descriptive statistics
+stats_summary <- daily_admissions %>%
+  summarise(
+    Mean = round(mean(total_admissions), 2),
+    Median = median(total_admissions),
+    SD = round(sd(total_admissions), 2),
+    Min = min(total_admissions),
+    Max = max(total_admissions),
+    Q1 = quantile(total_admissions, 0.25),
+    Q3 = quantile(total_admissions, 0.75),
+    IQR = Q3 - Q1
+  )
+
+kable(stats_summary, caption = "Descriptive Statistics for Daily Patient Admissions")
+```
+
+### Importation vs Non-Importation Admissions
+
+```{r importation-stats}
+importation_summary <- admissions %>%
+  group_by(importation) %>%
+  summarise(
+    Count = n(),
+    Percentage = round(n() / nrow(admissions) * 100, 1),
+    .groups = 'drop'
+  ) %>%
+  mutate(Type = ifelse(importation, "Importation", "Non-Importation")) %>%
+  select(Type, Count, Percentage)
+
+kable(importation_summary, caption = "Summary of Importation vs Non-Importation Admissions")
+```
+
+## Visualizations
+
+### Distribution of Daily Admissions
+
+```{r histogram, fig.cap="Distribution of Daily Patient Admissions"}
+ggplot(daily_admissions, aes(x = total_admissions)) +
+  geom_histogram(bins = 20, fill = "lightblue", color = "black", alpha = 0.7) +
+  geom_vline(aes(xintercept = mean(total_admissions)), 
+             color = "red", linetype = "dashed", size = 1) +
+  labs(
+    x = "Number of Daily Admissions",
+    y = "Frequency",
+    title = "Distribution of Daily Patient Admissions",
+    subtitle = "Red dashed line shows the mean"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+### Importation vs Non-Importation by Day
+
+```{r stacked-bar, fig.cap="Daily Admissions by Type (Importation vs Non-Importation)"}
+daily_long <- daily_admissions %>%
+  select(day, importations, non_importations) %>%
+  tidyr::pivot_longer(cols = c(importations, non_importations),
+                      names_to = "type", values_to = "count") %>%
+  mutate(type = ifelse(type == "importations", "Importation", "Non-Importation"))
+
+ggplot(daily_long, aes(x = day, y = count, fill = type)) +
+  geom_col() +
+  labs(
+    x = "Day",
+    y = "Number of Admissions",
+    title = "Daily Admissions by Type",
+    fill = "Admission Type"
+  ) +
+  scale_fill_manual(values = c("Importation" = "red", "Non-Importation" = "blue")) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "bottom")
+```

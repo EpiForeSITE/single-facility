@@ -1,0 +1,339 @@
+---
+title: "Patient Timeline Analysis"
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    embed-resources: true
+editor: visual
+params:
+  patient_id: 77
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(dplyr)
+library(readr)
+library(knitr)
+library(ggplot2)
+library(DT)
+```
+
+# Patient Timeline Report
+
+This report provides a comprehensive timeline of all events for a specific patient across all simulation data files.
+
+**Target Patient ID:** `r params$patient_id`
+
+```{r load-data, echo=TRUE}
+# Function to safely read files
+safe_read_lines <- function(file_path) {
+  if (file.exists(file_path)) {
+    return(readLines(file_path, warn = FALSE))
+  } else {
+    warning(paste("File not found:", file_path))
+    return(character(0))
+  }
+}
+
+# Read all data files
+admissions_data <- safe_read_lines("admissions.txt")
+clinical_detection_data <- safe_read_lines("clinicalDetection.txt")
+transmissions_data <- safe_read_lines("transmissions.txt")
+decolonization_data <- safe_read_lines("decolonization.txt")
+surveillance_data <- safe_read_lines("surveillance.txt")
+
+cat("Data files loaded:\n")
+cat("- Admissions:", length(admissions_data), "records\n")
+cat("- Clinical Detection:", length(clinical_detection_data), "records\n")
+cat("- Transmissions:", length(transmissions_data), "records\n")
+cat("- Decolonization:", length(decolonization_data), "records\n")
+cat("- Surveillance:", length(surveillance_data), "records\n")
+```
+
+```{r parse-functions, echo=TRUE}
+# Function to parse admissions data
+parse_admissions <- function(lines, target_id) {
+  pattern <- "Time: ([^,]+), Patient ID: (\\d+), Importation: (true|false)"
+  matches <- regmatches(lines, regexec(pattern, lines))
+  
+  events <- data.frame()
+  for (match in matches) {
+    if (length(match) == 4 && match[1] != "") {
+      time <- as.numeric(match[2])
+      patient_id <- as.numeric(match[3])
+      importation <- match[4] == "true"
+      
+      if (patient_id == target_id) {
+        events <- rbind(events, data.frame(
+          time = time,
+          event_type = "Admission",
+          patient_id = patient_id,
+          details = paste("Importation:", importation),
+          stringsAsFactors = FALSE
+        ))
+      }
+    }
+  }
+  return(events)
+}
+
+# Function to parse clinical detection data
+parse_clinical_detection <- function(lines, target_id) {
+  pattern <- "Time: ([^,]+), Detected Patient: (\\d+)"
+  matches <- regmatches(lines, regexec(pattern, lines))
+  
+  events <- data.frame()
+  for (match in matches) {
+    if (length(match) == 3 && match[1] != "") {
+      time <- as.numeric(match[2])
+      patient_id <- as.numeric(match[3])
+      
+      if (patient_id == target_id) {
+        events <- rbind(events, data.frame(
+          time = time,
+          event_type = "Clinical Detection",
+          patient_id = patient_id,
+          details = "Patient clinically detected",
+          stringsAsFactors = FALSE
+        ))
+      }
+    }
+  }
+  return(events)
+}
+
+# Function to parse transmission data
+parse_transmissions <- function(lines, target_id) {
+  pattern <- "Time: ([^,]+), Patient1: (\\d+), Patient2: (\\d+)"
+  matches <- regmatches(lines, regexec(pattern, lines))
+  
+  events <- data.frame()
+  for (match in matches) {
+    if (length(match) == 4 && match[1] != "") {
+      time <- as.numeric(match[2])
+      patient1_id <- as.numeric(match[3])
+      patient2_id <- as.numeric(match[4])
+      
+      if (patient1_id == target_id) {
+        events <- rbind(events, data.frame(
+          time = time,
+          event_type = "Transmission (Source)",
+          patient_id = patient1_id,
+          details = paste("Transmitted to Patient", patient2_id),
+          stringsAsFactors = FALSE
+        ))
+      }
+      
+      if (patient2_id == target_id) {
+        events <- rbind(events, data.frame(
+          time = time,
+          event_type = "Transmission (Recipient)",
+          patient_id = patient2_id,
+          details = paste("Received from Patient", patient1_id),
+          stringsAsFactors = FALSE
+        ))
+      }
+    }
+  }
+  return(events)
+}
+
+# Function to parse decolonization data
+parse_decolonization <- function(lines, target_id) {
+  pattern <- "Time: ([^,]+), Decolonized Patient: (\\d+)"
+  matches <- regmatches(lines, regexec(pattern, lines))
+  
+  events <- data.frame()
+  for (match in matches) {
+    if (length(match) == 3 && match[1] != "") {
+      time <- as.numeric(match[2])
+      patient_id <- as.numeric(match[3])
+      
+      if (patient_id == target_id) {
+        events <- rbind(events, data.frame(
+          time = time,
+          event_type = "Decolonization",
+          patient_id = patient_id,
+          details = "Patient decolonized",
+          stringsAsFactors = FALSE
+        ))
+      }
+    }
+  }
+  return(events)
+}
+
+# Function to parse surveillance data
+parse_surveillance <- function(lines, target_id) {
+  pattern <- "Time: ([^,]+), Patient: (\\d+), Colonized: (true|false), Detected: (true|false)"
+  matches <- regmatches(lines, regexec(pattern, lines))
+  
+  events <- data.frame()
+  for (match in matches) {
+    if (length(match) == 5 && match[1] != "") {
+      time <- as.numeric(match[2])
+      patient_id <- as.numeric(match[3])
+      colonized <- match[4] == "true"
+      detected <- match[5] == "true"
+      
+      if (patient_id == target_id) {
+        events <- rbind(events, data.frame(
+          time = time,
+          event_type = "Surveillance",
+          patient_id = patient_id,
+          details = paste("Colonized:", colonized, "| Detected:", detected),
+          stringsAsFactors = FALSE
+        ))
+      }
+    }
+  }
+  return(events)
+}
+```
+
+```{r extract-events, echo=TRUE}
+# Extract events for the target patient
+target_patient <- params$patient_id
+
+cat("Extracting events for Patient ID:", target_patient, "\n\n")
+
+# Parse each data source
+admission_events <- parse_admissions(admissions_data, target_patient)
+clinical_events <- parse_clinical_detection(clinical_detection_data, target_patient)
+transmission_events <- parse_transmissions(transmissions_data, target_patient)
+decolonization_events <- parse_decolonization(decolonization_data, target_patient)
+surveillance_events <- parse_surveillance(surveillance_data, target_patient)
+
+# Combine all events
+all_events <- rbind(
+  admission_events,
+  clinical_events,
+  transmission_events,
+  decolonization_events,
+  surveillance_events
+)
+
+# Sort by time
+if (nrow(all_events) > 0) {
+  all_events <- all_events[order(all_events$time), ]
+  all_events$event_number <- 1:nrow(all_events)
+} else {
+  cat("No events found for Patient ID:", target_patient, "\n")
+}
+
+cat("Event counts by type:\n")
+if (nrow(all_events) > 0) {
+  event_summary <- table(all_events$event_type)
+  print(event_summary)
+  cat("\nTotal events:", nrow(all_events), "\n")
+} else {
+  cat("No events found.\n")
+}
+```
+
+## Patient Timeline Summary
+
+```{r timeline-summary, echo=FALSE}
+if (nrow(all_events) > 0) {
+  cat("**Patient ID:**", target_patient, "\n")
+  cat("**Total Events:**", nrow(all_events), "\n")
+  cat("**First Event:**", min(all_events$time), "\n")
+  cat("**Last Event:**", max(all_events$time), "\n")
+  cat("**Duration:**", max(all_events$time) - min(all_events$time), "time units\n")
+} else {
+  cat("No events found for Patient ID:", target_patient)
+}
+```
+
+## Detailed Event Timeline
+
+```{r detailed-timeline, echo=FALSE}
+if (nrow(all_events) > 0) {
+  # Create a nicely formatted table
+  timeline_table <- all_events %>%
+    select(event_number, time, event_type, details) %>%
+    rename(
+      "#" = event_number,
+      "Time" = time,
+      "Event Type" = event_type,
+      "Details" = details
+    )
+  
+  # Display with DT for interactive table
+  DT::datatable(timeline_table, 
+                options = list(pageLength = 25, scrollX = TRUE),
+                caption = paste("Complete Timeline for Patient", target_patient))
+} else {
+  cat("No events to display.")
+}
+```
+
+## Event Type Visualization
+
+```{r event-visualization, echo=FALSE}
+if (nrow(all_events) > 0) {
+  # Create a timeline plot
+  ggplot(all_events, aes(x = time, y = event_type, color = event_type)) +
+    geom_point(size = 3, alpha = 0.7) +
+    geom_line(aes(group = 1), alpha = 0.3) +
+    theme_minimal() +
+    labs(
+      title = paste("Event Timeline for Patient", target_patient),
+      x = "Time",
+      y = "Event Type",
+      color = "Event Type"
+    ) +
+    theme(axis.text.y = element_text(size = 10),
+          legend.position = "bottom") +
+    guides(color = guide_legend(override.aes = list(size = 4)))
+}
+```
+
+## Event Distribution
+
+```{r event-distribution, echo=FALSE}
+if (nrow(all_events) > 0 && length(unique(all_events$event_type)) > 1) {
+  # Bar plot of event types
+  event_counts <- all_events %>%
+    count(event_type) %>%
+    arrange(desc(n))
+  
+  ggplot(event_counts, aes(x = reorder(event_type, n), y = n, fill = event_type)) +
+    geom_bar(stat = "identity") +
+    coord_flip() +
+    theme_minimal() +
+    labs(
+      title = paste("Event Distribution for Patient", target_patient),
+      x = "Event Type",
+      y = "Number of Events",
+      fill = "Event Type"
+    ) +
+    theme(legend.position = "none")
+}
+```
+
+## Usage Instructions
+
+To generate a report for a different patient, you can render this document with different parameters:
+
+```r
+# Example: Generate report for Patient ID 123
+quarto::quarto_render("patient_timeline_analysis.qmd", 
+                      execute_params = list(patient_id = 123))
+```
+
+Or from the command line:
+```bash
+quarto render patient_timeline_analysis.qmd -P patient_id:123
+```
+
+## Data File Descriptions
+
+- **Admissions**: Records when patients are admitted to the facility
+- **Clinical Detection**: Records when patients are clinically detected as positive
+- **Transmissions**: Records transmission events between patients
+- **Decolonization**: Records when patients are decolonized
+- **Surveillance**: Records surveillance testing results over time

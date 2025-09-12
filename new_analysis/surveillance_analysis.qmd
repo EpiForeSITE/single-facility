@@ -1,0 +1,128 @@
+---
+title: "Surveillance Testing Analysis"
+author: "Single-Facility Analysis"
+date: "`r Sys.Date()`"
+format:
+  pdf:
+    documentclass: article
+    geometry: margin=1in
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(readr)
+library(tidyr)
+```
+
+```{r load-data}
+# Read the surveillance data
+surveillance_raw <- readLines("surveillance.txt")
+
+# Parse the data
+parse_surveillance <- function(line) {
+  time_match <- regexpr("Time: ([0-9.-]+)", line)
+  if (time_match == -1) return(NULL)
+  time_str <- regmatches(line, time_match)
+  time <- as.numeric(sub("Time: ", "", time_str))
+  
+  patient_match <- regexpr("Patient: ([0-9]+)", line)
+  if (patient_match == -1) return(NULL)
+  patient_str <- regmatches(line, patient_match)
+  patient_id <- sub("Patient: ", "", patient_str)
+  
+  colonized <- grepl("Colonized: true", line)
+  detected <- grepl("Detected: true", line)
+  
+  data.frame(time = time, patient_id = patient_id, colonized = colonized, detected = detected)
+}
+
+# Parse all lines
+surveillance_list <- lapply(surveillance_raw, parse_surveillance)
+surveillance_list <- surveillance_list[!sapply(surveillance_list, is.null)]
+surveillance <- do.call(rbind, surveillance_list)
+
+# Convert time to day (floor of time)
+surveillance$day <- floor(surveillance$time)
+
+# Count surveillance events per day
+daily_surveillance <- surveillance %>%
+  group_by(day) %>%
+  summarise(
+    total_tests = n(),
+    unique_patients = n_distinct(patient_id),
+    colonized_patients = sum(colonized),
+    detected_patients = sum(detected),
+    true_positives = sum(colonized & detected),
+    false_negatives = sum(colonized & !detected),
+    true_negatives = sum(!colonized & !detected),
+    false_positives = sum(!colonized & detected),
+    .groups = 'drop'
+  )
+
+# Calculate test performance metrics
+daily_surveillance <- daily_surveillance %>%
+  mutate(
+    sensitivity = ifelse(colonized_patients > 0, true_positives / colonized_patients, NA),
+    specificity = ifelse((total_tests - colonized_patients) > 0, 
+                        true_negatives / (total_tests - colonized_patients), NA),
+    positive_rate = colonized_patients / total_tests,
+    detection_rate = detected_patients / total_tests
+  )
+```
+
+## Data Summary
+
+```{r data-summary}
+# Basic data info
+total_tests <- nrow(surveillance)
+unique_patients <- n_distinct(surveillance$patient_id)
+total_colonized <- sum(surveillance$colonized)
+total_detected <- sum(surveillance$detected)
+overall_sensitivity <- sum(surveillance$colonized & surveillance$detected) / sum(surveillance$colonized)
+overall_specificity <- sum(!surveillance$colonized & !surveillance$detected) / sum(!surveillance$colonized)
+
+cat("Total surveillance tests:", total_tests, "\n")
+cat("Unique patients tested:", unique_patients, "\n")
+cat("Total colonized patients:", total_colonized, "\n")
+cat("Total detections:", total_detected, "\n")
+cat("Overall sensitivity:", round(overall_sensitivity, 3), "\n")
+cat("Overall specificity:", round(overall_specificity, 3), "\n")
+```
+
+
+## Visualizations
+
+### Distribution of Daily Test Counts
+
+```{r histogram, fig.cap="Distribution of Daily Surveillance Test Counts"}
+test_long <- daily_surveillance %>%
+  select(day, total_tests, colonized_patients, detected_patients) %>%
+  pivot_longer(cols = c(total_tests, colonized_patients, detected_patients),
+               names_to = "test_type", values_to = "count") %>%
+  mutate(test_type = recode(test_type,
+                           "total_tests" = "Total Tests",
+                           "colonized_patients" = "Colonized Found",
+                           "detected_patients" = "Detected"))
+
+ggplot(test_long, aes(x = count, fill = test_type)) +
+  geom_histogram(bins = 15, alpha = 0.7, position = "identity") +
+  facet_wrap(~ test_type, scales = "free") +
+  labs(
+    x = "Daily Count",
+    y = "Frequency",
+    title = "Distribution of Daily Surveillance Test Results",
+    fill = "Test Type"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "none")
+```
+

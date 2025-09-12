@@ -1,0 +1,28 @@
+project:
+  type: default
+  title: "Single-Facility Analysis Reports"
+  output-dir: "_output"
+
+format:
+  pdf:
+    documentclass: article
+    geometry: margin=1in
+    fig-width: 8
+    fig-height: 6
+    toc: false
+    number-sections: false
+
+execute:
+  echo: false
+  warning: false
+  message: false
+  freeze: auto
+
+# Specify which files to render
+render:
+  - "admissions_analysis.qmd"
+  - "clinical_detection_analysis.qmd"
+  - "daily_population_analysis.qmd"
+  - "decolonization_analysis.qmd"
+  - "surveillance_analysis.qmd"
+  - "transmissions_analysis.qmd"
