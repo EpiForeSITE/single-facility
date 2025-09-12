@@ -1,0 +1,17 @@
+{
+  "hash": "4705fa6b23d78d860fc95e3ad71f0db5",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Surveillance Testing Analysis\"\nauthor: \"Single-Facility Analysis\"\ndate: \"2025-09-12\"\nformat:\n  pdf:\n    documentclass: article\n    geometry: margin=1in\n    fig-width: 8\n    fig-height: 6\nexecute:\n  echo: false\n  warning: false\n  message: false\n---\n\n\n::: {.cell}\n\n:::\n\n\n\n::: {.cell}\n\n:::\n\n\n## Data Summary\n\n\n::: {.cell}\n::: {.cell-output .cell-output-stdout}\n\n```\nTotal surveillance tests: 175852 \n```\n\n\n:::\n\n::: {.cell-output .cell-output-stdout}\n\n```\nUnique patients tested: 4972 \n```\n\n\n:::\n\n::: {.cell-output .cell-output-stdout}\n\n```\nTotal colonized patients found: 2299 \n```\n\n\n:::\n\n::: {.cell-output .cell-output-stdout}\n\n```\nTotal detections: 1742 \n```\n\n\n:::\n\n::: {.cell-output .cell-output-stdout}\n\n```\nOverall sensitivity: 0.758 \n```\n\n\n:::\n\n::: {.cell-output .cell-output-stdout}\n\n```\nOverall specificity: 1 \n```\n\n\n:::\n:::\n\n\n\n## Visualizations\n\n### Distribution of Daily Test Counts\n\n\n::: {.cell}\n::: {.cell-output-display}\n![Distribution of Daily Surveillance Test Counts](surveillance_analysis_files/figure-pdf/histogram-1.pdf)\n:::\n:::\n\n\n",
+    "supporting": [
+      "surveillance_analysis_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": null,
+    "postProcess": false
+  }
+}

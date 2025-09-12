@@ -88,7 +88,7 @@
 				<parameter name="diseaseName" displayName="Disease Name" type="String" 
 						defaultValue="CRE" 
 						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$StringConverter"
+						
 											/>
 				<parameter name="nursingHomeBetaReduction" displayName="Nursing Home Beta Reduction Factor" type="double" 
 						defaultValue="10.0" 

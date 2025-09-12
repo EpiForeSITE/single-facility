@@ -1,0 +1,135 @@
+---
+title: "Clinical Detection Events Analysis"
+author: "Single-Facility Analysis"
+date: "`r Sys.Date()`"
+format:
+  pdf:
+    documentclass: article
+    geometry: margin=1in
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(readr)
+```
+
+```{r load-data}
+# Read the clinical detection data
+detections_raw <- readLines("clinicalDetection.txt")
+
+# Parse the data
+parse_detection <- function(line) {
+  time_match <- regexpr("Time: ([0-9.-]+)", line)
+  if (time_match == -1) return(NULL)
+  time_str <- regmatches(line, time_match)
+  time <- as.numeric(sub("Time: ", "", time_str))
+  
+  patient_match <- regexpr("Detected Patient: ([0-9]+)", line)
+  if (patient_match == -1) return(NULL)
+  patient_str <- regmatches(line, patient_match)
+  patient_id <- sub("Detected Patient: ", "", patient_str)
+  
+  data.frame(time = time, patient_id = patient_id)
+}
+
+# Parse all lines
+detection_list <- lapply(detections_raw, parse_detection)
+detection_list <- detection_list[!sapply(detection_list, is.null)]
+detections <- do.call(rbind, detection_list)
+
+# Convert time to day (floor of time)
+detections$day <- floor(detections$time)
+
+# Count detections per day
+daily_detections <- detections %>%
+  group_by(day) %>%
+  summarise(
+    total_detections = n(),
+    unique_patients = n_distinct(patient_id),
+    .groups = 'drop'
+  )
+```
+
+## Data Summary
+
+```{r data-summary}
+# Basic data info
+total_detections <- nrow(detections)
+unique_patients <- n_distinct(detections$patient_id)
+total_days <- max(daily_detections$day) - min(daily_detections$day) + 1
+date_range <- paste("Day", min(daily_detections$day), "to Day", max(daily_detections$day))
+
+cat("Total detection events:", total_detections, "\n")
+cat("Unique patients detected:", unique_patients, "\n")
+cat("Simulation period:", date_range, "\n")
+cat("Total days:", total_days, "\n")
+```
+
+## Descriptive Statistics
+
+### Daily Detection Events Summary
+
+```{r descriptive-stats}
+# Calculate descriptive statistics
+stats_summary <- daily_detections %>%
+  summarise(
+    Mean = round(mean(total_detections), 2),
+    Median = median(total_detections),
+    SD = round(sd(total_detections), 2),
+    Min = min(total_detections),
+    Max = max(total_detections),
+    Q1 = quantile(total_detections, 0.25),
+    Q3 = quantile(total_detections, 0.75),
+    IQR = Q3 - Q1
+  )
+
+kable(stats_summary, caption = "Descriptive Statistics for Daily Clinical Detection Events")
+```
+
+### Patient Detection Frequency
+
+```{r patient-frequency}
+# Analyze how many times each patient was detected
+patient_detection_freq <- detections %>%
+  group_by(patient_id) %>%
+  summarise(detection_count = n(), .groups = 'drop') %>%
+  group_by(detection_count) %>%
+  summarise(
+    num_patients = n(),
+    percentage = round(n() / unique_patients * 100, 1),
+    .groups = 'drop'
+  )
+
+kable(patient_detection_freq, 
+      col.names = c("Times Detected", "Number of Patients", "Percentage"),
+      caption = "Frequency of Detection Events per Patient")
+```
+
+## Visualizations
+
+### Distribution of Daily Detection Events
+
+```{r histogram, fig.cap="Distribution of Daily Clinical Detection Events"}
+ggplot(daily_detections, aes(x = total_detections)) +
+  geom_histogram(bins = 20, fill = "lightcoral", color = "black", alpha = 0.7) +
+  geom_vline(aes(xintercept = mean(total_detections)), 
+             color = "red", linetype = "dashed", size = 1) +
+  labs(
+    x = "Number of Daily Detection Events",
+    y = "Frequency",
+    title = "Distribution of Daily Clinical Detection Events",
+    subtitle = "Red dashed line shows the mean"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+

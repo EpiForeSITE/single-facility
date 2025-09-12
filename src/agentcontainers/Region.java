@@ -176,6 +176,7 @@ public class Region extends AgentContainer {
 	}
 
 	public void logDailyPopulationStats() {
+	    	int totalPopulation = people.size();
 		int totalColonized = 0;
 		int totalDetected = 0;
 		int totalIsolated = 0;
@@ -197,7 +198,7 @@ public class Region extends AgentContainer {
 		double currentTime = schedule.getTickCount();
 		if (currentTime > 3650) {
 			if(!SingleFacilityBuilder.isBatchRun) {
-			writer.printf("Time: %.2f, Colonized: %d, Detected: %d, Isolated: %d%n", currentTime, totalColonized,
+			writer.printf("Time: %.2f, Total: %d, Colonized: %d, Detected: %d, Isolated: %d%n", currentTime, totalPopulation, totalColonized,
 					totalDetected, totalIsolated);
 			}
 		}

@@ -1,0 +1,134 @@
+---
+title: "Decolonization Events Analysis"
+author: "Single-Facility Analysis"
+date: "`r Sys.Date()`"
+format:
+  pdf:
+    documentclass: article
+    geometry: margin=1in
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(readr)
+```
+
+```{r load-data}
+# Read the decolonization data
+decolonization_raw <- readLines("decolonization.txt")
+
+# Parse the data
+parse_decolonization <- function(line) {
+  time_match <- regexpr("Time: ([0-9.-]+)", line)
+  if (time_match == -1) return(NULL)
+  time_str <- regmatches(line, time_match)
+  time <- as.numeric(sub("Time: ", "", time_str))
+  
+  patient_match <- regexpr("Decolonized Patient: ([0-9]+)", line)
+  if (patient_match == -1) return(NULL)
+  patient_str <- regmatches(line, patient_match)
+  patient_id <- sub("Decolonized Patient: ", "", patient_str)
+  
+  data.frame(time = time, patient_id = patient_id)
+}
+
+# Parse all lines
+decolonization_list <- lapply(decolonization_raw, parse_decolonization)
+decolonization_list <- decolonization_list[!sapply(decolonization_list, is.null)]
+decolonizations <- do.call(rbind, decolonization_list)
+
+# Convert time to day (floor of time)
+decolonizations$day <- floor(decolonizations$time)
+
+# Count decolonizations per day
+daily_decolonizations <- decolonizations %>%
+  group_by(day) %>%
+  summarise(
+    total_decolonizations = n(),
+    unique_patients = n_distinct(patient_id),
+    .groups = 'drop'
+  )
+```
+
+## Data Summary
+
+```{r data-summary}
+# Basic data info
+total_decolonizations <- nrow(decolonizations)
+unique_patients <- n_distinct(decolonizations$patient_id)
+total_days <- max(daily_decolonizations$day) - min(daily_decolonizations$day) + 1
+date_range <- paste("Day", min(daily_decolonizations$day), "to Day", max(daily_decolonizations$day))
+
+cat("Total decolonization events:", total_decolonizations, "\n")
+cat("Unique patients decolonized:", unique_patients, "\n")
+cat("Simulation period:", date_range, "\n")
+cat("Total days:", total_days, "\n")
+```
+
+## Descriptive Statistics
+
+### Daily Decolonization Events Summary
+
+```{r descriptive-stats}
+# Calculate descriptive statistics
+stats_summary <- daily_decolonizations %>%
+  summarise(
+    Mean = round(mean(total_decolonizations), 2),
+    Median = median(total_decolonizations),
+    SD = round(sd(total_decolonizations), 2),
+    Min = min(total_decolonizations),
+    Max = max(total_decolonizations),
+    Q1 = quantile(total_decolonizations, 0.25),
+    Q3 = quantile(total_decolonizations, 0.75),
+    IQR = Q3 - Q1
+  )
+
+kable(stats_summary, caption = "Descriptive Statistics for Daily Decolonization Events")
+```
+
+### Patient Decolonization Frequency
+
+```{r patient-frequency}
+# Analyze how many times each patient was decolonized
+patient_decolonization_freq <- decolonizations %>%
+  group_by(patient_id) %>%
+  summarise(decolonization_count = n(), .groups = 'drop') %>%
+  group_by(decolonization_count) %>%
+  summarise(
+    num_patients = n(),
+    percentage = round(n() / unique_patients * 100, 1),
+    .groups = 'drop'
+  )
+
+kable(patient_decolonization_freq, 
+      col.names = c("Times Decolonized", "Number of Patients", "Percentage"),
+      caption = "Frequency of Decolonization Events per Patient")
+```
+
+## Visualizations
+
+### Distribution of Daily Decolonization Events
+
+```{r histogram, fig.cap="Distribution of Daily Decolonization Events"}
+ggplot(daily_decolonizations, aes(x = total_decolonizations)) +
+  geom_histogram(bins = 20, fill = "lightgreen", color = "black", alpha = 0.7) +
+  geom_vline(aes(xintercept = mean(total_decolonizations)), 
+             color = "darkgreen", linetype = "dashed", size = 1) +
+  labs(
+    x = "Number of Daily Decolonization Events",
+    y = "Frequency",
+    title = "Distribution of Daily Decolonization Events",
+    subtitle = "Green dashed line shows the mean"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```

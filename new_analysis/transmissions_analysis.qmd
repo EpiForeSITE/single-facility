@@ -1,0 +1,227 @@
+---
+title: "Disease Transmission Events Analysis"
+author: "Single-Facility Analysis"
+date: "`r Sys.Date()`"
+format:
+  pdf:
+    documentclass: article
+    geometry: margin=1in
+    fig-width: 8
+    fig-height: 6
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(readr)
+```
+
+```{r load-data}
+# Read the transmission data
+transmissions_raw <- readLines("transmissions.txt")
+
+# Parse the data
+parse_transmission <- function(line) {
+  time_match <- regexpr("Time: ([0-9.-]+)", line)
+  if (time_match == -1) return(NULL)
+  time_str <- regmatches(line, time_match)
+  time <- as.numeric(sub("Time: ", "", time_str))
+  
+  patient1_match <- regexpr("Patient1: ([0-9]+)", line)
+  if (patient1_match == -1) return(NULL)
+  patient1_str <- regmatches(line, patient1_match)
+  patient1_id <- sub("Patient1: ", "", patient1_str)
+  
+  patient2_match <- regexpr("Patient2: ([0-9]+)", line)
+  if (patient2_match == -1) return(NULL)
+  patient2_str <- regmatches(line, patient2_match)
+  patient2_id <- sub("Patient2: ", "", patient2_str)
+  
+  data.frame(time = time, from_patient = patient1_id, to_patient = patient2_id)
+}
+
+# Parse all lines
+transmission_list <- lapply(transmissions_raw, parse_transmission)
+transmission_list <- transmission_list[!sapply(transmission_list, is.null)]
+transmissions <- do.call(rbind, transmission_list)
+
+# Convert time to day (floor of time)
+transmissions$day <- floor(transmissions$time)
+
+# Count transmissions per day
+daily_transmissions <- transmissions %>%
+  group_by(day) %>%
+  summarise(
+    total_transmissions = n(),
+    unique_sources = n_distinct(from_patient),
+    unique_recipients = n_distinct(to_patient),
+    unique_patients = n_distinct(c(from_patient, to_patient)),
+    .groups = 'drop'
+  )
+```
+
+## Data Summary
+
+```{r data-summary}
+# Basic data info
+total_transmissions <- nrow(transmissions)
+unique_sources <- n_distinct(transmissions$from_patient)
+unique_recipients <- n_distinct(transmissions$to_patient)
+total_unique_patients <- n_distinct(c(transmissions$from_patient, transmissions$to_patient))
+total_days <- max(daily_transmissions$day) - min(daily_transmissions$day) + 1
+date_range <- paste("Day", min(daily_transmissions$day), "to Day", max(daily_transmissions$day))
+
+# Calculate effective reproductive rate (Re)
+# Re = average number of secondary infections per infected individual
+effective_re <- total_transmissions / unique_sources
+
+cat("Total transmission events:", total_transmissions, "\n")
+cat("Unique source patients:", unique_sources, "\n")
+cat("Unique recipient patients:", unique_recipients, "\n")
+cat("Total unique patients involved:", total_unique_patients, "\n")
+cat("Simulation period:", date_range, "\n")
+cat("Total days:", total_days, "\n")
+cat("Effective reproductive rate (Re):", round(effective_re, 3), "\n")
+```
+
+## Descriptive Statistics
+
+### Daily Transmission Events Summary
+
+```{r descriptive-stats}
+# Calculate descriptive statistics
+stats_summary <- daily_transmissions %>%
+  summarise(
+    Mean = round(mean(total_transmissions), 2),
+    Median = median(total_transmissions),
+    SD = round(sd(total_transmissions), 2),
+    Min = min(total_transmissions),
+    Max = max(total_transmissions),
+    Q1 = quantile(total_transmissions, 0.25),
+    Q3 = quantile(total_transmissions, 0.75),
+    IQR = Q3 - Q1
+  )
+
+kable(stats_summary, caption = "Descriptive Statistics for Daily Transmission Events")
+```
+
+### Effective Reproductive Rate Analysis
+
+```{r reproductive-rate}
+# Analyze transmission activity by patient
+source_activity <- transmissions %>%
+  group_by(from_patient) %>%
+  summarise(transmissions_caused = n(), .groups = 'drop')
+
+# Calculate reproductive rate statistics
+re_stats <- source_activity %>%
+  summarise(
+    `Mean Re per source` = round(mean(transmissions_caused), 3),
+    `Median Re per source` = median(transmissions_caused),
+    `SD Re per source` = round(sd(transmissions_caused), 3),
+    `Min Re per source` = min(transmissions_caused),
+    `Max Re per source` = max(transmissions_caused),
+    `Overall Re` = round(sum(transmissions_caused) / n(), 3)
+  )
+
+kable(t(re_stats), col.names = "Value", caption = "Effective Reproductive Rate Statistics")
+```
+
+### Patient Transmission Activity
+
+```{r patient-activity}
+recipient_activity <- transmissions %>%
+  group_by(to_patient) %>%
+  summarise(infections_received = n(), .groups = 'drop')
+
+# Summary of source activity
+source_summary <- source_activity %>%
+  group_by(transmissions_caused) %>%
+  summarise(num_patients = n(), .groups = 'drop') %>%
+  mutate(percentage = round(num_patients / nrow(source_activity) * 100, 1))
+
+kable(head(source_summary, 10), 
+      col.names = c("Transmissions Caused", "Number of Patients", "Percentage"),
+      caption = "Distribution of Transmissions Caused per Source Patient (Top 10)")
+
+# Summary of recipient activity
+recipient_summary <- recipient_activity %>%
+  group_by(infections_received) %>%
+  summarise(num_patients = n(), .groups = 'drop') %>%
+  mutate(percentage = round(num_patients / nrow(recipient_activity) * 100, 1))
+
+kable(head(recipient_summary, 10), 
+      col.names = c("Infections Received", "Number of Patients", "Percentage"),
+      caption = "Distribution of Infections Received per Recipient Patient (Top 10)")
+```
+
+## Visualizations
+
+### Reproductive Rate Distribution
+
+```{r re-histogram, fig.cap="Distribution of Individual Reproductive Rates"}
+ggplot(source_activity, aes(x = transmissions_caused)) +
+  geom_histogram(bins = 15, fill = "lightcoral", color = "black", alpha = 0.7) +
+  geom_vline(aes(xintercept = mean(transmissions_caused)), 
+             color = "red", linetype = "dashed", size = 1) +
+  labs(
+    x = "Number of Transmissions Caused per Source Patient",
+    y = "Number of Source Patients",
+    title = "Distribution of Individual Reproductive Rates",
+    subtitle = "Red dashed line shows the mean reproductive rate"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+### Distribution of Daily Transmission Events
+
+```{r histogram, fig.cap="Distribution of Daily Transmission Events"}
+ggplot(daily_transmissions, aes(x = total_transmissions)) +
+  geom_histogram(bins = 20, fill = "orange", color = "black", alpha = 0.7) +
+  geom_vline(aes(xintercept = mean(total_transmissions)), 
+             color = "red", linetype = "dashed", size = 1) +
+  labs(
+    x = "Number of Daily Transmission Events",
+    y = "Frequency",
+    title = "Distribution of Daily Transmission Events",
+    subtitle = "Red dashed line shows the mean"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+### Transmission Network Degree Distribution
+
+```{r network-analysis, fig.cap="Distribution of Patient Transmission Degrees"}
+# Create network analysis
+all_patients <- unique(c(transmissions$from_patient, transmissions$to_patient))
+out_degree <- table(factor(transmissions$from_patient, levels = all_patients))
+in_degree <- table(factor(transmissions$to_patient, levels = all_patients))
+total_degree <- out_degree + in_degree
+
+degree_df <- data.frame(
+  patient = names(total_degree),
+  out_degree = as.numeric(out_degree),
+  in_degree = as.numeric(in_degree),
+  total_degree = as.numeric(total_degree)
+)
+
+# Plot degree distribution
+ggplot(degree_df, aes(x = total_degree)) +
+  geom_histogram(bins = 20, fill = "purple", color = "black", alpha = 0.7) +
+  labs(
+    x = "Total Transmission Degree (In + Out)",
+    y = "Number of Patients",
+    title = "Distribution of Patient Transmission Network Degrees"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
