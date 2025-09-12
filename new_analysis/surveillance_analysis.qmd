@@ -91,7 +91,7 @@ overall_specificity <- sum(!surveillance$colonized & !surveillance$detected) / s
 
 cat("Total surveillance tests:", total_tests, "\n")
 cat("Unique patients tested:", unique_patients, "\n")
-cat("Total colonized patients found:", total_colonized, "\n")
+cat("Total colonized patients:", total_colonized, "\n")
 cat("Total detections:", total_detected, "\n")
 cat("Overall sensitivity:", round(overall_sensitivity, 3), "\n")
 cat("Overall specificity:", round(overall_specificity, 3), "\n")
