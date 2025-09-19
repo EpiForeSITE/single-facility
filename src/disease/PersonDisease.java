@@ -84,8 +84,7 @@ public class PersonDisease {
 			return;
 		}
 		double timeToDecolonization = decolonizationDistribution.sample();
-		ScheduleParameters params =
-			ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDecolonization);
+		ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDecolonization);
 		schedule.schedule(params, this, "doDecolonization");
 	}
 
@@ -102,14 +101,16 @@ public class PersonDisease {
 		incrementDetectionCount();
 
 		if (!SingleFacilityBuilder.isBatchRun && clinicalWriter != null) {
-			clinicalWriter.printf("Time: %.2f, Detected Patient: %d, DetectionCount: %d%n", currentTime, person.hashCode(), getDetectionCount());
+			clinicalWriter.printf("Time: %.2f, Detected Patient: %d, DetectionCount: %d%n", currentTime,
+					person.hashCode(), getDetectionCount());
 			clinicalWriter.flush();
 		}
 		clinicalOutputNum++;
 
 		// Verification log for detection source
 		if (!SingleFacilityBuilder.isBatchRun && verificationWriter != null) {
-			verificationWriter.printf("Time: %.2f, Patient: %d, Source: CLINICAL, Colonized: %b, DetectionCount: %d%n", currentTime, person.hashCode(), colonized, getDetectionCount());
+			verificationWriter.printf("Time: %.2f, Patient: %d, Source: CLINICAL, Colonized: %b, DetectionCount: %d%n",
+					currentTime, person.hashCode(), colonized, getDetectionCount());
 			verificationWriter.flush();
 		}
 
@@ -124,18 +125,21 @@ public class PersonDisease {
 	}
 
 	/**
-	 * Mark this PersonDisease as detected by surveillance testing.
-	 * Writes to verification log and performs isolation if configured.
+	 * Mark this PersonDisease as detected by surveillance testing. Writes to
+	 * verification log and performs isolation if configured.
 	 */
 	public void setDetectedBySurveillance() {
-		if (detected) return; // already detected by some source
+		if (detected)
+			return; // already detected by some source
 		detected = true;
 		detectedBySurveillance = true;
 		surveillanceOutputNum++;
 		double currentTime = schedule.getTickCount();
 		// Verification log
 		if (!SingleFacilityBuilder.isBatchRun && verificationWriter != null) {
-			verificationWriter.printf("Time: %.2f, Patient: %d, Source: SURVEILLANCE, Colonized: %b, DetectionCount: %d%n", currentTime, person.hashCode(), colonized, getDetectionCount());
+			verificationWriter.printf(
+					"Time: %.2f, Patient: %d, Source: SURVEILLANCE, Colonized: %b, DetectionCount: %d%n", currentTime,
+					person.hashCode(), colonized, getDetectionCount());
 			verificationWriter.flush();
 		}
 		if (!person.isIsolated() && disease.isolatePatientWhenDetected()) {
@@ -157,14 +161,14 @@ public class PersonDisease {
 			clinicalDetectionAction = null;
 		}
 
-		double meanTimeToClinicalDetection =
-			disease.getMeanTimeToClinicalDetection(person.getCurrentFacility().getType());
+		double meanTimeToClinicalDetection = disease
+				.getMeanTimeToClinicalDetection(person.getCurrentFacility().getType());
 		double timeToDetection = clinicalDetectionDistribution.sample();
 
-		ScheduleParameters params =
-			ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDetection);
+		ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDetection);
 		clinicalDetectionAction = schedule.schedule(params, this, "doClinicalDetection");
 	}
+
 	public void resetClinicalDetectionEvent() {
 		detected = false;
 		clinicallyDetectedDuringCurrentStay = false;
@@ -177,12 +181,10 @@ public class PersonDisease {
 
 		if (clinicalDetectionDistribution != null) {
 			double timeToDetection = clinicalDetectionDistribution.sample();
-			ScheduleParameters params =
-				ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDetection);
+			ScheduleParameters params = ScheduleParameters.createOneTime(schedule.getTickCount() + timeToDetection);
 			clinicalDetectionAction = schedule.schedule(params, this, "doClinicalDetection");
 		}
 	}
-
 
 	public void colonize() {
 		colonized = true;
@@ -194,6 +196,7 @@ public class PersonDisease {
 		startClinicalDetectionTimer();
 		person.updateAllTransmissionRateContributions();
 	}
+
 	public void incrementDetectionCount() {
 		this.detectionCount++;
 	}
@@ -204,14 +207,15 @@ public class PersonDisease {
 
 	public void updateTransmissionRateContribution() {
 		double score = 1.0;
-		if (person.isIsolated()) score *= person.getCurrentFacility().getBetaIsolationReduction();
+		if (person.isIsolated())
+			score *= person.getCurrentFacility().getBetaIsolationReduction();
 		transmissionRateContribution = score;
 	}
 
 	public void initializeEventDistributions() {
 		if (disease != null && person != null && person.getCurrentFacility() != null) {
-			double meanTimeToClinicalDetection =
-				disease.getMeanTimeToClinicalDetection(person.getCurrentFacility().getType());
+			double meanTimeToClinicalDetection = disease
+					.getMeanTimeToClinicalDetection(person.getCurrentFacility().getType());
 
 			decolonizationDistribution = new ExponentialDistribution(disease.getAvgDecolonizationTime());
 			clinicalDetectionDistribution = new ExponentialDistribution(meanTimeToClinicalDetection);
