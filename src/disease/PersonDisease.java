@@ -18,6 +18,7 @@ public class PersonDisease {
 	private Person person;
 	private boolean colonized = false;
 	private boolean detected = false;
+	private boolean detectedBySurveillance = false; // NEW: track source of detection
 	private double transmissionRateContribution = 1.0;
 	private boolean clinicallyDetectedDuringCurrentStay = false;
 	private boolean initialInfection = false;
@@ -31,13 +32,16 @@ public class PersonDisease {
 
 	private static PrintWriter decolWriter;
 	private static PrintWriter clinicalWriter;
+	private static PrintWriter verificationWriter; // NEW: verification log
 	public static int clinicalOutputNum;
+	public static int surveillanceOutputNum; // NEW: count surveillance detections
 
 	static {
 		try {
 			if (!SingleFacilityBuilder.isBatchRun) {
 				decolWriter = new PrintWriter("decolonization.txt");
 				clinicalWriter = new PrintWriter("clinicalDetection.txt");
+				verificationWriter = new PrintWriter("detection_verification.txt");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -92,6 +96,7 @@ public class PersonDisease {
 
 		double currentTime = schedule.getTickCount();
 		detected = true;
+		detectedBySurveillance = false; // mark as clinical
 		clinicallyDetectedDuringCurrentStay = true;
 
 		incrementDetectionCount();
@@ -102,6 +107,37 @@ public class PersonDisease {
 		}
 		clinicalOutputNum++;
 
+		// Verification log for detection source
+		if (!SingleFacilityBuilder.isBatchRun && verificationWriter != null) {
+			verificationWriter.printf("Time: %.2f, Patient: %d, Source: CLINICAL, Colonized: %b, DetectionCount: %d%n", currentTime, person.hashCode(), colonized, getDetectionCount());
+			verificationWriter.flush();
+		}
+
+		if (!person.isIsolated() && disease.isolatePatientWhenDetected()) {
+			person.isolate();
+			person.updateAllTransmissionRateContributions();
+		}
+		if (clinicalDetectionAction != null) {
+			schedule.removeAction(clinicalDetectionAction);
+			clinicalDetectionAction = null;
+		}
+	}
+
+	/**
+	 * Mark this PersonDisease as detected by surveillance testing.
+	 * Writes to verification log and performs isolation if configured.
+	 */
+	public void setDetectedBySurveillance() {
+		if (detected) return; // already detected by some source
+		detected = true;
+		detectedBySurveillance = true;
+		surveillanceOutputNum++;
+		double currentTime = schedule.getTickCount();
+		// Verification log
+		if (!SingleFacilityBuilder.isBatchRun && verificationWriter != null) {
+			verificationWriter.printf("Time: %.2f, Patient: %d, Source: SURVEILLANCE, Colonized: %b, DetectionCount: %d%n", currentTime, person.hashCode(), colonized, getDetectionCount());
+			verificationWriter.flush();
+		}
 		if (!person.isIsolated() && disease.isolatePatientWhenDetected()) {
 			person.isolate();
 			person.updateAllTransmissionRateContributions();
@@ -214,6 +250,10 @@ public class PersonDisease {
 
 	public void setDetected(boolean detected) {
 		this.detected = detected;
+	}
+
+	public boolean isDetectedBySurveillance() {
+		return detectedBySurveillance;
 	}
 
 	public boolean isClinicallyDetectedDuringCurrentStay() {

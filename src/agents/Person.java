@@ -116,17 +116,14 @@ public class Person extends Agent {
 			if (!pd.isDetected() && pd.getDisease().isActiveSurveillanceAgent()) {
 				if (pd.isColonized() && uniform() < pd.getDisease().getProbSurveillanceDetection()
 						* currentFacility.getMidstaySurveillanceAdherence()) {
-					pd.setDetected(true);
-					if (!isolated) {
-						isolate();
-						updateAllTransmissionRateContributions();
-					}
+					// Use the new API to record surveillance detections and verification logging
+					pd.setDetectedBySurveillance();
 				} else {
 					startNextPeriodicSurveillanceTimer();
 				}
 				if(!SingleFacilityBuilder.isBatchRun) {
 				surveillanceWriter.printf("Time: %.2f, Patient: %d, Colonized: %b, Detected: %b%n",
-                        currentTime, this.hashCode(), pd.isColonized(), pd.isDetected());
+				        currentTime, this.hashCode(), pd.isColonized(), pd.isDetected());
 				}
 			}
 		}
