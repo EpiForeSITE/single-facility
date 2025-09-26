@@ -1,0 +1,17 @@
+{
+  "hash": "d152f86e30e6cce5c9190515abb860bc",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Daily Population Statistics Analysis\"\nauthor: \"Single-Facility Analysis\"\ndate: \"2025-09-12\"\nformat:\n  pdf:\n    documentclass: article\n    geometry: margin=1in\n    fig-width: 8\n    fig-height: 6\nexecute:\n  echo: false\n  warning: false\n  message: false\n---\n\n\n::: {.cell}\n\n:::\n\n\n\n::: {.cell}\n\n:::\n\n\n## Data Summary\n\n\n::: {.cell}\n::: {.cell-output .cell-output-stdout}\n\n```\nTotal days recorded: 1713 \n```\n\n\n:::\n\n::: {.cell-output .cell-output-stdout}\n\n```\nSimulation period: Day 3651 to Day 5363 \n```\n\n\n:::\n\n::: {.cell-output .cell-output-stdout}\n\n```\nMean total population: 95.9 \n```\n\n\n:::\n\n::: {.cell-output .cell-output-stdout}\n\n```\nMean colonized patients: 34.13 \n```\n\n\n:::\n\n::: {.cell-output .cell-output-stdout}\n\n```\nMean detected patients: 20.36 \n```\n\n\n:::\n\n::: {.cell-output .cell-output-stdout}\n\n```\nMean isolated patients: 21.21 \n```\n\n\n:::\n:::\n\n\n## Descriptive Statistics\n\n### Population Statistics Summary\n\n\n::: {.cell}\n::: {.cell-output-display}\n\n\nTable: Descriptive Statistics for Daily Population Counts\n\n|population |  Mean| Median|    SD| Min| Max|\n|:----------|-----:|------:|-----:|---:|---:|\n|total      | 95.90|     96| 10.34|  64| 130|\n|colonized  | 34.13|     34|  7.41|   8|  60|\n|detected   | 20.36|     20|  5.10|   4|  39|\n|isolated   | 21.21|     22|  5.26|   6|  42|\n\n\n:::\n:::\n\n\n### Correlation Analysis\n\n\n::: {.cell}\n::: {.cell-output-display}\n\n\nTable: Correlation Matrix of Population Types\n\n|          |Variable  | total| colonized| detected| isolated|\n|:---------|:---------|-----:|---------:|--------:|--------:|\n|total     |total     | 1.000|     0.593|    0.534|    0.533|\n|colonized |colonized | 0.593|     1.000|    0.634|    0.632|\n|detected  |detected  | 0.534|     0.634|    1.000|    0.984|\n|isolated  |isolated  | 0.533|     0.632|    0.984|    1.000|\n\n\n:::\n:::\n\n\n## Visualizations\n\n### Distribution of Population Types\n\n\n::: {.cell}\n::: {.cell-output-display}\n![Distribution of Daily Population Counts](daily_population_analysis_files/figure-pdf/histogram-1.pdf)\n:::\n:::\n\n\n### Population Trends Over Time\n\n\n::: {.cell}\n::: {.cell-output-display}\n![Total Population Trend Over Time](daily_population_analysis_files/figure-pdf/total-trend-1.pdf)\n:::\n:::\n\n\n\n::: {.cell}\n::: {.cell-output-display}\n![Colonized Population Trend Over Time](daily_population_analysis_files/figure-pdf/colonized-trend-1.pdf)\n:::\n:::\n\n\n\n::: {.cell}\n::: {.cell-output-display}\n![Detected Population Trend Over Time](daily_population_analysis_files/figure-pdf/detected-trend-1.pdf)\n:::\n:::\n\n\n\n::: {.cell}\n::: {.cell-output-display}\n![Isolated Population Trend Over Time](daily_population_analysis_files/figure-pdf/isolated-trend-1.pdf)\n:::\n:::\n\n",
+    "supporting": [
+      "daily_population_analysis_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": null,
+    "postProcess": false
+  }
+}
