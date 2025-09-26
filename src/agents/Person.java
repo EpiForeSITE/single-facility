@@ -33,15 +33,15 @@ public class Person extends Agent {
 	private HashMap<String, Object> properties;
 	private static PrintWriter surveillanceWriter;
 
-    static {
-        try {
-			if(!SingleFacilityBuilder.isBatchRun) {
-            surveillanceWriter = new PrintWriter("surveillance.txt");
+	static {
+		try {
+			if (!SingleFacilityBuilder.isBatchRun) {
+				surveillanceWriter = new PrintWriter("surveillance.txt");
 			}
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public Person(Facility f) {
 		super();
@@ -116,17 +116,14 @@ public class Person extends Agent {
 			if (!pd.isDetected() && pd.getDisease().isActiveSurveillanceAgent()) {
 				if (pd.isColonized() && uniform() < pd.getDisease().getProbSurveillanceDetection()
 						* currentFacility.getMidstaySurveillanceAdherence()) {
-					pd.setDetected(true);
-					if (!isolated) {
-						isolate();
-						updateAllTransmissionRateContributions();
-					}
+					// Use the new API to record surveillance detections and verification logging
+					pd.setDetectedBySurveillance();
 				} else {
 					startNextPeriodicSurveillanceTimer();
 				}
-				if(!SingleFacilityBuilder.isBatchRun) {
-				surveillanceWriter.printf("Time: %.2f, Patient: %d, Colonized: %b, Detected: %b%n",
-                        currentTime, this.hashCode(), pd.isColonized(), pd.isDetected());
+				if (!SingleFacilityBuilder.isBatchRun) {
+					surveillanceWriter.printf("Time: %.2f, Patient: %d, Colonized: %b, Detected: %b%n", currentTime,
+							this.hashCode(), pd.isColonized(), pd.isDetected());
 				}
 			}
 		}
@@ -248,13 +245,13 @@ public class Person extends Agent {
 
 	public void setCurrentLOS(double currentLOS) {
 	}
-	
+
 	public void setProperty(String s, Object o) {
-	    this.properties.put(s, o);
-	  
+		this.properties.put(s, o);
+
 	}
-	
+
 	public Object getProperty(String s) {
-	    return this.properties.get(s);
-	    }
+		return this.properties.get(s);
+	}
 }
