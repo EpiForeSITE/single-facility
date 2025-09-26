@@ -152,6 +152,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 			disease.setSimIndex(i);
 			disease.setType(diseaseList[i]);
 			region.getDiseases().add(disease);
+			disease.setDiseaseName("CRE");
 		}
 
 		int[] facilitySize = { 75 };

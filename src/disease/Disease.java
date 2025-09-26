@@ -8,6 +8,7 @@ public class Disease {
 	private static int CRE = 1;
 	private int type;
 	private int simIndex;
+	private String diseaseName;
 	private Parameters params = repast.simphony.engine.environment.RunEnvironment.getInstance().getParameters();
 	
 
@@ -117,5 +118,9 @@ public class Disease {
 
 	public void setSimIndex(int simIndex) {
 	    this.simIndex = simIndex;
+	}
+
+	public void setDiseaseName(String diseaseName) {
+	    this.diseaseName = diseaseName;
 	}
 }

@@ -134,12 +134,15 @@ public class Person extends Agent {
 	}
 
 	public PersonDisease add_diseases() {
-
-		// Person person = region.people.get(region.people.size() - 1);
 		Disease disease = region.diseases.get(0);
-
+		// Check if a PersonDisease for this disease already exists
+		for (PersonDisease pd : this.personDiseases) {
+			if (pd.getDisease() == disease) {
+				return pd;
+			}
+		}
+		// If not, create and add a new one
 		PersonDisease pd = new PersonDisease(disease, this, schedule);
-
 		this.personDiseases.add(pd);
 		return pd;
 	}

@@ -21,3 +21,5 @@ output/*.txt
 ssh_remote_model.log
 *.txt
 build_model_archive.log
+/new_analysis/.quarto/*.*
+/new_analysis/
