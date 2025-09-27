@@ -89,6 +89,7 @@ public class PersonDisease {
 	}
 
 	public void doClinicalDetection() {
+	    		// If already detected or clinically detected during current stay, do nothing
 		if (detected || clinicallyDetectedDuringCurrentStay) {
 			return;
 		}
@@ -170,6 +171,7 @@ public class PersonDisease {
 	}
 
 	public void resetClinicalDetectionEvent() {
+	    	System.out.println("Resetting clinical detection event for person: " + person.hashCode() );
 		detected = false;
 		clinicallyDetectedDuringCurrentStay = false;
 

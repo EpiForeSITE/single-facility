@@ -88,6 +88,7 @@ public class Facility extends AgentContainer{
 				if(pd.getDisease().isActiveSurveillanceAgent() && onActiveSurveillance){
 					if(uniform() < pd.getDisease().getProbSurveillanceDetection() * admissionSurveillanceAdherence){
 						pd.setDetected(true);
+						pd.setDetectedBySurveillance();
 						if(pd.getDisease().isolatePatientWhenDetected()) p.isolate();
 					}
 				}

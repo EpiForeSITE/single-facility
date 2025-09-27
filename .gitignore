@@ -21,9 +21,26 @@ output/*.txt
 ssh_remote_model.log
 *.txt
 build_model_archive.log
-<<<<<<< HEAD
-*.txt
-=======
 /new_analysis/.quarto/*.*
 /new_analysis/
->>>>>>> fix-outputs
+
+# Ignore data output files
+admissions.txt
+clinicalDetection.txt
+daily_population_stats.txt
+daily_prevalence.txt
+daily_stats.txt
+decolonization.txt
+detection_verification.txt
+facilityPrevalenceData.txt
+simulation_results.txt
+transmissions.txt
+surveillance.txt
+sim_modeloutputs*.txt
+
+# Ignore output directory
+output/
+
+# Ignore Quarto and freeze directories
+new_analysis/.quarto/
+new_analysis/_freeze/

@@ -1,0 +1,20 @@
+# Configuration for single-facility simulation Makefile
+# Copy this file to 'config.mk' and adjust the paths for your system
+
+# Path to your Repast Simphony installation
+# This should point to the directory containing the lib folder with Repast JAR files
+REPAST_HOME = C:/path/to/repast/simphony
+
+# Java executable (if not in PATH)
+# JAVA = /path/to/java
+
+# Additional library paths (if needed)
+# EXTRA_LIBS = /path/to/additional/libs/*
+
+# Memory settings for the JVM
+JVM_MEMORY = -Xmx2g -Xms1g
+
+# Example paths for common Repast installations:
+# Windows: C:/Program Files/Repast Simphony 2.X
+# macOS: /Applications/RepastSimphony-2.X
+# Linux: ~/repast_simphony or /opt/repast_simphony
