@@ -14,7 +14,6 @@ import java.util.HashMap;
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
-import utils.TimeUtils;
 
 public class Person extends Agent {
 

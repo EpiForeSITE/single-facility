@@ -15,7 +15,6 @@ import repast.simphony.engine.schedule.ISchedulableAction;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
 import repast.simphony.engine.schedule.ScheduledMethod;
-import utils.TimeUtils;
 
 public class FacilityOutbreak {
 	private Disease disease;

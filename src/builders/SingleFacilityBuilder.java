@@ -11,7 +11,6 @@ import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.parameter.Parameters;
-import utils.TimeUtils;
 import agentcontainers.Facility;
 import agentcontainers.Region;
 import agents.Person;
@@ -23,6 +22,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+
 
 // Notes for TODO items:
 //find output number of clinicical detections to add to the batch outputs (raw number)
@@ -54,6 +54,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private PrintWriter dailyStatsWriter;
 	private int sumDailyInfected = 0;
 	private int sumDailyClinicalDetections = 0;
+	public StringBuffer dischargedPatientsBuffer = new StringBuffer();
 
 	@Override
 	public Context<Object> build(Context<Object> context) {
