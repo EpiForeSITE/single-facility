@@ -41,38 +41,31 @@ jobs:
           mkdir -p ~/repast-simphony
           cd ~/repast-simphony
 
-          # Try to download from SourceForge
-          # Using the direct download URL pattern for SourceForge
-          URL1="https://sourceforge.net/projects/repast/files/"
-          URL1="${URL1}Repast%20Simphony/"
-          URL1="${URL1}Repast%20Simphony%202.11/"
-          URL1="${URL1}Repast-Simphony-2.11-linux.tgz/download"
+          # NOTE: SourceForge downloads are currently blocked by firewall
+          # This step requires repository admin to either:
+          # 1. Add sourceforge.net to the allowed domains in Copilot settings
+          # 2. Store Repast Simphony JARs in GitHub Releases
+          # 3. Use a mirror or alternative download location
 
-          echo "Attempting download from: $URL1"
-          if wget -O repast-simphony-2.11.tgz "$URL1" \
-              2>&1 | tee download.log; then
-            echo "Download successful"
-            tar -xzf repast-simphony-2.11.tgz
-            ls -la
-          else
-            echo "Download failed. Trying alternative URL..."
-            # Try alternative URL
-            URL2="https://downloads.sourceforge.net/project/repast/"
-            URL2="${URL2}Repast%20Simphony/"
-            URL2="${URL2}Repast%20Simphony%202.11/"
-            URL2="${URL2}Repast-Simphony-2.11-linux.tgz"
-            if wget -O repast-simphony-2.11.tgz "$URL2" \
-                2>&1 | tee download.log; then
-              echo "Alternative download successful"
-              tar -xzf repast-simphony-2.11.tgz
-              ls -la
-            else
-              echo "ERROR: Could not download Repast Simphony"
-              echo "Please check SourceForge availability"
-              cat download.log
-              exit 1
-            fi
-          fi
+          echo "ERROR: Cannot download Repast Simphony"
+          echo ""
+          echo "SourceForge is blocked by the firewall."
+          echo "To fix this, a repository admin needs to:"
+          echo ""
+          echo "Option 1: Add sourceforge.net to allowed domains"
+          echo "  Go to: Settings > Copilot > Coding Agent"
+          echo "  Add: sourceforge.net, downloads.sourceforge.net"
+          echo ""
+          echo "Option 2: Store Repast JARs in GitHub"
+          echo "  - Download Repast Simphony 2.11.0 locally"
+          echo "  - Upload as a GitHub Release asset"
+          echo "  - Update workflow to download from GitHub"
+          echo ""
+          echo "Option 3: Commit essential JARs to repository"
+          echo "  - Extract needed JARs from Repast installation"
+          echo "  - Commit to lib/ directory (if size permits)"
+          echo ""
+          exit 1
 
       - name: Verify Repast installation
         run: |
