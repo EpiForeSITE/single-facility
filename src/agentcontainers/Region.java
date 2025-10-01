@@ -69,10 +69,7 @@ public class Region extends AgentContainer {
 
 		if (people.contains(person)) {
 			people.remove(person);
-			if (person.getCurrentFacility() != null) {
-				person.getCurrentFacility().dischargePatient(person);
-			}
-
+			// Removed redundant dischargePatient call to prevent duplicate discharges
 		}
 	}
 

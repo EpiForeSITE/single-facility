@@ -13,6 +13,7 @@ import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.parameter.Parameters;
 import agentcontainers.Facility;
 import agentcontainers.Region;
+import agents.DischargedPatient;
 import agents.Person;
 
 import java.io.FileNotFoundException;
@@ -54,8 +55,7 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private PrintWriter dailyStatsWriter;
 	private int sumDailyInfected = 0;
 	private int sumDailyClinicalDetections = 0;
-	public StringBuffer dischargedPatientsBuffer = new StringBuffer();
-
+	public ArrayList<DischargedPatient> dischargedPatients = new ArrayList<DischargedPatient>();
 	@Override
 	public Context<Object> build(Context<Object> context) {
 		// System.out.println("Starting simulation build.");
@@ -237,12 +237,27 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	        e.printStackTrace();
 	    }
 	}
+	
+	public void writeDischargedPatientFile() {
+		try (PrintWriter writer = new PrintWriter(new FileWriter("discharged_patients.csv"))) {
+			// Write the header from DischargedPatient.getHeader()
+			writer.println(DischargedPatient.getHeader());
+			
+			// Write each discharged patient as a row using toString()
+			for (DischargedPatient patient : dischargedPatients) {
+				writer.println(patient.toString());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void doSimulationEnd() throws IOException {
 	    System.out.println("Simulation ending at tick: " + schedule.getTickCount());
 	    
 	    if (!params.getBoolean("isBatchRun")) {
 	        writeDailyPrevToFile();
+	        writeDischargedPatientFile();
 	    }
 
 

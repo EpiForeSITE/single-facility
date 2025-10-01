@@ -10,6 +10,10 @@ import repast.simphony.engine.schedule.ISchedulableAction;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
 import repast.simphony.random.RandomHelper;
+import repast.simphony.context.Context;
+import repast.simphony.engine.environment.RunEnvironment;
+import repast.simphony.util.ContextUtils;
+import utils.TimeUtils;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -111,10 +115,16 @@ public class Facility extends AgentContainer{
 		region.people.remove(p);
 		getCurrentPatients().remove(p);
 		updateTransmissionRate();
+		SingleFacilityBuilder builder = getSimulationBuilder();
+		p.setDischargeTime(TimeUtils.getSchedule().getTickCount());
+		if (!region.isInBurnInPeriod()) {
+			builder.dischargedPatients.add(new agents.DischargedPatient(p));
+		}
+	
+		
 		// Oct 4, 2024 WRR: This isn't deleting the patient from anywhere but this currentPatients collection.
 		if(!getRegion().isInBurnInPeriod()) updateStayTally(p);
-
-		p.destroyMyself(getRegion());
+			p.destroyMyself(getRegion());
 	}
 
 	public void updateTransmissionRate(){
@@ -328,5 +338,49 @@ public class Facility extends AgentContainer{
 		if(!SingleFacilityBuilder.isBatchRun) {
           admissionsWriter.printf("Time: %.2f, Patient ID: %d, Importation: %b%n", time, patientID, importation);
 		}
+    }
+    
+    /**
+     * Gets a reference to the root context in Repast Simphony.
+     * This uses ContextUtils to get the context containing this facility object,
+     * which should be the root context where the simulation builder was added.
+     * 
+     * @return the root context
+     */
+    @SuppressWarnings("unchecked")
+    public Context<Object> getRootContext() {
+        return ContextUtils.getContext(this);
+    }
+    
+    /**
+     * Gets the SingleFacilityBuilder from the root context.
+     * This allows access to the main simulation controller and its methods/data.
+     * 
+     * @return the SingleFacilityBuilder instance, or null if not found
+     */
+    public SingleFacilityBuilder getSimulationBuilder() {
+        Context<Object> rootContext = getRootContext();
+        for (Object obj : rootContext) {
+            if (obj instanceof SingleFacilityBuilder) {
+                return (SingleFacilityBuilder) obj;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Alternative method to get the region from the root context.
+     * This demonstrates how to find specific objects in the context hierarchy.
+     * 
+     * @return the Region instance, or null if not found
+     */
+    public Region getRegionFromContext() {
+        Context<Object> rootContext = getRootContext();
+        for (Object obj : rootContext) {
+            if (obj instanceof Region) {
+                return (Region) obj;
+            }
+        }
+        return null;
     }
 }

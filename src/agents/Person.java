@@ -98,6 +98,7 @@ public class Person extends Agent {
 		double elapse = distro.sample();
 		ScheduleParameters params = ScheduleParameters.createOneTime(currTime + elapse);
 		schedule.schedule(params, this, "doPatientDischarge");
+		this.dischargeTime = currTime;
 	}
 
 	public void surveillanceTest() {

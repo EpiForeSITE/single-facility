@@ -9,23 +9,151 @@ format:
     embed-resources: true
 editor: visual
 params:
-  patient_id: 77
+  patient_id: 13094
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 library(dplyr)
-library(readr)
 library(knitr)
 library(ggplot2)
-library(DT)
 ```
 
-# Patient Timeline Report
+# Patient Timeline Analysis
+
+::: {.callout-tip}
+## How to Change Patient
+To analyze a different patient, change the `patient_id` parameter in the YAML header above and re-render the document.
+
+**Quick Patient Selection Guide:**
+- **High Activity Patients**: See the top 20 table below
+- **Random Selection**: Any ID from the discharged patients list
+- **Current Patient**: `r params$patient_id`
+:::
 
 This report provides a comprehensive timeline of all events for a specific patient across all simulation data files.
 
+## Patient Event Summary
+
+First, let's see which patients have the most and least events across all data files:
+
+```{r patient-event-counts, echo=TRUE}
+# Function to safely read files
+safe_read_lines <- function(file_path) {
+  if (file.exists(file_path)) {
+    return(readLines(file_path, warn = FALSE))
+  } else {
+    warning(paste("File not found:", file_path))
+    return(character(0))
+  }
+}
+
+# Read all data files
+admissions_data <- safe_read_lines("../admissions.txt")
+clinical_detection_data <- safe_read_lines("../clinicalDetection.txt")
+transmissions_data <- safe_read_lines("../transmissions.txt")
+decolonization_data <- safe_read_lines("../decolonization.txt")
+surveillance_data <- safe_read_lines("../surveillance.txt")
+
+# Load discharged patients to get the valid patient ID range
+discharged_patients <- read.csv("../discharged_patients.csv", stringsAsFactors = FALSE)
+valid_patient_ids <- discharged_patients$id
+
+cat("Analyzing events for", length(valid_patient_ids), "discharged patients\n\n")
+
+# Function to extract patient IDs from different file formats
+extract_patient_ids <- function(lines, pattern) {
+  matches <- regmatches(lines, regexec(pattern, lines))
+  valid_matches <- matches[sapply(matches, length) > 0]
+  if (length(valid_matches) > 0) {
+    return(as.numeric(sapply(valid_matches, function(x) x[2])))
+  }
+  return(numeric(0))
+}
+
+# Extract patient IDs from each data source
+admission_ids <- extract_patient_ids(admissions_data, "Patient ID: (\\d+)")
+clinical_ids <- extract_patient_ids(clinical_detection_data, "Detected Patient: (\\d+)")
+transmission_patient1_ids <- extract_patient_ids(transmissions_data, "Patient1: (\\d+)")
+transmission_patient2_ids <- extract_patient_ids(transmissions_data, "Patient2: (\\d+)")
+decolonization_ids <- extract_patient_ids(decolonization_data, "Decolonized Patient: (\\d+)")
+surveillance_ids <- extract_patient_ids(surveillance_data, "Patient: (\\d+)")
+
+# Combine all patient IDs and count events per patient
+all_patient_events <- c(
+  admission_ids,
+  clinical_ids,
+  transmission_patient1_ids,
+  transmission_patient2_ids,
+  decolonization_ids,
+  surveillance_ids
+)
+
+# Filter to only include discharged patients
+all_patient_events <- all_patient_events[all_patient_events %in% valid_patient_ids]
+
+# Count events per patient
+event_counts <- table(all_patient_events)
+event_summary <- data.frame(
+  patient_id = as.numeric(names(event_counts)),
+  total_events = as.numeric(event_counts)
+) %>%
+  arrange(desc(total_events))
+
+# Add patients with zero events (discharged but no events in other files)
+zero_event_patients <- valid_patient_ids[!valid_patient_ids %in% event_summary$patient_id]
+if (length(zero_event_patients) > 0) {
+  zero_events_df <- data.frame(
+    patient_id = zero_event_patients,
+    total_events = 0
+  )
+  event_summary <- rbind(event_summary, zero_events_df) %>%
+    arrange(desc(total_events), patient_id)
+}
+
+# Create top 20 and bottom 20 tables
+top_20 <- event_summary %>%
+  slice_head(n = 20) %>%
+  mutate(rank = row_number())
+
+bottom_20 <- event_summary %>%
+  slice_tail(n = 20) %>%
+  mutate(rank = (nrow(event_summary) - 19):nrow(event_summary)) %>%
+  arrange(rank)
+
+cat("Total discharged patients analyzed:", nrow(event_summary), "\n")
+cat("Patients with events:", sum(event_summary$total_events > 0), "\n")
+cat("Patients with no events:", sum(event_summary$total_events == 0), "\n")
+cat("Range of events per patient:", min(event_summary$total_events), "to", max(event_summary$total_events), "\n\n")
+
+# Display tables
+kable(top_20, 
+      caption = "Top 20 Discharged Patients by Number of Events",
+      col.names = c("Patient ID", "Total Events", "Rank"))
+```
+
+```{r bottom-patients}
+kable(bottom_20, 
+      caption = "Bottom 20 Patients by Number of Events", 
+      col.names = c("Patient ID", "Total Events", "Rank"))
+```
+
+------------------------------------------------------------------------
+
 **Target Patient ID:** `r params$patient_id`
+
+```{r patient-context}
+# Show where the target patient ranks
+target_rank <- which(event_summary$patient_id == params$patient_id)
+target_events <- event_summary$total_events[target_rank]
+
+if (length(target_rank) > 0) {
+  cat("Target Patient", params$patient_id, "ranks #", target_rank, "out of", nrow(event_summary), "patients\n")
+  cat("Target Patient has", target_events, "total events\n")
+} else {
+  cat("Target Patient", params$patient_id, "not found in event data\n")
+}
+```
 
 ```{r load-data, echo=TRUE}
 # Function to safely read files
@@ -39,11 +167,11 @@ safe_read_lines <- function(file_path) {
 }
 
 # Read all data files
-admissions_data <- safe_read_lines("admissions.txt")
-clinical_detection_data <- safe_read_lines("clinicalDetection.txt")
-transmissions_data <- safe_read_lines("transmissions.txt")
-decolonization_data <- safe_read_lines("decolonization.txt")
-surveillance_data <- safe_read_lines("surveillance.txt")
+admissions_data <- safe_read_lines("../admissions.txt")
+clinical_detection_data <- safe_read_lines("../clinicalDetection.txt")
+transmissions_data <- safe_read_lines("../transmissions.txt")
+decolonization_data <- safe_read_lines("../decolonization.txt")
+surveillance_data <- safe_read_lines("../surveillance.txt")
 
 cat("Data files loaded:\n")
 cat("- Admissions:", length(admissions_data), "records\n")
@@ -82,21 +210,22 @@ parse_admissions <- function(lines, target_id) {
 
 # Function to parse clinical detection data
 parse_clinical_detection <- function(lines, target_id) {
-  pattern <- "Time: ([^,]+), Detected Patient: (\\d+)"
+  pattern <- "Time: ([^,]+), Detected Patient: (\\d+), DetectionCount: (\\d+)"
   matches <- regmatches(lines, regexec(pattern, lines))
   
   events <- data.frame()
   for (match in matches) {
-    if (length(match) == 3 && match[1] != "") {
+    if (length(match) == 4 && match[1] != "") {
       time <- as.numeric(match[2])
       patient_id <- as.numeric(match[3])
+      detection_count <- as.numeric(match[4])
       
       if (patient_id == target_id) {
         events <- rbind(events, data.frame(
           time = time,
           event_type = "Clinical Detection",
           patient_id = patient_id,
-          details = "Patient clinically detected",
+          details = paste("Detection Count:", detection_count),
           stringsAsFactors = FALSE
         ))
       }
@@ -192,7 +321,34 @@ parse_surveillance <- function(lines, target_id) {
   }
   return(events)
 }
+
+# Function to get discharge information
+get_discharge_info <- function(target_id) {
+  discharged_patients <- read.csv("../discharged_patients.csv", stringsAsFactors = FALSE)
+  patient_row <- discharged_patients[discharged_patients$id == target_id, ]
+  
+  if (nrow(patient_row) > 0) {
+    discharge_event <- data.frame(
+      time = patient_row$dischargeTime,
+      event_type = "Discharge",
+      patient_id = target_id,
+      details = paste("LOS:", round(patient_row$los, 2), "days | Colonized:", patient_row$isColonized, 
+                     "| Detected:", patient_row$isDetected, "| Isolated:", patient_row$isIsolated),
+      stringsAsFactors = FALSE
+    )
+    return(discharge_event)
+  } else {
+    return(data.frame())
+  }
+}
 ```
+
+```         
+)
+return(discharge_event)
+```
+
+} else { return(data.frame()) } }
 
 ```{r extract-events, echo=TRUE}
 # Extract events for the target patient
@@ -206,6 +362,7 @@ clinical_events <- parse_clinical_detection(clinical_detection_data, target_pati
 transmission_events <- parse_transmissions(transmissions_data, target_patient)
 decolonization_events <- parse_decolonization(decolonization_data, target_patient)
 surveillance_events <- parse_surveillance(surveillance_data, target_patient)
+discharge_event <- get_discharge_info(target_patient)
 
 # Combine all events
 all_events <- rbind(
@@ -213,13 +370,23 @@ all_events <- rbind(
   clinical_events,
   transmission_events,
   decolonization_events,
-  surveillance_events
+  surveillance_events,
+  discharge_event
 )
 
-# Sort by time
+# Sort by time and add event numbering
 if (nrow(all_events) > 0) {
+  # Ensure time column is numeric and handle any missing values
+  all_events$time <- as.numeric(all_events$time)
+  
+  # Sort by time (chronological order)
   all_events <- all_events[order(all_events$time), ]
+  
+  # Add sequential event numbers
   all_events$event_number <- 1:nrow(all_events)
+  
+  cat("Events sorted chronologically from", round(min(all_events$time), 2), 
+      "to", round(max(all_events$time), 2), "time units\n")
 } else {
   cat("No events found for Patient ID:", target_patient, "\n")
 }
@@ -319,21 +486,22 @@ if (nrow(all_events) > 0 && length(unique(all_events$event_type)) > 1) {
 
 To generate a report for a different patient, you can render this document with different parameters:
 
-```r
+``` r
 # Example: Generate report for Patient ID 123
 quarto::quarto_render("patient_timeline_analysis.qmd", 
                       execute_params = list(patient_id = 123))
 ```
 
 Or from the command line:
-```bash
+
+``` bash
 quarto render patient_timeline_analysis.qmd -P patient_id:123
 ```
 
 ## Data File Descriptions
 
-- **Admissions**: Records when patients are admitted to the facility
-- **Clinical Detection**: Records when patients are clinically detected as positive
-- **Transmissions**: Records transmission events between patients
-- **Decolonization**: Records when patients are decolonized
-- **Surveillance**: Records surveillance testing results over time
+-   **Admissions**: Records when patients are admitted to the facility
+-   **Clinical Detection**: Records when patients are clinically detected as positive
+-   **Transmissions**: Records transmission events between patients
+-   **Decolonization**: Records when patients are decolonized
+-   **Surveillance**: Records surveillance testing results over time
