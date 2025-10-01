@@ -41,31 +41,36 @@ jobs:
           mkdir -p ~/repast-simphony
           cd ~/repast-simphony
 
-          # NOTE: SourceForge downloads are currently blocked by firewall
-          # This step requires repository admin to either:
-          # 1. Add sourceforge.net to the allowed domains in Copilot settings
-          # 2. Store Repast Simphony JARs in GitHub Releases
-          # 3. Use a mirror or alternative download location
+          # Try downloading from Repast GitHub pages
+          # Based on suggestion: https://repast.github.io/download.html
+          echo "Attempting download from Repast GitHub pages..."
 
-          echo "ERROR: Cannot download Repast Simphony"
-          echo ""
-          echo "SourceForge is blocked by the firewall."
-          echo "To fix this, a repository admin needs to:"
-          echo ""
-          echo "Option 1: Add sourceforge.net to allowed domains"
-          echo "  Go to: Settings > Copilot > Coding Agent"
-          echo "  Add: sourceforge.net, downloads.sourceforge.net"
-          echo ""
-          echo "Option 2: Store Repast JARs in GitHub"
-          echo "  - Download Repast Simphony 2.11.0 locally"
-          echo "  - Upload as a GitHub Release asset"
-          echo "  - Update workflow to download from GitHub"
-          echo ""
-          echo "Option 3: Commit essential JARs to repository"
-          echo "  - Extract needed JARs from Repast installation"
-          echo "  - Commit to lib/ directory (if size permits)"
-          echo ""
-          exit 1
+          # Try direct link to the Linux version
+          REPAST_URL="https://github.com/Repast/repast.simphony/releases/download/v.2.11.0/Repast-Simphony-2.11-linux.tgz"
+
+          if wget -O repast-simphony-2.11.tgz "$REPAST_URL" 2>&1; then
+            echo "Download successful from GitHub releases"
+            # Verify the file is actually a valid tar.gz
+            if file repast-simphony-2.11.tgz | grep -q "gzip compressed"; then
+              tar -xzf repast-simphony-2.11.tgz
+              echo "Extraction successful"
+              ls -la
+            else
+              echo "ERROR: Downloaded file is not a valid gzip archive"
+              file repast-simphony-2.11.tgz
+              exit 1
+            fi
+          else
+            echo "ERROR: Could not download Repast Simphony from GitHub releases"
+            echo ""
+            echo "Tried URL: $REPAST_URL"
+            echo ""
+            echo "Please check:"
+            echo "1. The release exists at the Repast GitHub repository"
+            echo "2. The file name matches the version (2.11.0)"
+            echo "3. Alternative: Store Repast in a GitHub Release for this repo"
+            exit 1
+          fi
 
       - name: Verify Repast installation
         run: |
