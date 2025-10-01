@@ -41,36 +41,58 @@ jobs:
           mkdir -p ~/repast-simphony
           cd ~/repast-simphony
 
-          # Try downloading from Repast GitHub pages
+          # Try multiple download locations
           # Based on suggestion: https://repast.github.io/download.html
-          echo "Attempting download from Repast GitHub pages..."
+          echo "Attempting download from multiple sources..."
 
-          # Try direct link to the Linux version
-          REPAST_URL="https://github.com/Repast/repast.simphony/releases/download/v.2.11.0/Repast-Simphony-2.11-linux.tgz"
+          # Array of URLs to try
+          URLS=(
+            "https://github.com/Repast/repast.simphony/releases/download/v2.11.0/Repast-Simphony-2.11-linux.tgz"
+            "https://github.com/Repast/repast.simphony/releases/download/v.2.11.0/Repast-Simphony-2.11-linux.tgz"
+            "https://repast.github.io/download/Repast-Simphony-2.11-linux.tgz"
+            "https://raw.githubusercontent.com/Repast/repast.simphony/gh-pages/download/Repast-Simphony-2.11-linux.tgz"
+          )
 
-          if wget -O repast-simphony-2.11.tgz "$REPAST_URL" 2>&1; then
-            echo "Download successful from GitHub releases"
-            # Verify the file is actually a valid tar.gz
-            if file repast-simphony-2.11.tgz | grep -q "gzip compressed"; then
-              tar -xzf repast-simphony-2.11.tgz
-              echo "Extraction successful"
-              ls -la
+          SUCCESS=false
+          for URL in "${URLS[@]}"; do
+            echo "Trying: $URL"
+            if wget -O repast-simphony-2.11.tgz "$URL" 2>&1 | tee download.log; then
+              # Check if file is valid
+              if file repast-simphony-2.11.tgz | grep -q "gzip compressed"; then
+                echo "✓ Download successful from: $URL"
+                SUCCESS=true
+                break
+              else
+                echo "✗ File not valid gzip, trying next URL..."
+                rm -f repast-simphony-2.11.tgz
+              fi
             else
-              echo "ERROR: Downloaded file is not a valid gzip archive"
-              file repast-simphony-2.11.tgz
-              exit 1
+              echo "✗ Download failed, trying next URL..."
+              rm -f repast-simphony-2.11.tgz
             fi
-          else
-            echo "ERROR: Could not download Repast Simphony from GitHub releases"
+          done
+
+          if [ "$SUCCESS" = false ]; then
             echo ""
-            echo "Tried URL: $REPAST_URL"
+            echo "ERROR: Could not download Repast Simphony from any source"
             echo ""
-            echo "Please check:"
-            echo "1. The release exists at the Repast GitHub repository"
-            echo "2. The file name matches the version (2.11.0)"
-            echo "3. Alternative: Store Repast in a GitHub Release for this repo"
+            echo "Tried URLs:"
+            for URL in "${URLS[@]}"; do
+              echo "  - $URL"
+            done
+            echo ""
+            echo "Alternative solutions:"
+            echo "1. Upload Repast-Simphony-2.11-linux.tgz as a GitHub Release asset in this repository"
+            echo "2. Check https://repast.github.io/download.html for the correct download URL"
+            echo "3. Add required domains to firewall allowlist"
             exit 1
           fi
+
+          # Extract the downloaded file
+          echo "Extracting Repast Simphony..."
+          tar -xzf repast-simphony-2.11.tgz
+          echo "Extraction successful"
+          ls -la
 
       - name: Verify Repast installation
         run: |
