@@ -47,8 +47,10 @@ jobs:
 
           # Array of URLs to try
           URLS=(
+            "https://github.com/Repast/repast.simphony/releases/download/v.2.11.0/Repast-Simphony-2.11.0-linux.tgz"
             "https://github.com/Repast/repast.simphony/releases/download/v2.11.0/Repast-Simphony-2.11-linux.tgz"
-            "https://github.com/Repast/repast.simphony/releases/download/v.2.11.0/Repast-Simphony-2.11-linux.tgz"
+            "https://github.com/Repast/repast.simphony/releases/download/v.2.11.0/Repast-Simphony-2.11.0-linux.tgz"
+            "https://github.com/Repast/repast.simphony/releases/download/v2.11.0/Repast-Simphony-2.11.0-linux.tgz"
             "https://repast.github.io/download/Repast-Simphony-2.11-linux.tgz"
             "https://raw.githubusercontent.com/Repast/repast.simphony/gh-pages/download/Repast-Simphony-2.11-linux.tgz"
           )
