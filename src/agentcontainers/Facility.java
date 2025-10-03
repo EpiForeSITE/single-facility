@@ -120,11 +120,12 @@ public class Facility extends AgentContainer{
 		if (!region.isInBurnInPeriod()) {
 			builder.dischargedPatients.add(new agents.DischargedPatient(p));
 		}
-	
-		
-		// Oct 4, 2024 WRR: This isn't deleting the patient from anywhere but this currentPatients collection.
 		if(!getRegion().isInBurnInPeriod()) updateStayTally(p);
-			p.destroyMyself(getRegion());
+		p.destroyMyself(getRegion());
+		// Remove from Repast context to allow dereferencing and garbage collection
+		if (builder.getContext() != null) {
+			builder.getContext().remove(p);
+		}
 	}
 
 	public void updateTransmissionRate(){

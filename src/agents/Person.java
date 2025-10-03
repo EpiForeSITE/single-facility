@@ -67,6 +67,7 @@ public class Person extends Agent {
 	public void destroyMyself(Region r) {
 
 		r.remove_people(this);
+		// Context removal is now handled in Facility.dischargePatient
 	}
 
 	public void startNextPeriodicSurveillanceTimer() {

@@ -56,8 +56,10 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 	private int sumDailyInfected = 0;
 	private int sumDailyClinicalDetections = 0;
 	public ArrayList<DischargedPatient> dischargedPatients = new ArrayList<DischargedPatient>();
+	private Context<Object> context;
 	@Override
 	public Context<Object> build(Context<Object> context) {
+		this.context = context;
 		// System.out.println("Starting simulation build.");
 		schedule = repast.simphony.engine.environment.RunEnvironment.getInstance().getCurrentSchedule();
 
@@ -433,6 +435,10 @@ public class SingleFacilityBuilder implements ContextBuilder<Object> {
 
 	public void setStop(boolean stop) {
 		this.stop = stop;
+	}
+
+	public Context<Object> getContext() {
+		return context;
 	}
 
 }
