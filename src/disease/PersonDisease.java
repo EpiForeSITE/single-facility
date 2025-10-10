@@ -62,6 +62,9 @@ public class PersonDisease {
 
 	public void doDecolonization() {
 		double currentTime = schedule.getTickCount();
+		if (this.person.isNoMoreEvents()) {
+			return;
+		}
 
 		if (colonized) {
 			colonized = false;
@@ -89,7 +92,7 @@ public class PersonDisease {
 
 	public void doClinicalDetection() {
 	    		// If already detected or clinically detected during current stay, do nothing
-		if (detected || clinicallyDetectedDuringCurrentStay) {
+		if (detected || clinicallyDetectedDuringCurrentStay || this.person.isNoMoreEvents()) {
 			return;
 		}
 

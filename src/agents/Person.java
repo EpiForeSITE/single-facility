@@ -31,6 +31,7 @@ public class Person extends Agent {
 	private ExponentialDistribution distro;
 	private HashMap<String, Object> properties;
 	private static PrintWriter surveillanceWriter;
+	private boolean noMoreEvents = false;
 
 	static {
 		try {
@@ -67,6 +68,7 @@ public class Person extends Agent {
 	public void destroyMyself(Region r) {
 
 		r.remove_people(this);
+		this.setNoMoreEvents(true);
 		// Context removal is now handled in Facility.dischargePatient
 	}
 
@@ -111,6 +113,10 @@ public class Person extends Agent {
 	}
 
 	public void doSurveillanceTest() {
+	    if (this.isNoMoreEvents()) {
+	        return; // Skip if the person is marked to have no more events
+	    }
+	    
 		double currentTime = schedule.getTickCount();
 		for (PersonDisease pd : personDiseases) {
 			// Nov 1, 2024 WRR: Something wrong with this conditional.
@@ -257,5 +263,13 @@ public class Person extends Agent {
 
 	public Object getProperty(String s) {
 		return this.properties.get(s);
+	}
+
+	public boolean isNoMoreEvents() {
+	    return noMoreEvents;
+	}
+
+	public void setNoMoreEvents(boolean noMoreEvents) {
+	    this.noMoreEvents = noMoreEvents;
 	}
 }

@@ -69,7 +69,7 @@ public class Facility extends AgentContainer{
 	}
 
 	public void admitNewPatient(ISchedule sched) {
-		schedule = sched;
+		
 		Person newPatient = new Person(this);
 		admitPatient(newPatient);
 		totalAdmissions++;
@@ -113,6 +113,8 @@ public class Facility extends AgentContainer{
 	}
 	public void dischargePatient(Person p){
 		region.people.remove(p);
+		
+		
 		getCurrentPatients().remove(p);
 		updateTransmissionRate();
 		SingleFacilityBuilder builder = getSimulationBuilder();
@@ -126,6 +128,7 @@ public class Facility extends AgentContainer{
 		if (builder.getContext() != null) {
 			builder.getContext().remove(p);
 		}
+		p.setNoMoreEvents(true);
 	}
 
 	public void updateTransmissionRate(){
