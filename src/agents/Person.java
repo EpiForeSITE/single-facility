@@ -42,6 +42,13 @@ public class Person extends Agent {
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public int hashCode() {
+	    // TODO Auto-generated method stub
+	    return super.id;
+		    }
+
 
 	public Person(Facility f) {
 		super();

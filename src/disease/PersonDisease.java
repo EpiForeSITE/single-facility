@@ -271,4 +271,11 @@ public class PersonDisease {
 	public boolean isInitialInfection() {
 		return initialInfection;
 	}
+	
+	@Override
+	public int hashCode() {
+	    // TODO Auto-generated method stub
+	    return this.person.hashCode();
+		    }
+
 }

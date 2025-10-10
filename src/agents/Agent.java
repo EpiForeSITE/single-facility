@@ -7,7 +7,7 @@ import repast.simphony.engine.schedule.ISchedule;
 
 abstract class Agent {
     private static int idCounter = 0;
-    private int id;
+    protected int id;
 	
 
 	Agent() {
