@@ -43,4 +43,4 @@ output/
 
 # Ignore Quarto and freeze directories
 new_analysis/.quarto/
-new_analysis/_freeze/
+new_analysis/_freeze/RHome/*

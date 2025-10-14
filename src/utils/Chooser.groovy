@@ -5,7 +5,7 @@ import repast.simphony.random.RandomHelper
 class Chooser {
 	
 	
-	
+   
 	public static choose(List options, List density) {
 		def testValue = RandomHelper.getUniform().nextDoubleFromTo(0.0, 1.0)
 		
